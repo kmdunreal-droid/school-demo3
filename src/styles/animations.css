@@ -1,0 +1,190 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ANIMATIONS — motion system
+   ═══════════════════════════════════════════════════════════════════════════
+   Purane keyframes (fadeIn / slideUp / popIn / floatY / gradientShift /
+   themeAurora / themePop) index.css mein waise hi rehte hain. Yahan sirf
+   NAYE motion utilities add ho rahe hain.
+
+   Sab animations `html.reduce-motion` aur OS-level `prefers-reduced-motion`
+   ko respect karti hain (woh rules base.css mein hain).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulseRing {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-brand-500) 45%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 12px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@keyframes sheen {
+  0% {
+    transform: translateX(-120%) skewX(-18deg);
+  }
+  100% {
+    transform: translateX(220%) skewX(-18deg);
+  }
+}
+
+@keyframes bumpIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  70% {
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@layer utilities {
+  .animate-scale-in {
+    animation: scaleIn 0.3s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  }
+
+  /* Page / panel entrance — dashboards ke tab panels ke liye */
+  .animate-rise {
+    animation: riseIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .animate-fade-up {
+    animation: fadeUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .animate-slide-right {
+    animation: slideInRight 0.34s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .animate-bump {
+    animation: bumpIn 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  .animate-pulse-ring {
+    animation: pulseRing 2.2s ease-out infinite;
+  }
+
+  /* Shine sweep — "premium" button/card par hover par */
+  .sheen-host {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .sheen-host::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    bottom: -50%;
+    width: 40%;
+    left: 0;
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      rgb(255 255 255 / 0.35),
+      transparent
+    );
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .sheen-host:hover::after {
+    opacity: 1;
+    animation: sheen 0.9s ease-out;
+  }
+
+  /* Stagger — list/grid items ek ke baad ek ubharte hain.
+     `.stagger` parent par lagao aur bachon ko `.d-1 ... .d-12` do. */
+  .stagger > * {
+    animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .d-1 { animation-delay: 0.03s; }
+  .d-2 { animation-delay: 0.06s; }
+  .d-3 { animation-delay: 0.09s; }
+  .d-4 { animation-delay: 0.12s; }
+  .d-5 { animation-delay: 0.15s; }
+  .d-6 { animation-delay: 0.18s; }
+  .d-7 { animation-delay: 0.21s; }
+  .d-8 { animation-delay: 0.24s; }
+  .d-9 { animation-delay: 0.27s; }
+  .d-10 { animation-delay: 0.3s; }
+  .d-11 { animation-delay: 0.33s; }
+  .d-12 { animation-delay: 0.36s; }
+
+  /* Hover lift — interactive cards */
+  .lift {
+    transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .lift:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-elev-3);
+  }
+
+  .lift-sm:hover {
+    transform: translateY(-1.5px);
+  }
+
+  /* Numeric count-up jab value badalti hai */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+  }
+}

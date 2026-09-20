@@ -1,0 +1,212 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   TOKENS — rang, radius, elevation, typography
+   ═══════════════════════════════════════════════════════════════════════════
+   Sab kuch Tailwind v4 `@theme` blocks mein hai, is liye Tailwind in se
+   utilities banata hai (--color-brand-600 → bg-brand-600 / text-brand-600).
+
+   LEGACY REMAP ka sab se ahem hissa:
+     Purani files `teal-*` aur `amber-*` classes use karti hain (600 + 590
+     usages). Hum in dono ramps ko naye brand/accent values par point kar dete
+     hain — is liye poori app ka rang badal jata hai bina kisi .tsx edit ke.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+/* ───────────────────────── BRAND · Midnight Indigo ───────────────────────── */
+@theme {
+  --color-brand-50: #eef1ff;
+  --color-brand-100: #e0e6ff;
+  --color-brand-200: #c6d0ff;
+  --color-brand-300: #a3b0fc;
+  --color-brand-400: #7f8bf8;
+  --color-brand-500: #6366f1;
+  --color-brand-600: #4f46e5;
+  --color-brand-700: #4238cf;
+  --color-brand-800: #342ea8;
+  --color-brand-900: #282480;
+  --color-brand-950: #17144d;
+}
+
+/* Purani `teal-*` classes → brand indigo (600+ usages remap) */
+@theme {
+  --color-teal-50: #eef1ff;
+  --color-teal-100: #e0e6ff;
+  --color-teal-200: #c6d0ff;
+  --color-teal-300: #a3b0fc;
+  --color-teal-400: #7f8bf8;
+  --color-teal-500: #6366f1;
+  --color-teal-600: #4f46e5;
+  --color-teal-700: #4238cf;
+  --color-teal-800: #342ea8;
+  --color-teal-900: #282480;
+  --color-teal-950: #17144d;
+}
+
+/* ───────────────────────── ACCENT · Amber Gold ───────────────────────── */
+@theme {
+  --color-accent-50: #fffbeb;
+  --color-accent-100: #fef3c7;
+  --color-accent-200: #fde68a;
+  --color-accent-300: #fcd34d;
+  --color-accent-400: #fbbf24;
+  --color-accent-500: #f59e0b;
+  --color-accent-600: #d97706;
+  --color-accent-700: #b45309;
+  --color-accent-800: #92400e;
+  --color-accent-900: #78350f;
+  --color-accent-950: #451a03;
+}
+
+/* Purani `amber-*` classes → gold accent (590+ usages remap)
+   NOTE: amber app mein "attention/pending" ka matlab bhi rakhta hai —
+   gold naturally woh matlab deta hai, is liye semantic meaning safe hai. */
+@theme {
+  --color-amber-50: #fffbeb;
+  --color-amber-100: #fef3c7;
+  --color-amber-150: #fdeab0;
+  --color-amber-200: #fde68a;
+  --color-amber-300: #fcd34d;
+  --color-amber-400: #fbbf24;
+  --color-amber-500: #f59e0b;
+  --color-amber-600: #d97706;
+  --color-amber-700: #b45309;
+  --color-amber-800: #92400e;
+  --color-amber-900: #78350f;
+  --color-amber-950: #451a03;
+}
+
+/* ───────────────── NEUTRAL · unified graphite scale ─────────────────
+   `slate` aur `gray` dono ko bilkul barabar kiya gaya hai. Pehle app mein
+   dono milay-julay use ho rahe the (200+ `gray-*` classes) jo design ko
+   ghair-muttasir (inconsistent) banata tha.
+   Intermediate stops (150/250/450/650/750/850) bhi add kiye — pehle ye
+   classes render hi nahi hoti thein (~40 jagah). */
+@theme {
+  --color-slate-50: #f7f8fc;
+  --color-slate-100: #eef1f7;
+  --color-slate-150: #e7ebf3;
+  --color-slate-200: #e1e6ef;
+  --color-slate-250: #d5dce8;
+  --color-slate-300: #c9d1de;
+  --color-slate-400: #94a0b5;
+  --color-slate-450: #7c8899;
+  --color-slate-500: #64748b;
+  --color-slate-600: #4a5568;
+  --color-slate-650: #3f4a5c;
+  --color-slate-700: #334155;
+  --color-slate-705: #2e3949;
+  --color-slate-750: #28313f;
+  --color-slate-800: #1c2434;
+  --color-slate-850: #161d2a;
+  --color-slate-900: #0f1523;
+  --color-slate-950: #070b14;
+}
+
+@theme {
+  --color-gray-50: #f7f8fc;
+  --color-gray-100: #eef1f7;
+  --color-gray-150: #e7ebf3;
+  --color-gray-200: #e1e6ef;
+  --color-gray-250: #d5dce8;
+  --color-gray-300: #c9d1de;
+  --color-gray-400: #94a0b5;
+  --color-gray-500: #64748b;
+  --color-gray-600: #4a5568;
+  --color-gray-700: #334155;
+  --color-gray-800: #1c2434;
+  --color-gray-900: #0f1523;
+  --color-gray-950: #070b14;
+}
+
+/* ───────────────── SEMANTIC STATUS ─────────────────
+   Sirf matlab batane ke liye — naye components in ko use karenge taake
+   "success / warning / info / danger" ka rang kabhi brand ke sath clash na kare. */
+@theme {
+  --color-success-50: #ecfdf5;
+  --color-success-100: #d1fae5;
+  --color-success-200: #a7f3d0;
+  --color-success-300: #6ee7b7;
+  --color-success-400: #34d399;
+  --color-success-500: #10b981;
+  --color-success-600: #059669;
+  --color-success-700: #047857;
+  --color-success-800: #065f46;
+  --color-success-900: #064e3b;
+
+  --color-warn-50: #fffbeb;
+  --color-warn-100: #fef3c7;
+  --color-warn-200: #fde68a;
+  --color-warn-300: #fcd34d;
+  --color-warn-400: #fbbf24;
+  --color-warn-500: #f59e0b;
+  --color-warn-600: #d97706;
+  --color-warn-700: #b45309;
+  --color-warn-800: #92400e;
+  --color-warn-900: #78350f;
+
+  --color-info-50: #f0f9ff;
+  --color-info-100: #e0f2fe;
+  --color-info-200: #bae6fd;
+  --color-info-300: #7dd3fc;
+  --color-info-400: #38bdf8;
+  --color-info-500: #0ea5e9;
+  --color-info-600: #0284c7;
+  --color-info-700: #0369a1;
+  --color-info-800: #075985;
+  --color-info-900: #0c4a6e;
+
+  --color-danger-50: #fff1f2;
+  --color-danger-100: #ffe4e6;
+  --color-danger-200: #fecdd3;
+  --color-danger-300: #fda4af;
+  --color-danger-400: #fb7185;
+  --color-danger-500: #f43f5e;
+  --color-danger-600: #e11d48;
+  --color-danger-700: #be123c;
+  --color-danger-800: #9f1239;
+  --color-danger-900: #881337;
+
+  /* Purane `red-*` intermediate shades — pehle ye kuch render nahi karte the */
+  --color-red-250: #f8b4b4;
+  --color-red-550: #d92d20;
+  --color-red-650: #b42318;
+}
+
+/* ───────────────── SURFACE / INK (semantic) ─────────────────
+   In tokens ko `src/styles/dark-mode.css` override karta hai, is liye naye
+   components dark mode mein khud-ba-khud sahi dikhte hain. */
+@theme {
+  --color-surface: #ffffff;
+  --color-surface-2: #f7f8fc;
+  --color-surface-3: #eef1f7;
+  --color-line: #e1e6ef;
+  --color-line-strong: #c9d1de;
+  --color-ink: #0f1523;
+  --color-ink-2: #334155;
+  --color-ink-muted: #64748b;
+  --color-ink-faint: #94a0b5;
+}
+
+/* ───────────────── RADIUS · ek consistent scale ─────────────────
+   Pehle app mein rounded-none / rounded-xl / rounded-2xl / rounded-3xl
+   beraabtar mile-julay the. Ab sirf 4 maqsad-based radius hain. */
+@theme {
+  --radius-control: 0.75rem;
+  --radius-card: 1rem;
+  --radius-panel: 1.25rem;
+  --radius-hero: 1.75rem;
+}
+
+/* ───────────────── ELEVATION · layered premium shadows ───────────────── */
+@theme {
+  --shadow-elev-1: 0 1px 2px 0 rgb(15 21 35 / 0.04), 0 1px 3px 0 rgb(15 21 35 / 0.07);
+  --shadow-elev-2: 0 2px 4px -1px rgb(15 21 35 / 0.05), 0 6px 16px -4px rgb(15 21 35 / 0.1);
+  --shadow-elev-3: 0 4px 8px -2px rgb(15 21 35 / 0.06), 0 12px 28px -6px rgb(15 21 35 / 0.14);
+  --shadow-elev-4: 0 8px 16px -4px rgb(15 21 35 / 0.08), 0 24px 48px -12px rgb(15 21 35 / 0.2);
+  --shadow-brand: 0 8px 24px -6px rgb(79 70 229 / 0.38);
+  --shadow-accent: 0 8px 24px -6px rgb(217 119 6 / 0.38);
+}

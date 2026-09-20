@@ -1,0 +1,142 @@
+{
+  "collections": {
+    "app_settings": {
+      "description": "Global application configuration and templates",
+      "fields": {
+        "absentTemplate": "string",
+        "autoWhatsAppRedirect": "boolean",
+        "deletedPeriods": "map",
+        "extraPeriods": "map",
+        "feeTemplate": "string",
+        "periodColors": "map",
+        "whatsAppAutoAbsence": "boolean",
+        "whatsAppAutoFee": "boolean",
+        "whatsAppAutoResult": "boolean"
+      }
+    },
+    "attendance": {
+      "description": "Daily attendance logs for students",
+      "fields": {
+        "date": "string",
+        "id": "string",
+        "status": "string",
+        "studentId": "string"
+      }
+    },
+    "classes": {
+      "description": "Class definitions and teacher mapping",
+      "fields": {
+        "className": "string",
+        "classTeacherId": "string",
+        "feeConfigs": "array",
+        "id": "string",
+        "section": "string",
+        "subjects": "array"
+      }
+    },
+    "coordinators": {
+      "description": "Academic coordinator profiles",
+      "fields": {
+        "email": "string",
+        "id": "string",
+        "name": "string",
+        "password": "string",
+        "phone": "string",
+        "username": "string"
+      }
+    },
+    "fee_data": {
+      "description": "Complex student fee history and ledger data",
+      "fields": {
+        "class": "string",
+        "enrollmentMonth": "string",
+        "id": "string",
+        "monthlyFee": "number",
+        "name": "string",
+        "otherFunds": "array",
+        "payments": "array"
+      }
+    },
+    "fees": {
+      "description": "Transaction records for fee payments",
+      "fields": {
+        "amount": "number",
+        "description": "string",
+        "dueDate": "string",
+        "feeType": "string",
+        "id": "string",
+        "month": "string",
+        "paidDate": "string",
+        "paymentMethod": "string",
+        "status": "string",
+        "studentId": "string"
+      }
+    },
+    "logs": {
+      "description": "System event and broadcast logs",
+      "fields": {
+        "id": "string",
+        "message": "string",
+        "timestamp": "timestamp",
+        "type": "string"
+      }
+    },
+    "marks": {
+      "description": "Student academic performance marks",
+      "fields": {
+        "examType": "string",
+        "id": "string",
+        "marksObtained": "number",
+        "maxMarks": "number",
+        "studentId": "string",
+        "subject": "string"
+      }
+    },
+    "students": {
+      "description": "Student academic and personal records",
+      "fields": {
+        "academySubjects": "array",
+        "baseFee": "number",
+        "category": "string",
+        "classId": "string",
+        "email": "string",
+        "enrollmentMonth": "string",
+        "guardianName": "string",
+        "id": "string",
+        "idCardColor": "string",
+        "idCardTheme": "string",
+        "name": "string",
+        "parentPhone": "string",
+        "password": "string",
+        "photo": "string",
+        "rollNumber": "string",
+        "studentPhone": "string",
+        "username": "string"
+      }
+    },
+    "teachers": {
+      "description": "Faculty profiles and contact details",
+      "fields": {
+        "email": "string",
+        "id": "string",
+        "name": "string",
+        "password": "string",
+        "phone": "string",
+        "subject": "string",
+        "username": "string"
+      }
+    },
+    "timetable": {
+      "description": "Academic period schedules",
+      "fields": {
+        "classId": "string",
+        "day": "string",
+        "id": "string",
+        "period": "string",
+        "subject": "string",
+        "teacherId": "string",
+        "time": "string"
+      }
+    }
+  }
+}

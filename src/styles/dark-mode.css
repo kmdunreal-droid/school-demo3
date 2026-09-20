@@ -1,0 +1,363 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   DARK MODE
+   ═══════════════════════════════════════════════════════════════════════════
+   Do kaam karta hai:
+
+   1) SEMANTIC TOKENS — `html.dark` mein --color-surface / ink / line override
+      hote hain. Kyunke har Tailwind utility `var(--color-*)` use karti hai,
+      is liye naye components (.card .nav-item .input .badge ...) khud-ba-khud
+      dark ho jate hain.
+
+   2) LEGACY SHIM — purani files ne hardcoded light classes likhi hain
+      (`bg-white` 393 baar, `border-slate-200` 444 baar, `text-slate-900` 240
+      baar, `bg-slate-50` 233 baar ...). Yeh shim un classes ko dark surface
+      par map karta hai, is liye POORA app bina kisi TSX change ke dark mode
+      mein sahi dikhta hai — pehle dark toggle karne par dashboards safed reh
+      jate the (asli bug tha).
+
+   ⚠️ Yeh rules jaan-boojh kar @layer ke BAHAR hain: CSS cascade mein unlayered
+      rules layered rules ko haraate hain, is liye yeh Tailwind utilities ko
+      theek se override kar lete hain.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+html.dark {
+  --color-surface: #121a2b;
+  --color-surface-2: #0b1120;
+  --color-surface-3: #1a2438;
+  --color-line: #26324a;
+  --color-line-strong: #35425e;
+  --color-ink: #eef2f9;
+  --color-ink-2: #c2ccdd;
+  --color-ink-muted: #93a0b8;
+  --color-ink-faint: #6b7a94;
+  color-scheme: dark;
+}
+
+/* Deep-graphite premium background — brand tint ke saath (purani teal aurora ki jagah) */
+html.dark,
+html.dark body {
+  background-color: #070b14;
+  background-image:
+    radial-gradient(1200px 600px at 12% -8%, rgb(79 70 229 / 0.22), transparent 60%),
+    radial-gradient(900px 520px at 92% 4%, rgb(124 58 237 / 0.16), transparent 62%),
+    radial-gradient(1000px 700px at 50% 110%, rgb(30 41 59 / 0.55), transparent 60%),
+    linear-gradient(180deg, #070b14 0%, #0a1020 45%, #070b14 100%);
+  background-attachment: fixed;
+  animation: none;
+}
+
+/* ───────────────── 1 · SURFACES ─────────────────
+   `bg-white` app ka main card/sidebar/TopBar surface hai (393 usages). */
+html.dark .bg-white {
+  background-color: var(--color-surface);
+}
+
+html.dark .bg-white\/95 {
+  background-color: color-mix(in srgb, var(--color-surface) 94%, transparent);
+}
+
+html.dark .bg-white\/90 {
+  background-color: color-mix(in srgb, var(--color-surface) 88%, transparent);
+}
+
+html.dark .bg-white\/80 {
+  background-color: color-mix(in srgb, var(--color-surface) 80%, transparent);
+}
+
+html.dark .bg-white\/70 {
+  background-color: color-mix(in srgb, var(--color-surface) 72%, transparent);
+}
+
+html.dark .bg-white\/60 {
+  background-color: color-mix(in srgb, var(--color-surface) 62%, transparent);
+}
+
+html.dark .bg-white\/40 {
+  background-color: color-mix(in srgb, var(--color-surface) 45%, transparent);
+}
+
+/* Neutral tile backgrounds → dark elevated surfaces.
+   NOTE: `bg-white/5..30` ko jaan-boojh kar chhoda gaya hai — woh gradient
+   headers ke andar decorative chips hain aur unhe light hi rehna chahiye. */
+html.dark .bg-slate-50,
+html.dark .bg-gray-50,
+html.dark .bg-slate-100,
+html.dark .bg-gray-100,
+html.dark .bg-slate-150,
+html.dark .bg-gray-150 {
+  background-color: var(--color-surface-3);
+}
+
+html.dark .bg-slate-200,
+html.dark .bg-gray-200 {
+  background-color: var(--color-line);
+}
+
+html.dark .bg-slate-50\/50,
+html.dark .bg-teal-50\/50,
+html.dark .bg-teal-50\/40,
+html.dark .bg-slate-100\/50 {
+  background-color: color-mix(in srgb, var(--color-surface-3) 55%, transparent);
+}
+
+/* Pehle se dark surfaces — aur gehra kar do (in par white text hai, safe) */
+html.dark .bg-slate-900 {
+  background-color: #060a12;
+}
+
+html.dark .bg-slate-950 {
+  background-color: #04070d;
+}
+
+/* ───────────────── 2 · BORDERS ───────────────── */
+html.dark .border-slate-50,
+html.dark .border-slate-100,
+html.dark .border-slate-150,
+html.dark .border-slate-200,
+html.dark .border-gray-50,
+html.dark .border-gray-100,
+html.dark .border-gray-150,
+html.dark .border-gray-200 {
+  border-color: var(--color-line);
+}
+
+html.dark .border-slate-250,
+html.dark .border-slate-300,
+html.dark .border-gray-300 {
+  border-color: var(--color-line-strong);
+}
+
+html.dark .divide-slate-100 > * + *,
+html.dark .divide-slate-200 > * + *,
+html.dark .divide-gray-100 > * + *,
+html.dark .divide-gray-200 > * + * {
+  border-color: var(--color-line);
+}
+
+/* ───────────────── 3 · TEXT ───────────────── */
+html.dark .text-slate-900,
+html.dark .text-gray-900,
+html.dark .text-slate-850,
+html.dark .text-slate-800,
+html.dark .text-gray-800 {
+  color: var(--color-ink);
+}
+
+html.dark .text-slate-750,
+html.dark .text-slate-700,
+html.dark .text-gray-700 {
+  color: var(--color-ink-2);
+}
+
+html.dark .text-slate-650,
+html.dark .text-slate-600,
+html.dark .text-gray-600 {
+  color: var(--color-ink-muted);
+}
+
+html.dark .text-slate-500,
+html.dark .text-gray-500 {
+  color: var(--color-ink-muted);
+}
+
+html.dark .text-slate-450,
+html.dark .text-slate-400,
+html.dark .text-gray-400 {
+  color: var(--color-ink-faint);
+}
+
+html.dark .text-slate-300,
+html.dark .text-gray-300 {
+  color: #5d6b85;
+}
+
+html.dark .placeholder\:text-slate-300::placeholder,
+html.dark .placeholder\:text-slate-400::placeholder {
+  color: var(--color-ink-faint);
+}
+
+/* ───────────────── 4 · BRAND TINTS ─────────────────
+   `bg-teal-50` type tints dark background par chamakdar (glaring) lagte hain,
+   is liye unhe translucent brand tint bana diya gaya hai. */
+html.dark .bg-teal-50,
+html.dark .bg-indigo-50 {
+  background-color: rgb(99 102 241 / 0.12);
+}
+
+html.dark .bg-teal-100,
+html.dark .bg-indigo-100 {
+  background-color: rgb(99 102 241 / 0.18);
+}
+
+html.dark .bg-teal-100\/50,
+html.dark .bg-teal-200 {
+  background-color: rgb(99 102 241 / 0.24);
+}
+
+html.dark .border-teal-50,
+html.dark .border-teal-100,
+html.dark .border-teal-200,
+html.dark .border-indigo-100 {
+  border-color: rgb(99 102 241 / 0.32);
+}
+
+html.dark .text-teal-500,
+html.dark .text-teal-600 {
+  color: #929dfb;
+}
+
+html.dark .text-teal-700,
+html.dark .text-teal-800,
+html.dark .text-teal-900 {
+  color: #b6bfff;
+}
+
+/* ───────────────── 5 · ACCENT (GOLD) TINTS ───────────────── */
+html.dark .bg-amber-50 {
+  background-color: rgb(245 158 11 / 0.13);
+}
+
+html.dark .bg-amber-100,
+html.dark .bg-amber-150 {
+  background-color: rgb(245 158 11 / 0.2);
+}
+
+html.dark .bg-amber-100\/50,
+html.dark .bg-amber-200 {
+  background-color: rgb(245 158 11 / 0.26);
+}
+
+html.dark .border-amber-100,
+html.dark .border-amber-150,
+html.dark .border-amber-200 {
+  border-color: rgb(245 158 11 / 0.34);
+}
+
+html.dark .text-amber-600 {
+  color: #fbbf24;
+}
+
+html.dark .text-amber-700,
+html.dark .text-amber-800,
+html.dark .text-amber-900 {
+  color: #fcd34d;
+}
+
+/* ───────────────── 6 · DANGER / SUCCESS / INFO TINTS ───────────────── */
+html.dark .bg-rose-50,
+html.dark .bg-red-50 {
+  background-color: rgb(244 63 94 / 0.13);
+}
+
+html.dark .bg-rose-100,
+html.dark .bg-red-100 {
+  background-color: rgb(244 63 94 / 0.2);
+}
+
+html.dark .border-rose-100,
+html.dark .border-rose-200,
+html.dark .border-red-100,
+html.dark .border-red-200 {
+  border-color: rgb(244 63 94 / 0.34);
+}
+
+html.dark .text-rose-600,
+html.dark .text-red-600 {
+  color: #fb7185;
+}
+
+html.dark .text-rose-700,
+html.dark .text-rose-800,
+html.dark .text-red-700,
+html.dark .text-red-800 {
+  color: #fda4af;
+}
+
+html.dark .bg-emerald-50,
+html.dark .bg-green-50 {
+  background-color: rgb(16 185 129 / 0.13);
+}
+
+html.dark .bg-emerald-100 {
+  background-color: rgb(16 185 129 / 0.2);
+}
+
+html.dark .border-emerald-100,
+html.dark .border-emerald-200 {
+  border-color: rgb(16 185 129 / 0.32);
+}
+
+html.dark .text-emerald-700,
+html.dark .text-emerald-800 {
+  color: #6ee7b7;
+}
+
+html.dark .bg-sky-50,
+html.dark .bg-blue-50 {
+  background-color: rgb(14 165 233 / 0.13);
+}
+
+html.dark .border-sky-100,
+html.dark .border-sky-200 {
+  border-color: rgb(14 165 233 / 0.32);
+}
+
+html.dark .text-sky-700,
+html.dark .text-sky-800 {
+  color: #7dd3fc;
+}
+
+/* ───────────────── 7 · HOVER STATES ───────────────── */
+html.dark .hover\:bg-slate-50:hover,
+html.dark .hover\:bg-slate-100:hover,
+html.dark .hover\:bg-slate-150:hover,
+html.dark .hover\:bg-gray-50:hover,
+html.dark .hover\:bg-gray-100:hover,
+html.dark .hover\:bg-white:hover {
+  background-color: var(--color-surface-3);
+}
+
+html.dark .hover\:bg-teal-50:hover {
+  background-color: rgb(99 102 241 / 0.14);
+}
+
+html.dark .hover\:bg-teal-100:hover {
+  background-color: rgb(99 102 241 / 0.2);
+}
+
+html.dark .hover\:bg-amber-50:hover {
+  background-color: rgb(245 158 11 / 0.16);
+}
+
+html.dark .hover\:bg-rose-50:hover {
+  background-color: rgb(244 63 94 / 0.16);
+}
+
+html.dark .hover\:border-slate-300:hover,
+html.dark .hover\:border-slate-400:hover {
+  border-color: var(--color-line-strong);
+}
+
+/* ───────────────── 8 · SHADOWS ─────────────────
+   Light mode ke soft colored glows dark mode mein ajeeb lagte hain — unhe
+   deep neutral shadow bana diya gaya hai. */
+html.dark .shadow-sm,
+html.dark .shadow,
+html.dark .shadow-md,
+html.dark .shadow-lg,
+html.dark .shadow-xl,
+html.dark .shadow-2xl,
+html.dark .shadow-inner {
+  --tw-shadow-color: rgb(0 0 0 / 0.55);
+}
+
+html.dark .shadow-teal-100,
+html.dark .shadow-teal-200,
+html.dark .shadow-amber-100,
+html.dark .shadow-amber-200,
+html.dark .shadow-rose-100,
+html.dark .shadow-rose-200,
+html.dark .shadow-slate-100,
+html.dark .shadow-slate-200 {
+  --tw-shadow-color: rgb(0 0 0 / 0.5);
+}
