@@ -2,6 +2,7 @@
  * GEO UTILITIES — teacher attendance ke GPS verification ke liye.
  * Haversine formula se school vs live-position distance calculate hota hai.
  */
+import { L } from './i18n';
 import type { SchoolLocation } from '../types';
 
 /** Default school location (Karachi — demo). Principal settings mein change ho sakta hai. */
@@ -24,7 +25,7 @@ export async function getCurrentPosition(): Promise<GeoPosition | null> {
     if (typeof navigator === 'undefined') return null;
     const geoApi = (navigator as any).geolocation;
     if (!geoApi || typeof geoApi.getCurrentPosition !== 'function') {
-      console.warn('[Geo] Browser geolocation available nahi (HTTPS/localhost wala experiment).');
+      console.warn('[Geo] Browser geolocation is not available (requires HTTPS/localhost).');
       return null;
     }
     const pos = await new Promise<any>((resolve, reject) => {

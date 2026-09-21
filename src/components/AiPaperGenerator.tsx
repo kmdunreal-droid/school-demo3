@@ -2,6 +2,7 @@
  * AI PAPER GENERATOR — book ke chapter (text/photos/PDF) se exam paper design.
  * Gemini free API se generate → editable → print (A4) → MCQs quiz mein push.
  */
+import { L } from '../lib/i18n';
 import { useState, useRef } from 'react';
 import { motion } from 'motion/react';
 import {
@@ -56,7 +57,7 @@ export default function AiPaperGenerator({ userSession, classes }: AiPaperGenera
 
   const openCamera = async () => {
     if (!hasCamera) {
-      toast.error('Camera nahi mili — is device/ browser mein camera support nahi hai');
+      toast.error(L('Camera not found — this device/browser does not support camera', 'کیمرہ نہیں ملا — اس ڈیوائس/براؤزر میں کیمرہ سپورٹ نہیں'));
       return;
     }
     try {
@@ -70,10 +71,10 @@ export default function AiPaperGenerator({ userSession, classes }: AiPaperGenera
         await videoRef.current.play();
       }
       setCameraOpen(true);
-      toast.success(`Camera khul gaya (${cameraType === 'front' ? 'front' : 'rear'} lens)`);
+      toast.success(L(`Camera opened (${cameraType === 'front' ? 'front' : 'rear'} lens)`, `کیمرہ کھل گیا (${cameraType === 'front' ? 'سامنے' : 'پچھلا'} لینس)`));
     } catch (err) {
       console.error('Camera access error:', err);
-      toast.error('Camera open nahi hui — permission check karein ya doosra device try karein');
+      toast.error(L('Camera did not open — allow permission or try another device', 'کیمرہ نہیں کھلا — اجازت دیں یا دوسرا ڈیوائس آزمائیں'));
     }
   };
 
@@ -88,14 +89,14 @@ export default function AiPaperGenerator({ userSession, classes }: AiPaperGenera
 
   const capturePhoto = () => {
     if (!videoRef.current || !videoRef.current.videoWidth) {
-      toast.error('Camera frame ready nahi hai — ek second ruko aur try karein');
+      toast.error(L('Camera frame is not ready — wait a second and try again', 'کیمرہ فریم تیار نہیں — ایک لمحہ رکیں اور دوبارہ کوشش کریں'));
       return;
     }
     const canvas = document.createElement('canvas');
     canvas.width = videoRef.current.videoWidth;
     canvas.height = videoRef.current.videoHeight;
     const ctx = canvas.getContext('2d');
-    if (!ctx) { toast.error('Canvas capture fail hua'); return; }
+    if (!ctx) { toast.error(L('Canvas capture failed', 'تصویر محفوظ نہیں ہو سکی')); return; }
     ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
     const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
     const base64 = dataUrl.split(',')[1] || '';
@@ -105,7 +106,7 @@ export default function AiPaperGenerator({ userSession, classes }: AiPaperGenera
       data: base64,
     };
     setFiles(prev => [...prev, fileObj].slice(0, 8));
-    toast.success('Book page ki photo capture ho gayi — file list mein dikhegi');
+    toast.success(L('Book page photo captured — it will appear in the file list', 'کتاب کے صفحے کی تصویر محفوظ ہو گئی — فائل فہرست میں دکھے گی'));
     // Ek chhota blink feedback ke liye stream ko turant restart nahi karte
   };
 
@@ -120,7 +121,7 @@ export default function AiPaperGenerator({ userSession, classes }: AiPaperGenera
         if (f.type === 'text/plain' || f.name.endsWith('.txt')) {
           const text = await f.text();
           setSourceText(prev => `${prev}\n\n${text}`.trim());
-          toast.success(`${f.name} ka text add ho gaya`);
+          toast.success(L(`Text from ${f.name} added`, `${f.name} کا متن شامل ہو گیا`));
           continue;
         }
         const dataUrl = await new Promise<string>((resolve, reject) => {
@@ -132,18 +133,18 @@ export default function AiPaperGenerator({ userSession, classes }: AiPaperGenera
         const base64 = dataUrl.split(',')[1] || '';
         next.push({ name: f.name, mimeType: f.type || 'application/octet-stream', data: base64 });
       } catch {
-        toast.error(`${f.name} read nahi hui`);
+        toast.error(L(`Could not read ${f.name}`, `${f.name} پڑھی نہیں جا سکی`));
       }
     }
     if (next.length > 0) {
       setFiles(prev => [...prev, ...next].slice(0, 8));
-      toast.success(`${next.length} file(s) upload ho gayi`);
+      toast.success(L(`${next.length} file(s) uploaded`, `${next.length} فائل(یں) اپ لوڈ ہو گئیں`));
     }
   };
 
   const generate = async () => {
     if (!sourceText.trim() && files.length === 0) {
-      toast.error('Book ka content dein — text paste karein ya pages upload karein');
+      toast.error(L('Add the book content — paste text or upload pages', 'کتاب کا مواد دیں — متن پیسٹ کریں یا صفحات اپ لوڈ کریں'));
       return;
     }
     setLoading(true);
@@ -160,7 +161,7 @@ export default function AiPaperGenerator({ userSession, classes }: AiPaperGenera
       setPaper(result);
       toast.success(`Paper ready! ${result.questions.length} questions · ${result.totalMarks} marks 🎉`);
     } catch (e: any) {
-      toast.error(e?.message || 'AI paper generation fail hui');
+      toast.error(e?.message || L('AI paper generation failed', 'AI سے پرچہ تیار نہیں ہو سکا'));
     } finally {
       setLoading(false);
     }
@@ -181,7 +182,7 @@ export default function AiPaperGenerator({ userSession, classes }: AiPaperGenera
 
   const addQuestion = () => {
     if (!paper) return;
-    setPaper({ ...paper, questions: [...paper.questions, { question: 'Naya question...', type: 'short', marks: 5, answer: '' }], totalMarks: paper.totalMarks + 5 });
+    setPaper({ ...paper, questions: [...paper.questions, { question: L('New question...', 'نیا سوال…'), type: 'short', marks: 5, answer: '' }], totalMarks: paper.totalMarks + 5 });
   };
 
   // ---- Print A4 (print window — payslip/report jaisa pattern) ----
@@ -239,7 +240,7 @@ ${sectionsHtml}
 <script>window.onload=function(){setTimeout(function(){window.print();},400);};</script>
 </body></html>`;
     const w = window.open('', '_blank');
-    if (!w) { toast.error('Popup block hai — allow karein'); return; }
+    if (!w) { toast.error(L('Popup blocked — please allow it', 'پاپ اپ بلاک ہے — اجازت دیں')); return; }
     w.document.write(html);
     w.document.close();
   };
@@ -248,7 +249,7 @@ ${sectionsHtml}
   const pushMcqsToQuiz = () => {
     if (!paper) return;
     const mcqs = paper.questions.filter(q => q.type === 'mcq' && q.options && q.options.length === 4);
-    if (mcqs.length === 0) { toast.error('Is paper mein MCQs nahi hain'); return; }
+    if (mcqs.length === 0) { toast.error(L('This paper has no MCQs', 'اس پرچے میں MCQs نہیں ہیں')); return; }
     const questions: QuizQuestion[] = mcqs.map(q => ({
       id: newId('q'),
       question: q.question,
@@ -270,7 +271,7 @@ ${sectionsHtml}
       status: 'draft',
       createdAt: new Date().toISOString(),
     });
-    toast.success('MCQs Quiz module mein draft ban gaye — Quizzes tab se publish karein! 🚀');
+    toast.success(L('MCQs saved as a draft in Quizzes — publish from the Quizzes tab! 🚀', 'MCQs کوئز میں ڈرافٹ بن گئے — کوئز ٹیب سے شائع کریں! 🚀'));
   };
 
 
@@ -286,7 +287,7 @@ ${sectionsHtml}
             <textarea
               value={sourceText}
               onChange={e => setSourceText(e.target.value)}
-              placeholder="Chapter ka text paste karein... (ya neeche book pages ki photos/PDF upload karein)"
+              placeholder={L('Paste the chapter text... (or upload book page photos/PDF below)', 'باب کا متن پیسٹ کریں… (یا نیچے کتاب کے صفحات کی تصاویر/PDF اپ لوڈ کریں)')}
               rows={6}
               className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-teal-500"
             />
@@ -413,7 +414,7 @@ ${sectionsHtml}
               className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-indigo-200 transition-all"
             >
               {loading ? <Loader2 size={15} className="animate-spin" /> : <Sparkles size={15} />}
-              {loading ? 'AI paper design kar raha hai...' : 'Generate Paper'}
+              {loading ? L('AI is designing the paper…', 'AI پرچہ تیار کر رہا ہے…') : L('Generate Paper', 'پرچہ بنائیں')}
             </button>
           </div>
         </div>
@@ -505,10 +506,10 @@ function HeaderBlock({ aiOn }: { aiOn: boolean }) {
         <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase flex items-center gap-2">
           <FileText size={22} className="text-teal-600" /> AI Paper Generator
         </h1>
-        <p className="text-xs text-slate-500 mt-1 uppercase tracking-widest font-bold">Books ke chapter se exam paper — Gemini AI (free)</p>
+        <p className="text-xs text-slate-500 mt-1 uppercase tracking-widest font-bold">{L('Exam papers from book chapters — Gemini AI (free)', 'کتاب کے ابواب سے پرچہ — Gemini AI (مفت)')}</p>
       </div>
       <span className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest w-fit ${aiOn ? 'bg-teal-100 text-teal-700' : 'bg-slate-200 text-slate-500'}`}>
-        {aiOn ? '🤖 AI Ready ✓' : '⚠️ AI Off — Settings → AI API Key add karein'}
+        {aiOn ? L('🤖 AI Ready ✓', '🤖 AI تیار ✓') : L('⚠️ AI Off — add key in Settings → AI API Key', '⚠️ AI بند — سیٹنگز → AI API Key میں کلید شامل کریں')}
       </span>
     </div>
   );

@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import { 
   Award, Calendar, Clock, LogOut, CheckSquare, Sparkles, BookOpen, 
-  Menu, X, TrendingUp, Info, User, CheckCircle2, AlertCircle, CreditCard, Bell, Sun, Moon, Download, Fingerprint, ClipboardList, HelpCircle, Pin
+  Menu, X, TrendingUp, Info, User, CheckCircle2, AlertCircle, CreditCard, Bell, Sun, Moon, Download, Fingerprint, ClipboardList, Pin
 } from 'lucide-react';
 import { getNotifications, saveNotifications, addNotification, PortalNotification } from '../lib/notificationUtils';
 import { getPeriodStatus, getStatusColor } from '../lib/periodUtils';
@@ -13,24 +13,17 @@ import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tool
 import { Teacher, Student, Class, TimetableEntry, Attendance, Mark, UserSession, DayOfWeek, FeeRecord, Assignment } from '../types';
 import { loadFromLocalStorage, getStudentFullAccount, StudentFeeData } from '../lib/feeEngine';
 import AttendanceSwipeOverlay from './AttendanceSwipeOverlay';
-// ── Naya design system + onboarding (Batch 3–5) ──
-import TourOverlay from './TourOverlay';
-import HelpCenter from './HelpCenter';
+// ── Naya design system + utilities (Batch 3–5) ──
 import SmartTaskPanel from './SmartTaskPanel';
 import CommandPalette from './CommandPalette';
+import LanguageToggle from './LanguageToggle';
 import NoticeBoard from './NoticeBoard';
 import EventsCalendar from './EventsCalendar';
-import { getNavItems, groupNavItems } from '../lib/navConfig';
+import { getNavItems, groupNavItems, navLabel, navHint, groupLabel } from '../lib/navConfig';
 import { buildSmartTasks } from '../lib/smartActions';
 import { getFavorites, toggleFavorite } from '../lib/favorites';
-import {
-  HELP_OPEN_EVENT,
-  TOUR_START_EVENT,
-  getTutorialPrefs,
-  initMotionPreference,
-  markTourCompleted,
-  shouldAutoStartTour,
-} from '../lib/tutorialPrefs';
+import { initMotionPreference } from '../lib/motionPrefs';
+import { useLang, t, i18nCls, L } from '../lib/i18n';
 
 interface StudentDashboardProps {
   userSession: UserSession;
@@ -219,22 +212,17 @@ export default function StudentDashboard({
      ONBOARDING · SMART ACTIONS · SEARCH  (naya "easy to use" layer)
      ═══════════════════════════════════════════════════════════════════════ */
 
-  const [tourOpen, setTourOpen] = useState(false);
-  const [helpOpen, setHelpOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [pins, setPins] = useState<string[]>(() => getFavorites(userSession.role));
+  const [lang] = useLang();
+  const cls = i18nCls(lang);
 
-  // Motion preference apply karo + pehli baar login par tour khud dikhao
+  // Motion preference (reduce-motion) apply karo
   useEffect(() => {
     initMotionPreference();
-    const timer = window.setTimeout(() => {
-      if (shouldAutoStartTour(userSession.role)) setTourOpen(true);
-    }, 1400);
-    return () => window.clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Ctrl+K search + window event bus (theme toggle ka same pattern)
+  // Ctrl+K search — kahin se bhi turant dhoondein
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
@@ -242,16 +230,8 @@ export default function StudentDashboard({
         setPaletteOpen(true);
       }
     };
-    const onTour = () => setTourOpen(true);
-    const onHelp = () => setHelpOpen(true);
     window.addEventListener('keydown', onKey);
-    window.addEventListener(TOUR_START_EVENT, onTour);
-    window.addEventListener(HELP_OPEN_EVENT, onHelp);
-    return () => {
-      window.removeEventListener('keydown', onKey);
-      window.removeEventListener(TOUR_START_EVENT, onTour);
-      window.removeEventListener(HELP_OPEN_EVENT, onHelp);
-    };
+    return () => window.removeEventListener('keydown', onKey);
   }, []);
 
   const navItems = useMemo(() => getNavItems(userSession.role), [userSession.role]);
@@ -284,6 +264,7 @@ export default function StudentDashboard({
       feeStudents,
       timetable,
       assignments,
+      lang,
     ]
   );
 
@@ -618,18 +599,17 @@ export default function StudentDashboard({
           </div>
           <div className="text-center w-full">
             <h1 className="text-slate-900 font-black text-sm tracking-widest uppercase leading-none">Demo Academy</h1>
-            <p className="text-slate-400 font-bold text-[10px] tracking-[0.3em] uppercase mt-1">Student Portal</p>
+            <p className={`text-slate-400 font-bold text-[10px] tracking-[0.3em] uppercase mt-1 ${cls}`}>{t('portal.student')}</p>
           </div>
         </div>
 
         {/* Grouped Navigation — tarteeb-waar (src/lib/navConfig.ts se) */}
         <nav
-          data-tour="sidebar"
           className="flex-1 overflow-y-auto overscroll-contain px-3 pb-4 custom-scrollbar"
         >
           {navGroups.map((group) => (
             <div key={group.id}>
-              <p className="nav-group">{group.label}</p>
+              <p className={`nav-group ${cls}`}>{groupLabel(group.id, lang)}</p>
               <div className="space-y-1">
                 {group.items.map((item) => {
                   const isActive = activeTab === item.id;
@@ -638,8 +618,7 @@ export default function StudentDashboard({
                     <div key={item.id} className="group/nav relative">
                       <button
                         type="button"
-                        data-tour={`nav-${item.id}`}
-                        title={item.hint}
+                        title={navHint(item, userSession.role, lang)}
                         onClick={() => {
                           handleTabChange(item.id as TabType);
                           setSidebarOpen(false);
@@ -647,13 +626,13 @@ export default function StudentDashboard({
                         className={`nav-item pr-9 ${isActive ? 'nav-item-active' : ''}`}
                       >
                         <item.icon size={15} className="nav-icon" />
-                        <span className="truncate">{item.label}</span>
+                        <span className={`truncate ${cls}`}>{navLabel(item, userSession.role, lang)}</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => handleTogglePin(item.id)}
-                        title={isPinned ? 'Pin hatayein' : 'Dashboard par pin karein'}
-                        aria-label={isPinned ? 'Pin hatayein' : 'Pin karein'}
+                        title={isPinned ? L('Unpin', 'پن ہٹائیں') : L('Pin', 'پن کریں')}
+                        aria-label={isPinned ? 'Unpin' : 'Pin'}
                         className={`absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 transition-all ${
                           isActive
                             ? 'text-white/80 hover:text-white'
@@ -669,14 +648,20 @@ export default function StudentDashboard({
             </div>
           ))}
 
+          {/* Language Toggle in Student Sidebar */}
+          <div className="mt-3 flex items-center justify-between px-1">
+            <span className={`text-[10px] font-black uppercase tracking-widest text-slate-400 ${cls}`}>{t('sidebar.language')}</span>
+            <LanguageToggle />
+          </div>
+
           {/* Install Button in Student Sidebar */}
           <button
             type="button"
             onClick={onInstallApp}
-            className="nav-item mt-3 border border-teal-100 bg-teal-50 text-teal-700 hover:bg-teal-100"
+            className="nav-item mt-2 border border-teal-100 bg-teal-50 text-teal-700 hover:bg-teal-100"
           >
             <Download size={15} className="nav-icon" />
-            Install App
+            <span className={cls}>{t('sidebar.install')}</span>
           </button>
         </nav>
 
@@ -697,7 +682,7 @@ export default function StudentDashboard({
             className="w-full py-4 bg-rose-600 text-white hover:bg-rose-700 transition-all text-xs font-black uppercase tracking-widest text-center cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-rose-100"
           >
             <LogOut size={16} />
-            EXIT CAMPUS PORTAL
+            <span className={cls}>{t('sidebar.logoutStudent')}</span>
           </button>
         </div>
       </div>
@@ -712,7 +697,7 @@ export default function StudentDashboard({
               <img src="/logo.png" alt="Demo School Logo" className="h-20 w-auto object-contain sm:block hidden" referrerPolicy="no-referrer" />
               <div className="sm:block hidden leading-none select-none">
                 <h2 className="text-3xl font-black text-slate-900 tracking-tight">Demo School</h2>
-                <p className="text-teal-600 font-black text-[10px] tracking-[0.3em] uppercase mt-1">Student Portal</p>
+                <p className={`text-teal-600 font-black text-[10px] tracking-[0.3em] uppercase mt-1 ${cls}`}>{t('portal.student')}</p>
               </div>
             </div>
             
@@ -840,28 +825,31 @@ export default function StudentDashboard({
         {/* ========== STUDENT DASHBOARD HOME ========== */}
         {activeTab === 'dashboard' && (
           <div id="panel-student-home" className="space-y-8 animate-fade-in bg-teal-50/50 p-4 sm:p-6 -mx-4 sm:-mx-6 rounded-2xl border border-teal-100 shadow-inner">
-            {/* Greeting Header */}
-            <div className="bg-white rounded-xl p-6 md:p-8 border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border-t-4 border-t-teal-600">
-              <div>
-                <span className="text-xs font-extrabold text-teal-600 uppercase tracking-widest block mb-1">STUDENT ADVISORY</span>
-                <h1 className="text-2xl font-black text-slate-900 tracking-tight font-display uppercase">Hello, {userSession.name.split(' ').slice(0, 1).join(' ') || userSession.name}!</h1>
-                <p className="text-sm text-slate-500 mt-1">
-                  Enrolled in <strong className="text-teal-800 font-bold">{assignedClass ? `${assignedClass.className} - ${assignedClass.section}` : 'N/A Class'}</strong>.
+            {/* Greeting Header — vibrant gradient + bilingual */}
+            <div className="greet-student rounded-2xl p-6 md:p-8 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 text-white relative overflow-hidden">
+              <div className="absolute -top-16 -right-14 w-56 h-56 bg-white/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
+              <div className="relative z-10">
+                <span className="text-xs font-extrabold text-emerald-300 uppercase tracking-widest block mb-1">STUDENT ADVISORY</span>
+                <h1 className={`text-2xl font-black tracking-tight font-display uppercase ${cls}`}>
+                  {t('home.hello')}, {userSession.name.split(' ').slice(0, 1).join(' ') || userSession.name}!
+                </h1>
+                <p className={`text-sm text-emerald-100/90 mt-1 ${cls}`}>
+                  {t('home.enrolledIn')} <strong className="text-white font-bold">{assignedClass ? `${assignedClass.className} - ${assignedClass.section}` : (lang === 'ur' ? 'کوئی کلاس نہیں' : 'N/A Class')}</strong>.
                   {classTeacherObj && (
-                    <span> Advisory Teacher: <strong className="text-slate-800">{classTeacherObj.name}</strong>.</span>
+                    <span> {t('home.advisoryTeacher')}: <strong className="text-white">{classTeacherObj.name}</strong>.</span>
                   )}
                 </p>
               </div>
 
-              <div className="flex gap-2.5">
-                <div className="p-4 bg-teal-50 rounded-xl border border-teal-100/60 text-center">
-                  <h4 className="text-xs font-bold text-teal-400 uppercase tracking-wider">Attendance Rate</h4>
-                  <p className="text-xl font-bold text-teal-900 mt-1">{attendancePercent}%</p>
+              <div className="relative z-10 flex gap-2.5">
+                <div className="p-4 bg-white/10 rounded-xl border border-white/15 text-center backdrop-blur-sm">
+                  <h4 className={`text-xs font-bold text-emerald-200 uppercase tracking-wider ${cls}`}>{t('home.attendanceRate')}</h4>
+                  <p className="text-xl font-bold text-white mt-1">{attendancePercent}%</p>
                 </div>
 
-                <div className="p-4 bg-amber-50 rounded-xl border border-amber-100/60 text-center">
-                  <h4 className="text-xs font-bold text-amber-400 uppercase tracking-wider">Marks Logged</h4>
-                  <p className="text-xl font-bold text-amber-900 mt-1">{myMarks.length} elements</p>
+                <div className="p-4 bg-white/10 rounded-xl border border-white/15 text-center backdrop-blur-sm">
+                  <h4 className={`text-xs font-bold text-amber-200 uppercase tracking-wider ${cls}`}>{t('home.marksLogged')}</h4>
+                  <p className="text-xl font-bold text-white mt-1">{myMarks.length}</p>
                 </div>
               </div>
             </div>
@@ -1864,12 +1852,12 @@ export default function StudentDashboard({
         }`}
       >
         <div className="flex justify-around items-center h-16 relative">
-          {[
-            { id: 'dashboard', label: 'Home', icon: Sparkles, active: 'bg-brand-600 shadow-lg shadow-brand-600/40' },
-            { id: 'attendance', label: 'Presence', icon: CheckSquare, active: 'bg-accent-500 shadow-lg shadow-accent-500/40' },
-            { id: 'marks', label: 'Marks', icon: Award, active: 'bg-rose-600 shadow-lg shadow-rose-600/40' },
-            { id: 'id_card', label: 'ID Card', icon: Fingerprint, active: 'bg-info-600 shadow-lg shadow-info-600/40' },
-          ].map((item) => {
+          {([
+            { id: 'dashboard', label: 'Home', ur: 'ہوم', icon: Sparkles, active: 'bg-brand-600 shadow-lg shadow-brand-600/40' },
+            { id: 'attendance', label: 'Presence', ur: 'حاضری', icon: CheckSquare, active: 'bg-accent-500 shadow-lg shadow-accent-500/40' },
+            { id: 'marks', label: 'Marks', ur: 'نمبر', icon: Award, active: 'bg-rose-600 shadow-lg shadow-rose-600/40' },
+            { id: 'id_card', label: 'ID Card', ur: 'کارڈ', icon: Fingerprint, active: 'bg-info-600 shadow-lg shadow-info-600/40' },
+          ] as Array<{ id: string; label: string; ur: string; icon: typeof Sparkles; active: string }>).map((item) => {
             const isActive = activeTab === item.id;
             const Icon = item.icon;
             
@@ -1885,8 +1873,8 @@ export default function StudentDashboard({
                   style={isActive ? { minHeight: '52px', minWidth: '52px' } : {}}
                 >
                   <Icon size={isActive ? 20 : 18} />
-                  <span className={`text-[10px] uppercase tracking-widest mt-0.5 ${isActive ? 'font-black' : 'font-bold'}`}>
-                    {item.label}
+                  <span className={`text-[10px] uppercase tracking-widest mt-0.5 ${cls} ${isActive ? 'font-black' : 'font-bold'}`}>
+                    {lang === 'ur' ? item.ur : item.label}
                   </span>
                 </button>
               </div>
@@ -1906,39 +1894,7 @@ export default function StudentDashboard({
         </div>
       </div>
 
-      {/* ═══════════ ONBOARDING LAYER — tour, help, search (Ctrl+K) ═══════════ */}
-      {getTutorialPrefs().enabled && (
-        <button
-          type="button"
-          data-tour="help-fab"
-          onClick={() => setHelpOpen(true)}
-          className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full border border-line bg-surface text-ink shadow-[var(--shadow-elev-3)] transition-transform hover:scale-110 active:scale-95 print:hidden"
-          title="Madad, guide aur tutorial settings"
-          aria-label="Help Center kholein"
-        >
-          <HelpCircle size={19} className="text-brand-600" />
-        </button>
-      )}
-
-      <TourOverlay
-        role={userSession.role}
-        open={tourOpen}
-        onClose={() => {
-          setTourOpen(false);
-          markTourCompleted(userSession.role);
-        }}
-      />
-
-      <HelpCenter
-        role={userSession.role}
-        open={helpOpen}
-        onClose={() => setHelpOpen(false)}
-        onStartTour={() => {
-          setHelpOpen(false);
-          setTourOpen(true);
-        }}
-      />
-
+      {/* ═══════════ SEARCH OVERLAY (Ctrl+K) ═══════════ */}
       <CommandPalette
         role={userSession.role}
         open={paletteOpen}

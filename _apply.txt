@@ -1,0 +1,76 @@
+﻿=== _i18n_batchA.cjs ===
+APPLIED: 0
+MISSES:
+  src/components/QuizModule.tsx:595 ΓÇö find 0 dafa mila
+  src/components/QuizModule.tsx:539 ΓÇö find 0 dafa mila
+  src/components/QuizModule.tsx:512 ΓÇö find 0 dafa mila
+  src/components/QuizModule.tsx:483 ΓÇö find 0 dafa mila
+  src/components/QuizModule.tsx:477 ΓÇö find 0 dafa mila
+  src/components/QuizModule.tsx:475 ΓÇö find 0 dafa mila
+  src/components/QuizModule.tsx:434 ΓÇö find 0 dafa mila
+  src/components/QuizModule.tsx:432 ΓÇö find 0 dafa mila
+  src/components/QuizModule.tsx:425 ΓÇö find 0 dafa mila
+  src/components/QuizModule.tsx:423 ΓÇö find 0 dafa mila
+  src/components/QuizModule.tsx:408 ΓÇö find 0 dafa mila
+  src/components/QuizModule.tsx:355 ΓÇö find 0 dafa mila
+  src/components/QuizModule.tsx:351 ΓÇö find 0 dafa mila
+  src/components/QuizModule.tsx:343 ΓÇö find 0 dafa mila
+  src/components/QuizModule.tsx:314 ΓÇö find 0 dafa mila
+  src/components/QuizModule.tsx:299 ΓÇö find 0 dafa mila
+  src/components/QuizModule.tsx:285 ΓÇö find 0 dafa mila
+  src/components/QuizModule.tsx:245 ΓÇö find 0 dafa mila
+  src/components/QuizModule.tsx:88 ΓÇö find 0 dafa mila
+  src/components/SmartTaskPanel.tsx:77 ΓÇö find 0 dafa mila
+  src/components/SmartTaskPanel.tsx:76 ΓÇö find 0 dafa mila
+  src/components/SmartTaskPanel.tsx:72 ΓÇö find 0 dafa mila
+  src/components/SmartTaskPanel.tsx:62 ΓÇö find 0 dafa mila
+  src/components/NoticeBoard.tsx:154 ΓÇö find 0 dafa mila
+  src/components/NoticeBoard.tsx:72 ΓÇö find 0 dafa mila
+  src/components/NoticeBoard.tsx:62 ΓÇö find 0 dafa mila
+  src/components/NoticeBoard.tsx:46 ΓÇö find 0 dafa mila
+  src/components/EventsCalendar.tsx:167 ΓÇö find 0 dafa mila
+  src/components/EventsCalendar.tsx:153 ΓÇö find 0 dafa mila
+  src/components/EventsCalendar.tsx:74 ΓÇö find 0 dafa mila
+  src/components/EventsCalendar.tsx:60 ΓÇö find 0 dafa mila
+=== _i18n_batchC1.cjs ===
+APPLIED: 0
+MISSES:
+  src/components/PrincipalDashboard.tsx:4754 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:3147 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:3146 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:1386 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:1376 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:1352 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:1292 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:1277 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:1275 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:1273 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:1227 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:1225 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:1224 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:892 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:686 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:686 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:429 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:423 ΓÇö find 0 dafa mila
+=== _i18n_batchC2.cjs ===
+APPLIED: 0
+MISSES:
+  src/components/PrincipalDashboard.tsx:11440 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:11435 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:11429 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:11001 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:10988 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:10987 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:10972 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:10964 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:10110 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:10090 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:7048 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:6937 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:6764 ΓÇö find 0 dafa mila
+  src/components/PrincipalDashboard.tsx:1325 ΓÇö find 0 dafa mila
+=== _i18n_batchC3.cjs ===
+APPLIED: 17
+MISSES:
+  src/components/StudentDashboard.tsx:633 ΓÇö find 0 dafa mila

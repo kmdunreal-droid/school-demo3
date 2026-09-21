@@ -1,0 +1,88 @@
+
+=== src/App.tsx  (1) ===
+  379: console.log("Supabase records khali — initial datasets seed kar rahe hain...");
+
+=== src/components/CommandPalette.tsx  (4) ===
+  86: keywords: 'fee center collect receipt dues payment paisa fees',
+  95: keywords: 'add student naya admission form darj enroll',
+  104: keywords: 'add teacher naya faculty staff',
+  332: <span>↑ ↓ chalne ke liye · Enter kholein · Esc band</span>
+
+=== src/components/FeePaymentCenter.tsx  (6) ===
+  221: {listRows.length} Students - jis student ki fee/dues pay karni hai us par click karein (pending wale upar)
+  290: <TrendingUp size={12} /> Advance Fee - Zyada Di Gayi Fee Aagay Months Mein
+  299: Ye balance age ke months ki school fee mein khud adjust ho jayegi - dobara paisa nahi lagega.
+  330: Advance balance abhi kisi ek month ko full cover nahi kar raha - agli fee par khud lag jayega.
+  335: <Wallet size={10} /> PKR {advInfo.remainingAfter.toLocaleString()} balance {advInfo.currentYear} ke baad wale months ke liye carry forward
+  504: <ChevronLeft size={14} /> Doosre Student Ki Fee Pay Karein
+
+=== src/components/PrincipalDashboard.tsx  (37) ===
+  266: ONBOARDING · SMART ACTIONS · SEARCH  (naya "easy to use" layer)
+  423: toast.error('Valid lat / lng / radius enter karein.');
+  429: toast.success('School location updated — teachers ka GPS radius ab naye coordinates se check hoga.');
+  686: toast.success(`Applied "${bulkDueDesc.trim()}" PKR ${amt.toLocaleString()} to ${addedCount > 0 ? addedCount : targetStudents.length} ${bulkDueTarget === 'student' ? 'stud
+  892: toast.error("Koi due select nahi kiya — Pending Dues se select karein ya fee amount enter karein.");
+  1224: if (selectedIds.length === 0) { toast.error('Kam az kam aik student select karein.'); return; }
+  1225: if (!(amount > 0)) { toast.error('Sahi amount enter karein (PKR).'); return; }
+  1227: if (classDuesMode === 'collect' && collected > amount) { toast.error('Collect amount, due amount se zyada nahi ho sakta.'); return; }
+  1292: if (!(remainingAmount > 0)) { toast.error('Amount enter karein (PKR).'); return; }
+  1325: pushRec(a.month, a.year, a.amount, 'Fee Payment Center - advance (zyada pay)');
+  1352: if (!dueObj) { toast.error('Due entry nahi mili.'); return; }
+  1386: if (allocs.length === 0) { toast.error('Allocation fail — base fee ya amount check karein.'); return; }
+  3146: title={pins.includes(item.id) ? 'Pin hatayein' : 'Pin karein'}
+  3147: aria-label={pins.includes(item.id) ? 'Pin hatayein' : 'Pin karein'}
+  4754: title={`Class ${className} ke students ko Due/Paper Fund lagayein ya collect karein`}
+  5969: <button onClick={() => openFeePaymentCenter()} className="bg-rose-50 p-2 sm:p-4 rounded-2xl border border-rose-100 hover:border-rose-400 hover:shadow-md transition-all cu
+  5974: <button onClick={() => openFeePaymentCenter()} className="bg-amber-50 p-2 sm:p-4 rounded-2xl border border-amber-100 hover:border-amber-400 hover:shadow-md transition-all
+  6049: title={d.pending > 0 ? 'Click karein — Fee Payment Center se pay karein' : undefined}
+  6764: <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Teacher Pay & Hisab</h1>
+  6785: Teacher check-in sirf is location ke radius ke ANDAR hota hai. Coordinates Google Maps se copy karein.
+  6937: <p className="text-xs text-teal-100/90">AI • Attendance • WhatsApp • Theme — sab kuch yahin se manage karein</p>
+  7048: toast.info('Demo Mode active — app local storage par chalti hai. Cloud connection live mode (VITE_DATA_MODE hata kar) test hoga.');
+  9586: <option value={feeEditModal.feeType}>{feeEditModal.feeType} (purana record)</option>
+  10090: <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Month (Due kis mahine ki)</label>
+  10110: <p className="text-[10px] font-bold text-slate-400 mt-1">Same student + same month + same fund pe dobara apply nahi hoga (duplicate guard).</p>
+  10574: Advance (zyada pay) PKR {leftover.toLocaleString()} - agle months mein spread hoga
+  10580: Koi pending month nahi mila - poora PKR {amt.toLocaleString()} {quickCollectMonth} se aage wale months mein advance record hoga.
+  10930: Students ({classStudentsForDues.length}) — kisi ek, kuch ya sab ko select karein
+  10972: <p className="text-[10px] font-black text-amber-700 uppercase tracking-widest flex items-center gap-1.5"><Banknote size={12} /> Foran Wasooli (Collect)</p>
+  10987: ? `✓ Har student se PKR ${Number(classDuesCollectAmount).toLocaleString()} collect hoga — baqi PKR ${(Math.max(0, (Number(classDuesAmount) || 0) - Number(classDuesCollect
+  10988: : '✓ Full amount collect hoga. Kam amount likhein to baqi remaining Dues mein reh jayega.'}
+  11001: {classDuesMode === 'charge' ? 'Charge Only — Dues mein pending jayega' : 'Charge & Collect — foran wasooli, baqi remaining'}
+  11108: <option value={feeEditForm.feeType}>{feeEditForm.feeType} (purana record)</option>
+  11405: <TrendingUp size={11} /> Advance Fee - Zyada Di Gayi Fee
+  11416: Ye balance age ke months ki fee mein khud adjust ho jayegi
+  11440: <p className="text-[10px] font-bold text-slate-500">Advance balance abhi kisi ek month ko full cover nahi kar raha - agli fee par khud lag jayega.</p>
+  11444: <Wallet size={10} /> PKR {advInfo.remainingAfter.toLocaleString()} balance age months ke liye carry forward
+
+=== src/components/SmartTaskPanel.tsx  (1) ===
+  151: <CheckCircle2 size={13} /> Sab kaam mukammal
+
+=== src/components/StudentDashboard.tsx  (1) ===
+  212: ONBOARDING · SMART ACTIONS · SEARCH  (naya "easy to use" layer)
+
+=== src/components/TeacherDashboard.tsx  (3) ===
+  744: ONBOARDING · SMART ACTIONS · SEARCH  (naya "easy to use" layer)
+  4358: School: {schoolLocation.name} · Radius {schoolLocation.radiusMeters} m — check-in sirf school ke andar se hota hai.
+  4468: Tenure: {salaryHistory.tenureYears} Saal {salaryHistory.tenureRemMonths} Mahine · Since {salaryHistory.startLabel}
+
+=== src/lib/gemini.ts  (6) ===
+  63: throw new Error('AI disabled — Settings → "AI API Key" mein Google AI Studio se free key add karein (aistudio.google.com)');
+  96: throw new Error('AI ka jawab parse nahi hua — dobara try karein');
+  173: if (parts.length === 0) throw new Error('Pehle chapter text paste karein ya book pages upload karein');
+  187: if (questions.length === 0) throw new Error('AI ne koi question generate nahi kiya — source content check karein');
+  214: if (parts.length === 0) throw new Error('Pehle content dein — text paste karein ya book pages upload karein');
+  225: if (qs.length === 0) throw new Error('AI ne MCQs generate nahi kiye — content check karein');
+
+=== src/lib/geoUtils.ts  (1) ===
+  27: console.warn('[Geo] Browser geolocation available nahi (HTTPS/localhost wala experiment).');
+
+=== src/lib/navConfig.ts  (3) ===
+  258: NOTE: Student portal ke tab ids fixed hain (StudentDashboard ka TabType):
+  419: Helpers navLabel()/navHint()/tabLabel() lang ke saath sahi value dete hain —
+  420: dashboards inhi ko call karte hain, is liye har jagah consistent rehta hai.
+
+=== src/lib/smartActions.ts  (1) ===
+  185: taake dono jagah number bilkul match kare) */
+
+TOTAL REMAINING: 64

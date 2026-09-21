@@ -2,6 +2,7 @@
  * NOTICE BOARD — Principal announcements post karta hai, sab portals dekhte hain.
  * Demo/local store: 'acadamis_notices' (portalStore pattern).
  */
+import { L } from '../lib/i18n';
 import { useState, useMemo } from 'react';
 import { motion } from 'motion/react';
 import { Megaphone, Plus, Trash2, Pin, AlertTriangle, Info, Bell } from 'lucide-react';
@@ -43,7 +44,7 @@ export default function NoticeBoard({ userSession }: NoticeBoardProps) {
 
   const handlePost = () => {
     if (!title.trim() || !message.trim()) {
-      toast.error('Title aur message dono zaroori hain');
+      toast.error(L('Both title and message are required', 'عنوان اور پیغام دونوں ضروری ہیں'));
       return;
     }
     const notice: Notice = {
@@ -59,7 +60,7 @@ export default function NoticeBoard({ userSession }: NoticeBoardProps) {
     upsert(notice);
     setTitle(''); setMessage(''); setPriority('normal'); setAudience('all');
     setShowForm(false);
-    toast.success('Notice publish ho gaya! 📢');
+    toast.success(L('Notice published! 📢', 'اعلان شائع ہو گیا! 📢'));
   };
 
   return (
@@ -69,7 +70,7 @@ export default function NoticeBoard({ userSession }: NoticeBoardProps) {
           <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase flex items-center gap-2">
             <Megaphone size={22} className="text-teal-600" /> Notice Board
           </h1>
-          <p className="text-xs text-slate-500 mt-1 uppercase tracking-widest font-bold">School announcements — sab portals par live</p>
+          <p className="text-xs text-slate-500 mt-1 uppercase tracking-widest font-bold">L('School announcements — live on all portals', 'اسکول کے اعلانات — تمام پورٹلز پر دستیاب')</p>
         </div>
         {canManage && (
           <button
@@ -151,7 +152,7 @@ export default function NoticeBoard({ userSession }: NoticeBoardProps) {
                 </div>
                 {canManage && (
                   <button
-                    onClick={() => { remove(n.id); toast.success('Notice delete ho gaya'); }}
+                    onClick={() => { remove(n.id); toast.success(L('Notice deleted', 'اعلان حذف ہو گیا')); }}
                     className="shrink-0 p-2 text-slate-300 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
                     aria-label="Delete notice"
                   >

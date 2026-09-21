@@ -7,6 +7,7 @@
  *   3. Bas — AI features auto-enable ho jayenge. Key na ho to features
  *      gracefully "disabled" dikhte hain, baqi app normal chalti hai.
  */
+import { L } from './i18n';
 import { GoogleGenAI } from '@google/genai';
 import { safeStorage } from './safeStorage';
 
@@ -60,7 +61,7 @@ let clientKey: string = '';
 function getClient(): GoogleGenAI {
   const key = getGeminiApiKey();
   if (!key) {
-    throw new Error('AI disabled — Settings → "AI API Key" mein Google AI Studio se free key add karein (aistudio.google.com)');
+    throw new Error(L('AI is disabled — add a free key from Google AI Studio in Settings → "AI API Key" (aistudio.google.com)', 'AI بند ہے — سیٹنگز → "AI API Key" میں Google AI Studio سے مفت کلید شامل کریں (aistudio.google.com)'));
   }
   if (!client || clientKey !== key) {
     client = new GoogleGenAI({ apiKey: key });
@@ -93,7 +94,7 @@ async function aiJson<T>(systemInstruction: string, parts: any[]): Promise<T> {
   try {
     return JSON.parse(clean) as T;
   } catch {
-    throw new Error('AI ka jawab parse nahi hua — dobara try karein');
+    throw new Error(L('Could not parse the AI response — please try again', 'AI کا جواب سمجھ نہیں آیا — دوبارہ کوشش کریں'));
   }
 }
 
@@ -170,7 +171,7 @@ Total questions must match the plan exactly.`;
     parts.push({ text: `${counts}\n\nSOURCE CONTENT (book chapter):\n"""\n${source.text.slice(0, 60000)}\n"""` });
   }
   (source.files || []).forEach(f => parts.push({ inlineData: { mimeType: f.mimeType, data: f.data } }));
-  if (parts.length === 0) throw new Error('Pehle chapter text paste karein ya book pages upload karein');
+  if (parts.length === 0) throw new Error(L('Paste the chapter text first, or upload book pages', 'پہلے باب کا متن پیسٹ کریں یا کتاب کے صفحات اپ لوڈ کریں'));
   if (source.text && source.text.trim() && (source.files || []).length > 0) {
     parts.unshift({ text: counts });
   }
@@ -184,7 +185,7 @@ Total questions must match the plan exactly.`;
     correctIndex: Number.isInteger(q.correctIndex) ? Math.min(3, Math.max(0, q.correctIndex as number)) : undefined,
     answer: q.answer ? String(q.answer) : undefined,
   }));
-  if (questions.length === 0) throw new Error('AI ne koi question generate nahi kiya — source content check karein');
+  if (questions.length === 0) throw new Error(L('AI generated no questions — check the source content', 'AI نے کوئی سوال نہیں بنایا — ماخذ مواد چیک کریں'));
 
   const totalMarks = questions.reduce((a, q) => a + q.marks, 0);
   return {
@@ -211,7 +212,7 @@ export async function aiGenerateMcqs(
   const ask = `Generate exactly ${count} multiple-choice questions (MCQs) for subject "${subject}" (difficulty: ${difficulty}) STRICTLY from the provided content. Each MCQ: exactly 4 options, one correct (correctIndex 0-3), ${marksPerQ} mark(s) each. Return JSON: { "questions": [ { "question", "type": "mcq", "marks", "options": [4 strings], "correctIndex" } ] }`;
   if (source.text && source.text.trim()) parts.push({ text: `${ask}\n\nCONTENT:\n"""\n${source.text.slice(0, 60000)}\n"""` });
   (source.files || []).forEach(f => parts.push({ inlineData: { mimeType: f.mimeType, data: f.data } }));
-  if (parts.length === 0) throw new Error('Pehle content dein — text paste karein ya book pages upload karein');
+  if (parts.length === 0) throw new Error(L('Add the content first — paste text or upload book pages', 'پہلے مواد دیں — متن پیسٹ کریں یا کتاب کے صفحات اپ لوڈ کریں'));
   const out = await aiJson<{ questions: GeneratedQuestion[] }>(PAPER_SYSTEM, parts);
   const qs = (out.questions || [])
     .map((q, i) => ({
@@ -222,7 +223,7 @@ export async function aiGenerateMcqs(
       correctIndex: Number.isInteger(q.correctIndex) ? Math.min(3, Math.max(0, q.correctIndex as number)) : 0,
     }))
     .filter(q => q.options.length === 4);
-  if (qs.length === 0) throw new Error('AI ne MCQs generate nahi kiye — content check karein');
+  if (qs.length === 0) throw new Error(L('AI generated no MCQs — check the content', 'AI نے MCQs نہیں بنائے — مواد چیک کریں'));
   return qs;
 }
 

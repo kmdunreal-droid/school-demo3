@@ -9,6 +9,7 @@
  * aur "Karo →" par sahi tab par le jata hai.
  * ═══════════════════════════════════════════════════════════════════════════
  */
+import { L, t } from '../lib/i18n';
 import React, { useState } from 'react';
 import {
   Award,
@@ -59,7 +60,7 @@ export default function SmartTaskPanel({
     <section
       data-tour="today-tasks"
       className={`card p-0 ${isAllClear ? '' : 'ring-1 ring-brand-500/10'}`}
-      aria-label="Aaj ka kaam"
+      aria-label={t('smart.title')}
     >
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-3">
@@ -69,19 +70,19 @@ export default function SmartTaskPanel({
           </span>
           <div>
             <h2 className="font-display text-[12px] font-extrabold uppercase tracking-[0.16em] text-ink">
-              Aaj ka Kaam
+              {t('smart.title')}
             </h2>
             <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-ink-faint">
               {isAllClear
-                ? 'Sab clear hai — kuch pending nahi'
-                : `${tasks.length} kaam aap ka intezar kar rahe hain`}
+                ? t('smart.allClearSub')
+                : `${tasks.length} ${t('smart.waiting')}`}
             </p>
           </div>
         </div>
 
         {!isAllClear && (
           <span className="badge badge-brand">
-            <ListChecks size={11} /> {tasks.length} pending
+            <ListChecks size={11} /> {tasks.length} {t('smart.pendingBadge')}
           </span>
         )}
       </div>
@@ -133,11 +134,11 @@ export default function SmartTaskPanel({
           >
             {expanded ? (
               <>
-                <ChevronUp size={12} /> Kam dikhayein
+                <ChevronUp size={12} /> {L('Show less', 'کم دکھائیں')}
               </>
             ) : (
               <>
-                <ChevronDown size={12} /> {hidden} aur dikhayein
+                <ChevronDown size={12} /> {L(`${hidden} more`, `${hidden} مزید دکھائیں`)}
               </>
             )}
           </button>

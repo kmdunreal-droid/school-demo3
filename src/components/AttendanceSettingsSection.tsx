@@ -1,3 +1,4 @@
+import { L } from '../lib/i18n';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { MapPin, Navigation, LocateFixed, CheckCircle2, XCircle, ShieldCheck, ShieldAlert } from 'lucide-react';
@@ -33,13 +34,13 @@ export default function AttendanceSettingsSection({ schoolLocation, onSaved }: A
     setGpsRestricted(next);
     setAttendanceSettings({ gpsRestricted: next });
     toast.success(next
-      ? 'GPS-restricted check-in ON — teachers sirf school radius ke andar se check-in kar sakte hain.'
-      : 'GPS-restricted check-in OFF — teachers kisi bhi location se check-in kar sakte hain.');
+      ? L('GPS-restricted check-in ON — teachers can check in only inside the school radius.', 'GPS محدود حاضری آن — اساتذہ صرف اسکول کے دائرے میں حاضری لگا سکتے ہیں۔')
+      : L('GPS-restricted check-in OFF — teachers can check in from any location.', 'GPS محدود حاضری آف — اساتذہ کسی بھی جگہ سے حاضری لگا سکتے ہیں۔'));
   };
 
   const useMyLocation = () => {
     if (!navigator.geolocation) {
-      toast.error('Is browser mein geolocation available nahi hai.');
+      toast.error(L('Geolocation is not available in this browser.', 'اس براؤزر میں لوکیشن دستیاب نہیں۔'));
       return;
     }
     setLocating(true);
@@ -48,11 +49,11 @@ export default function AttendanceSettingsSection({ schoolLocation, onSaved }: A
         setLat(pos.coords.latitude.toFixed(6));
         setLng(pos.coords.longitude.toFixed(6));
         setLocating(false);
-        toast.success('Current location mil gayi — Save Location dabakar confirm karein.');
+        toast.success(L('Current location found — press Save Location to confirm.', 'موجودہ مقام مل گیا — تصدیق کے لیے Save Location دبائیں۔'));
       },
       () => {
         setLocating(false);
-        toast.error('Device location nahi mili. Coordinates manually enter karein (Google Maps se copy karein).');
+        toast.error(L('Device location not found. Enter the coordinates manually (copy from Google Maps).', 'ڈیوائس کی لوکیشن نہیں ملی۔ کوآرڈینیٹس خود درج کریں (گوگل میپس سے کاپی کریں)۔'));
       },
       { enableHighAccuracy: true, timeout: 10000 }
     );
@@ -63,11 +64,11 @@ export default function AttendanceSettingsSection({ schoolLocation, onSaved }: A
     const nLng = Number(lng);
     const nRadius = Number(radius);
     if (isNaN(nLat) || isNaN(nLng) || nLat < -90 || nLat > 90 || nLng < -180 || nLng > 180) {
-      toast.error('Valid Latitude (-90..90) aur Longitude (-180..180) enter karein.');
+      toast.error(L('Enter a valid Latitude (-90..90) and Longitude (-180..180).', 'درست Latitude (-90..90) اور Longitude (-180..180) درج کریں۔'));
       return;
     }
     if (isNaN(nRadius) || nRadius <= 0) {
-      toast.error('Valid Radius (meters) enter karein — minimum 1 m.');
+      toast.error(L('Enter a valid radius in meters — minimum 1 m.', 'درست رداس (میٹر میں) درج کریں — کم از کم 1 میٹر۔'));
       return;
     }
     const loc: SchoolLocation = {
@@ -80,7 +81,7 @@ export default function AttendanceSettingsSection({ schoolLocation, onSaved }: A
     setAttendanceSettings({ gpsRestricted });
     onSaved?.(loc);
     flashSaved();
-    toast.success('Attendance location saved — teachers ka GPS radius ab naye coordinates se check hoga.');
+    toast.success(L('Attendance location saved — teacher GPS will now be checked against the new coordinates.', 'حاضری کا مقام محفوظ ہو گیا — اساتذہ کا GPS اب نئے کوآرڈینیٹس سے جانچا جائے گا۔'));
   };
 
   return (
@@ -99,7 +100,7 @@ export default function AttendanceSettingsSection({ schoolLocation, onSaved }: A
               Attendance Collection — Location Settings
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Teacher check-in ka verification yahan se control hota hai.
+              {L('Teacher check-in verification is controlled here.', 'اساتذہ کی حاضری کی تصدیق یہاں سے کنٹرول ہوتی ہے۔')}
             </p>
           </div>
         </div>
@@ -122,8 +123,8 @@ export default function AttendanceSettingsSection({ schoolLocation, onSaved }: A
           <p className="text-xs font-black uppercase text-slate-700 dark:text-slate-200">GPS-Restricted Check-In</p>
           <p className="text-xs text-slate-400 dark:text-slate-400">
             {gpsRestricted
-              ? 'Teachers sirf school radius ke ANDAR se check-in kar sakte hain.'
-              : 'Teachers kisi bhi location se check-in kar sakte hain (manual allowance).'}
+              ? L('Teachers can check in only INSIDE the school radius.', 'اساتذہ صرف اسکول کے دائرے کے اندر حاضری لگا سکتے ہیں۔')
+              : L('Teachers can check in from any location (manual allowance).', 'اساتذہ کسی بھی جگہ سے حاضری لگا سکتے ہیں (دستی اجازت)۔')}
           </p>
         </div>
         <button
@@ -141,7 +142,7 @@ export default function AttendanceSettingsSection({ schoolLocation, onSaved }: A
           School GPS Location (Attendance Radius)
         </label>
         <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider mb-2">
-          Teacher check-in sirf is location ke radius ke ANDAR hota hai. Coordinates Google Maps se copy karein.
+          {L('Teacher check-in works only INSIDE this radius. Copy the coordinates from Google Maps.', 'اساتذہ کی حاضری صرف اسی دائرے کے اندر قبول ہوتی ہے۔ کوآرڈینیٹس گوگل میپس سے کاپی کریں۔')}
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div className="space-y-1">
@@ -204,9 +205,9 @@ export default function AttendanceSettingsSection({ schoolLocation, onSaved }: A
           </button>
           <span className="inline-flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold text-slate-500">
             {gpsRestricted ? (
-              <><CheckCircle2 size={12} className="text-sky-600" /> Check-in sirf school ke andar se hoga</>
+              <><CheckCircle2 size={12} className="text-sky-600" /> {L('Check-in only from inside the school', 'حاضری صرف اسکول کے اندر سے')}</>
             ) : (
-              <><XCircle size={12} className="text-amber-500" /> Check-in kisi bhi location se ho sakta hai</>
+              <><XCircle size={12} className="text-amber-500" /> {L('Check-in allowed from any location', 'حاضری کسی بھی جگہ سے ممکن ہے')}</>
             )}
           </span>
         </div>
@@ -217,9 +218,9 @@ export default function AttendanceSettingsSection({ schoolLocation, onSaved }: A
         <p className="font-bold uppercase tracking-widest mb-0.5 flex items-center gap-1.5">
           <MapPin size={11} /> How It Works
         </p>
-        Teacher <strong>My Attendance</strong> tab mein <strong>Check-In</strong> dabata hai — browser ka live GPS
-        school location se compare hota hai (Haversine distance). <strong>GPS Restricted ON</strong> par door hoga to
-        check-in block ho jata hai. Device GPS na mile to teacher "Demo GPS (School Location)" checkbox use kar sakta hai.
+        {L("In the teacher's ", 'استاد کے ')}<strong>{L('My Attendance', 'میری حاضری')}</strong>{L(' tab, pressing ', ' ٹیب میں ')}<strong>{L('Check-In', 'حاضری لگائیں')}</strong>{L(" compares the browser's live GPS", ' دبانے پر براؤزر کا لائیو GPS')}
+        {L(' with the school location (Haversine distance). With ', ' اسکول کے مقام سے موازنہ ہوتا ہے۔ ')}<strong>{L('GPS Restricted ON', 'GPS محدود آن')}</strong>{L(', if the distance is too large', ' ہونے پر فاصلہ زیادہ ہو تو')}
+        {L(' check-in is blocked. If the device GPS is unavailable, the teacher can use the "Demo GPS (School Location)" checkbox.', ' حاضری بلاک ہو جاتی ہے۔ ڈیوائس GPS نہ ملے تو استاد "Demo GPS (School Location)" چیک باکس استعمال کر سکتا ہے۔')}
       </div>
     </div>
   );

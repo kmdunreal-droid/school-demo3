@@ -13,6 +13,7 @@
  *   API/backend bhejenge to sirf .env mein VITE_DATA_MODE hatana/wapis
  *   "live" karna hai aur yeh adapter naye endpoint par point kar dena hai.
  */
+import { L } from '../lib/i18n';
 import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = (import.meta.env.VITE_SUPABASE_URL as string) || '';
@@ -46,7 +47,7 @@ export const supabase = createClient(
 
 if (!isSupabaseConfigured()) {
   console.warn(
-    '[Supabase] VITE_SUPABASE_URL/VITE_SUPABASE_PUBLISHABLE_KEY missing in .env — client placeholder par hai. Demo/local mode theek chalega; live sync ke liye .env set karein.',
+    '[Supabase] VITE_SUPABASE_URL/VITE_SUPABASE_PUBLISHABLE_KEY missing in .env — the client is using a placeholder. Demo/local mode will work; set .env for live sync.',
   );
 }
 
@@ -64,7 +65,7 @@ export async function testSupabaseConnection(): Promise<boolean> {
     const { data, error } = await supabase.from('students').select('id').limit(1);
     if (error) {
       if ((error as any)?.code === 'PGRST205') {
-        console.warn('[Supabase] tables missing — SQL Editor mein scripts/supabase-schema.sql chalayein.');
+        console.warn('[Supabase] tables are missing — run scripts/supabase-schema.sql in the SQL Editor.');
       }
       throw error;
     }

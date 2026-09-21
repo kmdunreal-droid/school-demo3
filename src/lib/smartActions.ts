@@ -16,6 +16,7 @@ import {
   getTotalPending,
 } from './feeEngine';
 import { safeStorage } from './safeStorage';
+import { L } from './i18n';
 import type {
   Assignment,
   Attendance,
@@ -135,17 +136,17 @@ function allClearTask(role: string): SmartTask {
     id: 'all-clear',
     title:
       role === 'teacher'
-        ? 'Sab kaam mukammal ✅'
+        ? L('All tasks complete ✅', 'سب کام مکمل ✅')
         : role === 'student'
-          ? 'Sab kuch theek hai ✅'
-          : 'Aaj koi pending kaam nahi ✅',
+          ? L('Everything is fine ✅', 'سب ٹھیک ہے ✅')
+          : L('No pending tasks today ✅', 'آج کوئی کام باقی نہیں ✅'),
     detail:
       role === 'teacher'
-        ? 'Aaj ki hazri lag chuki hai aur koi assignment bhi pending nahi. Shabash!'
+        ? L('Attendance is marked and no assignment is pending. Well done!', 'آج کی حاضری لگ چکی ہے اور کوئی اسائنمنٹ بھی باقی نہیں۔ شاباش!')
         : role === 'student'
-          ? 'Koi assignment ya fee ki tareekh qareeb nahi. Aaram se parhai karein.'
-          : 'Hazri, fees aur check-ins sab update hain. Aaj koi kaam pending nahi.',
-    cta: role === 'student' ? 'Timetable dekhein' : 'Dashboard dekhein',
+          ? L('No assignment or fee deadline nearby. Study with ease.', 'کوئی اسائنمنٹ یا فیس کی تاریخ قریب نہیں۔ آرام سے پڑھائی کریں۔')
+          : L('Attendance, fees and check-ins are all updated. Nothing pending today.', 'حاضری، فیس اور چیک اِن سب اپ ڈیٹ ہیں۔ آج کوئی کام باقی نہیں۔'),
+    cta: role === 'student' ? L('View timetable', 'ٹائم ٹیبل دیکھیں') : L('View dashboard', 'ڈیش بورڈ دیکھیں'),
     tab: role === 'student' ? 'timetable' : 'dashboard',
     tone: 'success',
     icon: 'celebrate',
@@ -171,9 +172,9 @@ function buildPrincipalTasks(input: SmartTaskInput, now: Date): SmartTask[] {
   if (classesMissing.length > 0) {
     tasks.push({
       id: 'attendance-pending',
-      title: `Aaj ki hazri baqi hai — ${classesMissing.length} class`,
-      detail: `${summarizeList(classesMissing.map(classLabel))} ki roll call abhi nahi lagi.`,
-      cta: 'Attendance kholein',
+      title: L(`Attendance pending — ${classesMissing.length} class(es)`, `آج کی حاضری باقی ہے — ${classesMissing.length} کلاس`),
+      detail: L(`${summarizeList(classesMissing.map(classLabel))} — roll call not taken yet.`, `${summarizeList(classesMissing.map(classLabel))} کی رول کال ابھی نہیں لگی۔`),
+      cta: L('Open attendance', 'حاضری کھولیں'),
       tab: 'registers',
       tone: 'warn',
       icon: 'attendance',
@@ -195,9 +196,9 @@ function buildPrincipalTasks(input: SmartTaskInput, now: Date): SmartTask[] {
   if (pendingStudents > 0) {
     tasks.push({
       id: 'fee-pending',
-      title: `${pendingStudents} students ki fee baqi hai`,
-      detail: `Kul baqi raqam ${formatMoney(pendingAmount)}. Fee Center mein har student ka mahina-war hisab mojood hai.`,
-      cta: 'Fee Center kholein',
+      title: L(`${pendingStudents} student(s) have pending fees`, `${pendingStudents} طلبہ کی فیس باقی ہے`),
+      detail: L(`Total outstanding ${formatMoney(pendingAmount)}. Month-wise ledger is available in Fee Center.`, `کل بقایا ${formatMoney(pendingAmount)}۔ فیس سینٹر میں ہر طالب علم کا ماہانہ حساب موجود ہے۔`),
+      cta: L('Open Fee Center', 'فیس سینٹر کھولیں'),
       tab: 'fees',
       tone: 'danger',
       icon: 'fee',
@@ -213,9 +214,9 @@ function buildPrincipalTasks(input: SmartTaskInput, now: Date): SmartTask[] {
   if (input.teachers.length > 0 && notCheckedIn.length > 0 && notCheckedIn.length < input.teachers.length) {
     tasks.push({
       id: 'teacher-checkin',
-      title: `${notCheckedIn.length} teachers ne check-in nahi kiya`,
-      detail: `${summarizeList(notCheckedIn.map((t) => t.name))}. Unki salary hazri se hi calculate hoti hai.`,
-      cta: 'Staff Salaries dekhein',
+      title: L(`${notCheckedIn.length} teacher(s) have not checked in`, `${notCheckedIn.length} اساتذہ نے چیک اِن نہیں کیا`),
+      detail: L(`${summarizeList(notCheckedIn.map((t) => t.name))}. Salaries are calculated from attendance.`, `${summarizeList(notCheckedIn.map((t) => t.name))}۔ تنخواہ حاضری سے ہی حساب ہوتی ہے۔`),
+      cta: L('View salaries', 'تنخواہیں دیکھیں'),
       tab: 'teacher_pay',
       tone: 'warn',
       icon: 'checkin',
@@ -241,9 +242,9 @@ function buildPrincipalTasks(input: SmartTaskInput, now: Date): SmartTask[] {
   if (lowAttendance.length > 0) {
     tasks.push({
       id: 'low-attendance',
-      title: `${lowAttendance.length} students ki hazri 75% se kam`,
-      detail: `${summarizeList(lowAttendance)} — parents ko ittila dena behtar hoga.`,
-      cta: 'Register dekhein',
+      title: L(`${lowAttendance.length} student(s) below 75% attendance`, `${lowAttendance.length} طلبہ کی حاضری 75% سے کم`),
+      detail: L(`${summarizeList(lowAttendance)} — better to inform parents.`, `${summarizeList(lowAttendance)} — والدین کو اطلاع دینا بہتر ہوگا۔`),
+      cta: L('View register', 'رجسٹر دیکھیں'),
       tab: 'registers',
       tone: 'info',
       icon: 'marks',
@@ -259,12 +260,12 @@ function buildPrincipalTasks(input: SmartTaskInput, now: Date): SmartTask[] {
     const first = upcoming[0];
     tasks.push({
       id: 'upcoming-event',
-      title: first.inDays === 0 ? `Aaj: ${first.e.title}` : `${first.e.title} — ${first.inDays} din baad`,
+      title: first.inDays === 0 ? L(`Today: ${first.e.title}`, `آج: ${first.e.title}`) : L(`${first.e.title} — in ${first.inDays} day(s)`, `${first.e.title} — ${first.inDays} دن بعد`),
       detail:
         upcoming.length > 1
-          ? `Is hafte ${upcoming.length} events hain. Calendar mein poori list dekh lein.`
-          : `School calendar mein tafseel mojood hai.`,
-      cta: 'Calendar kholein',
+          ? L(`${upcoming.length} events this week. See the full list in Calendar.`, `اس ہفتے ${upcoming.length} ایونٹس ہیں۔ مکمل فہرست کیلنڈر میں دیکھیں۔`)
+          : L('Details are in the school calendar.', 'تفصیل اسکول کیلنڈر میں موجود ہے۔'),
+      cta: L('Open calendar', 'کیلنڈر کھولیں'),
       tab: 'calendar',
       tone: 'info',
       icon: 'event',
@@ -307,9 +308,15 @@ function buildTeacherTasks(input: SmartTaskInput, now: Date): SmartTask[] {
   if (pendingClasses.length > 0) {
     tasks.push({
       id: 'teacher-attendance',
-      title: `Aaj ki hazri baqi — ${pendingClasses.length} class`,
-      detail: `${summarizeList(pendingClasses)} ki roll call lagani hai. Lagane ke baad absent students ke parents ko WhatsApp bhi bhej sakte hain.`,
-      cta: 'Hazri lagayein',
+      title: L(
+        `Attendance pending — ${pendingClasses.length} class(es)`,
+        `حاضری باقی ہے — ${pendingClasses.length} کلاس`
+      ),
+      detail: L(
+        `${summarizeList(pendingClasses)} — roll call not taken yet. After marking you can also WhatsApp the parents of absent students.`,
+        `${summarizeList(pendingClasses)} کی رول کال ابھی نہیں لگی۔ حاضری لگانے کے بعد غیر حاضر طلبہ کے والدین کو واٹس ایپ بھی بھیج سکتے ہیں۔`
+      ),
+      cta: L('Mark attendance', 'حاضری لگائیں'),
       tab: 'attendance',
       tone: 'warn',
       icon: 'attendance',
@@ -324,9 +331,12 @@ function buildTeacherTasks(input: SmartTaskInput, now: Date): SmartTask[] {
       .join(' · ');
     tasks.push({
       id: 'teacher-periods',
-      title: `Aaj aap ke ${myPeriodsToday.length} periods hain`,
+      title: L(
+        `You have ${myPeriodsToday.length} periods today`,
+        `آج آپ کے ${myPeriodsToday.length} پیریڈز ہیں`
+      ),
       detail: `${list}${myPeriodsToday.length > 3 ? ' …' : ''}`,
-      cta: 'Timetable dekhein',
+      cta: L('View timetable', 'ٹائم ٹیبل دیکھیں'),
       tab: 'timetable',
       tone: 'info',
       icon: 'event',
@@ -346,10 +356,16 @@ function buildTeacherTasks(input: SmartTaskInput, now: Date): SmartTask[] {
       id: 'teacher-assignment-due',
       title:
         f.inDays === 0
-          ? `Aaj jama honi hai: ${f.a.title}`
-          : `${f.a.title} — ${f.inDays} din mein jama`,
-      detail: 'Class Diary mein check kar lein ke kis class ke liye di gayi thi.',
-      cta: 'Diary kholein',
+          ? L(`Due today: ${f.a.title}`, `آج جمع ہونی ہے: ${f.a.title}`)
+          : L(
+              `${f.a.title} — due in ${f.inDays} day(s)`,
+              `${f.a.title} — ${f.inDays} دن میں جمع`
+            ),
+      detail: L(
+        'Check the Class Diary to see which class it was assigned to.',
+        'کلاس ڈائری میں دیکھ لیں کہ کس کلاس کے لیے دی گئی تھی۔'
+      ),
+      cta: L('Open diary', 'ڈائری کھولیں'),
       tab: 'diary',
       tone: 'warn',
       icon: 'assignment',
@@ -366,9 +382,9 @@ function buildTeacherTasks(input: SmartTaskInput, now: Date): SmartTask[] {
   if (urgent.length > 0) {
     tasks.push({
       id: 'teacher-notice',
-      title: `Zaroori elaan: ${urgent[0].title}`,
+      title: L(`Important notice: ${urgent[0].title}`, `اہم اعلان: ${urgent[0].title}`),
       detail: urgent[0].message.slice(0, 120) + (urgent[0].message.length > 120 ? '…' : ''),
-      cta: 'Notices kholein',
+      cta: L('Open notices', 'اعلانات کھولیں'),
       tab: 'notices',
       tone: 'info',
       icon: 'notice',
@@ -396,9 +412,12 @@ function buildStudentTasks(input: SmartTaskInput, now: Date): SmartTask[] {
     if (pct < 75) {
       tasks.push({
         id: 'student-attendance',
-        title: `Aap ki hazri ${pct}% hai`,
-        detail: 'Requirement 75% hai. Regular classes mein aana zaroori hai warna exam mein dushwari ho sakti hai.',
-        cta: 'Record dekhein',
+        title: L(`Your attendance is ${pct}%`, `آپ کی حاضری ${pct}% ہے`),
+        detail: L(
+          'The requirement is 75%. Attend classes regularly, otherwise you may face problems in exams.',
+          'ضرورت 75% ہے۔ باقاعدگی سے کلاسوں میں آئیں ورنہ امتحان میں دشواری ہو سکتی ہے۔'
+        ),
+        cta: L('View record', 'ریکارڈ دیکھیں'),
         tab: 'attendance',
         tone: 'danger',
         icon: 'attendance',
@@ -420,12 +439,15 @@ function buildStudentTasks(input: SmartTaskInput, now: Date): SmartTask[] {
       tasks.push({
         id: 'student-assignment',
         title: overdue
-          ? `Late ho gayi: ${f.a.title}`
+          ? L(`Overdue: ${f.a.title}`, `تاریخ گزر گئی: ${f.a.title}`)
           : f.inDays === 0
-            ? `Aaj jama karni hai: ${f.a.title}`
-            : `${f.a.title} — ${f.inDays} din baqi`,
+            ? L(`Due today: ${f.a.title}`, `آج جمع کرنی ہے: ${f.a.title}`)
+            : L(
+                `${f.a.title} — ${f.inDays} day(s) left`,
+                `${f.a.title} — ${f.inDays} دن باقی`
+              ),
         detail: `${f.a.subject} · ${f.a.description.slice(0, 110)}${f.a.description.length > 110 ? '…' : ''}`,
-        cta: 'Assignments kholein',
+        cta: L('Open assignments', 'اسائنمنٹس کھولیں'),
         tab: 'assignments',
         tone: overdue ? 'danger' : 'warn',
         icon: 'assignment',
@@ -440,9 +462,12 @@ function buildStudentTasks(input: SmartTaskInput, now: Date): SmartTask[] {
     if (pending > 0) {
       tasks.push({
         id: 'student-fee',
-        title: `Fee baqi hai — ${formatMoney(pending)}`,
-        detail: 'Fees tab mein mahina-war tafseel mojood hai. Adaigi ke baad receipt mil jayegi.',
-        cta: 'Fees dekhein',
+        title: L(`Fee pending — ${formatMoney(pending)}`, `فیس باقی ہے — ${formatMoney(pending)}`),
+        detail: L(
+          'Month-wise details are in the Fees tab. A receipt is issued after payment.',
+          'ماہ کے حساب سے تفصیل فیس ٹیب میں موجود ہے۔ ادائیگی کے بعد رسید مل جائے گی۔'
+        ),
+        cta: L('View fees', 'فیس دیکھیں'),
         tab: 'fees',
         tone: 'info',
         icon: 'fee',
@@ -458,12 +483,12 @@ function buildStudentTasks(input: SmartTaskInput, now: Date): SmartTask[] {
     if (periods.length > 0) {
       tasks.push({
         id: 'student-periods',
-        title: `Aaj aap ke ${periods.length} periods hain`,
+        title: L(`You have ${periods.length} periods today`, `آج آپ کے ${periods.length} پیریڈز ہیں`),
         detail: periods
           .slice(0, 3)
           .map((p) => `${p.period} — ${p.subject}`)
           .join(' · '),
-        cta: 'Timetable dekhein',
+        cta: L('View timetable', 'ٹائم ٹیبل دیکھیں'),
         tab: 'timetable',
         tone: 'info',
         icon: 'event',

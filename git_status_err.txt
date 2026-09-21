@@ -1,0 +1,2 @@
+'c:\Users\kazam\AppData\Roaming\Code\User\globalStorage\github.copilot-chat\debugCommand' is not recognized as an internal or external command,
+operable program or batch file.

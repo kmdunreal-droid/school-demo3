@@ -1,3 +1,4 @@
+import { L } from '../lib/i18n';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Key, Eye, EyeOff, Sparkles, Save, Trash2, Zap, CheckCircle2, XCircle } from 'lucide-react';
@@ -20,15 +21,15 @@ export default function AiSettingsSection() {
     e.preventDefault();
     const trimmed = key.trim();
     if (!trimmed) {
-      toast.error('Pehle API key paste karein — aistudio.google.com se free mein milti hai.');
+      toast.error(L('Paste the API key first — it is free at aistudio.google.com.', 'پہلے API کلید پیسٹ کریں — یہ aistudio.google.com پر مفت ملتی ہے۔'));
       return;
     }
     try {
       setGeminiApiKey(trimmed);
       setAiOn(true);
-      toast.success('✅ Gemini API key saved! AI features ab enabled hain.');
+      toast.success(L('✅ Gemini API key saved! AI features are now enabled.', '✅ Gemini API کلید محفوظ ہو گئی! AI فیچرز اب فعال ہیں۔'));
     } catch (err) {
-      toast.error('Key save nahi hui — localStorage block ho sakta hai.');
+      toast.error(L('Key was not saved — localStorage may be blocked.', 'کلید محفوظ نہیں ہوئی — localStorage بلاک ہو سکتا ہے۔'));
     }
   };
 
@@ -37,12 +38,12 @@ export default function AiSettingsSection() {
     setShowKey(false);
     clearGeminiApiKey();
     setAiOn(isAiEnabled());
-    toast.success('API key remove kar di gayi. AI features ab disabled hain.');
+    toast.success(L('API key removed. AI features are now disabled.', 'API کلید ہٹا دی گئی۔ AI فیچرز اب بند ہیں۔'));
   };
 
   const handleTest = async () => {
     if (!key.trim()) {
-      toast.error('Pehle API key paste karein (Save karne ki zaroorat nahi).');
+      toast.error(L('Paste the API key first (no need to save).', 'پہلے API کلید پیسٹ کریں (محفوظ کرنے کی ضرورت نہیں)۔'));
       return;
     }
     setTesting(true);
@@ -51,10 +52,10 @@ export default function AiSettingsSection() {
       setGeminiApiKey(key.trim());
       setAiOn(true);
       const ok = await testAiConnection();
-      if (ok) toast.success('✅ AI connection OK — key valid hai! Features ready hain.');
-      else toast.error('⚠️ AI ne koi response nahi diya — key/model check karein.');
+      if (ok) toast.success(L('✅ AI connection OK — the key is valid! Features are ready.', '✅ AI کنکشن درست — کلید معتبر ہے! فیچرز تیار ہیں۔'));
+      else toast.error(L('⚠️ AI gave no response — check the key/model.', '⚠️ AI نے کوئی جواب نہیں دیا — کلید/ماڈل چیک کریں۔'));
     } catch (err: any) {
-      toast.error(`❌ AI test failed: ${err?.message || 'Invalid key ya network issue'}`);
+      toast.error(L(`❌ AI test failed: ${err?.message || 'Invalid key or network issue'}`, `❌ AI ٹیسٹ ناکام: ${err?.message || 'کلید غلط یا نیٹ ورک کا مسئلہ'}`));
     } finally {
       setTesting(false);
     }
@@ -75,7 +76,7 @@ export default function AiSettingsSection() {
             <h3 className="text-sm font-black uppercase text-slate-800 dark:text-slate-100 flex items-center gap-2">
               AI (Gemini) — API Key &amp; Features
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Settings se AI key enter karein — .env edit karne ki zaroorat nahi.</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">{L('Enter the AI key from Settings — no need to edit .env.', 'سیٹنگز سے AI کلید درج کریں — .env میں تبدیلی کی ضرورت نہیں۔')}</p>
           </div>
         </div>
         <span
@@ -84,9 +85,9 @@ export default function AiSettingsSection() {
           }`}
         >
           {aiOn ? (
-            <><CheckCircle2 size={13} /> AI Ready — {aiModelName()}</>
+            <>{<CheckCircle2 size={13} />}{L('AI Ready', 'AI تیار')} — {aiModelName()}</>
           ) : (
-            <><XCircle size={13} /> AI Off — key add karein</>
+            <>{<XCircle size={13} />}{L('AI Off — add a key', 'AI بند — کلید شامل کریں')}</>
           )}
         </span>
       </div>
@@ -174,8 +175,8 @@ export default function AiSettingsSection() {
         <p className="font-bold uppercase tracking-widest mb-0.5 flex items-center gap-1.5">
           <Key size={11} /> Security Note
         </p>
-        Key sirf <strong>is browser ke localStorage</strong> mein hoti hai (cloud/Supabase sync <strong>nahi</strong> hoti).
-        Save karne ke baad <strong>AI Paper Generator</strong>, <strong>MCQ Generator</strong> aur <strong>Student Remarks</strong> — teeno features isi waqt enabled ho jate hain. Koi feature "AI Off" dikhe to Settings tab kholein aur key enter karein.
+        {L('The key is stored only in ', 'کلید صرف ')}<strong>{L("this browser's localStorage", 'اسی براؤزر کے localStorage')}</strong>{L('. It does ', ' میں محفوظ رہتی ہے۔ یہ ')}<strong>{L('not', 'نہیں')}</strong>{L(' sync to cloud/Supabase.', ' کلاؤڈ/Supabase سے ہم آہنگ ہوتی۔')}
+        {L('After saving, ', 'محفوظ کرنے کے بعد ')}<strong>AI Paper Generator</strong>{L(', ', '، ')}<strong>MCQ Generator</strong>{L(' and ', ' اور ')}<strong>Student Remarks</strong>{L(' — all three features become active at once. If a feature shows "AI Off", open the Settings tab and enter the key.', ' — تینوں فیچرز فوراً فعال ہو جاتے ہیں۔ اگر کوئی فیچر "AI Off" دکھائے تو سیٹنگز ٹیب کھول کر کلید درج کریں۔')}
       </div>
     </div>
   );

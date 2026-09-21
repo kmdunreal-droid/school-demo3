@@ -2,6 +2,7 @@
  * CERTIFICATES & EXPORT — Principal portal.
  * Transfer/Character/Bonafide certificate (print A4) + CSV export.
  */
+import { L } from '../lib/i18n';
 import { useState, useMemo } from 'react';
 import { Printer, FileSpreadsheet } from 'lucide-react';
 import { toast } from 'sonner';
@@ -42,7 +43,7 @@ export default function CertificateTab({ students, classes, attendance, fees }: 
   }, [student, attendance, fees]);
 
   const printCertificate = () => {
-    if (!student || !studentStats) { toast.error('Pehle student select karein'); return; }
+    if (!student || !studentStats) { toast.error(L('Select a student first', 'پہلے طالب علم منتخب کریں')); return; }
     const today = new Date().toLocaleDateString('en-GB');
     const label = CERT_LABELS[type];
     const classText = classObj ? `${classObj.className} ${classObj.section}` : '______';
@@ -85,10 +86,10 @@ export default function CertificateTab({ students, classes, attendance, fees }: 
 <script>window.onload=function(){setTimeout(function(){window.print();},400);};</script>
 </body></html>`;
     const w = window.open('', '_blank');
-    if (!w) { toast.error('Popup block hai — allow karein'); return; }
+    if (!w) { toast.error(L('Popup blocked — please allow it', 'پاپ اپ بلاک ہے — اجازت دیں')); return; }
     w.document.write(html);
     w.document.close();
-    toast.success('Certificate print window khul gaya!');
+    toast.success(L('Certificate print window opened!', 'سرٹیفکیٹ پرنٹ ونڈو کھل گئی!'));
   };
 
   const exportStudents = () => {
@@ -99,21 +100,21 @@ export default function CertificateTab({ students, classes, attendance, fees }: 
         ParentPhone: s.parentPhone, BaseFee: s.baseFee ?? '', Enrollment: s.enrollmentMonth ?? '',
       };
     }));
-    toast.success('Students CSV download ho gayi!');
+    toast.success(L('Students CSV downloaded!', 'طلبہ کی CSV ڈاؤن لوڈ ہو گئی!'));
   };
   const exportFees = () => {
     downloadCsv('fees.csv', fees.map(f => ({
       Student: students.find(s => String(s.id) === String(f.studentId))?.name || f.studentId,
       Month: f.month, Amount: f.amount, Status: f.status, PaidDate: f.paidDate || '', Method: f.paymentMethod || '', Type: f.feeType || '',
     })));
-    toast.success('Fees CSV download ho gaya!');
+    toast.success(L('Fees CSV downloaded!', 'فیس کی CSV ڈاؤن لوڈ ہو گئی!'));
   };
   const exportAttendance = () => {
     downloadCsv('attendance.csv', attendance.map(a => ({
       Student: students.find(s => String(s.id) === String(a.studentId))?.name || a.studentId,
       Date: a.date, Status: a.status, MarkedBy: a.markedBy || '',
     })));
-    toast.success('Attendance CSV download ho gaya!');
+    toast.success(L('Attendance CSV downloaded!', 'حاضری کی CSV ڈاؤن لوڈ ہو گئی!'));
   };
 
   return (
@@ -129,7 +130,7 @@ export default function CertificateTab({ students, classes, attendance, fees }: 
         <h3 className="text-sm font-black text-slate-700 uppercase tracking-widest">Certificate Generator</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <select value={studentId} onChange={e => setStudentId(e.target.value)} className="px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold">
-            <option value="">Student select karein...</option>
+            <option value="">{L('Select a student...', 'طالب علم منتخب کریں…')}</option>
             {students.map(s => {
               const c = cls(s);
               return <option key={s.id} value={s.id}>{s.name} — {c ? `${c.className} ${c.section}` : 'No Class'}</option>;
@@ -150,7 +151,7 @@ export default function CertificateTab({ students, classes, attendance, fees }: 
           <input
             value={remarks}
             onChange={e => setRemarks(e.target.value)}
-            placeholder="Extra remarks (optional — Character Certificate ke liye)"
+            placeholder={L('Extra remarks (optional — for the Character Certificate)', 'اضافی ریمارکس (اختیاری — کریکٹر سرٹیفکیٹ کے لیے)')}
             className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs"
           />
         )}

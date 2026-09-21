@@ -1,11 +1,11 @@
-﻿import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import { 
   Users, Calendar, Award, CheckSquare, LogOut, Save, UserCheck, UserX, User,
   Clock, AlertCircle, Sparkles, BookOpen, Menu, X, ArrowLeft, ClipboardList, Info, CreditCard,
   Bell, CheckCircle2, ListTodo, CalendarDays, ArrowRight, Search, PlusCircle, AlertTriangle, ChevronDown, Sun, Moon, Phone, Trash2, Plus, Send, Download, Fingerprint, School, RefreshCw, Printer,
-  Wallet, Banknote, MapPin, Navigation, Receipt, LocateFixed, Coins, CalendarClock, Megaphone, HelpCircle, Pin
+  Wallet, Banknote, MapPin, Navigation, Receipt, LocateFixed, Coins, CalendarClock, Megaphone, Pin
 } from 'lucide-react';
 import QuizModule from './QuizModule';
 import AiPaperGenerator from './AiPaperGenerator';
@@ -22,22 +22,16 @@ import { defaultPayConfig, summarizeTeacherMonth, buildPayslip, monthKeyOf, mont
 import { INITIAL_TEACHER_PAY_CONFIGS, INITIAL_SCHOOL_LOCATION } from '../initialData';
 import { listChanged } from '../lib/dataUtils';
 import { HoldActionWrapper } from './HoldActionWrapper';
-// â”€â”€ Naya design system + onboarding (Batch 3â€“5) â”€â”€
-import TourOverlay from './TourOverlay';
-import HelpCenter from './HelpCenter';
+// ── Naya design system + onboarding (Batch 3–5) ──
 import SmartTaskPanel from './SmartTaskPanel';
 import CommandPalette from './CommandPalette';
-import { getNavItems, groupNavItems, NAV_GROUP_LABELS, type NavGroupId } from '../lib/navConfig';
+import { getNavItems, groupNavItems, NAV_GROUP_LABELS, navLabel, navHint, groupLabel, type NavGroupId } from '../lib/navConfig';
 import { buildSmartTasks } from '../lib/smartActions';
 import { getFavorites, toggleFavorite } from '../lib/favorites';
-import {
-  HELP_OPEN_EVENT,
-  TOUR_START_EVENT,
-  getTutorialPrefs,
-  initMotionPreference,
-  markTourCompleted,
-  shouldAutoStartTour,
-} from '../lib/tutorialPrefs';
+import { initMotionPreference } from '../lib/motionPrefs';
+import { useLang, t, i18nCls, L } from '../lib/i18n';
+import LanguageToggle from './LanguageToggle';
+import LanguageCard from './LanguageCard';
 
 interface TeacherDashboardProps {
   userSession: UserSession;
@@ -68,7 +62,7 @@ type TabType = 'dashboard' | 'students' | 'attendance' | 'marks' | 'timetable' |
 
 import { safeStorage } from '../lib/safeStorage';
 
-/** localStorage se typed load â€” demo mode ka primary store. */
+/** localStorage se typed load — demo mode ka primary store. */
 function loadLocalJSON<T>(key: string, fallback: T): T {
   try {
     const raw = safeStorage.getItem(key);
@@ -142,7 +136,7 @@ export default function TeacherDashboard({
   useEffect(() => { timetableRef.current = timetable; }, [timetable]);
   useEffect(() => { attendanceRef.current = attendance; }, [attendance]);
 
-  // Real-time Supabase listener â€” WebSocket push; doosri devices ki changes turant apply
+  // Real-time Supabase listener — WebSocket push; doosri devices ki changes turant apply
   useEffect(() => {
     const applyReload = async () => {
       try {
@@ -419,7 +413,7 @@ export default function TeacherDashboard({
   );
 
   const handleTeacherCheckIn = async () => {
-    if (myTodayAttendance?.checkIn) { toast.info('Aap already check-in kar chuke hain.'); return; }
+    if (myTodayAttendance?.checkIn) { toast.info(L('You have already checked in.', 'آپ پہلے ہی حاضری لگا چکے ہیں۔')); return; }
     let pos: { latitude: number; longitude: number } | null = null;
     let dist = Number.NaN;
     if (useDemoPosition) {
@@ -429,12 +423,12 @@ export default function TeacherDashboard({
       pos = await getCurrentPosition();
       if (!pos) {
         setUseDemoPosition(true);
-        toast.error('Device location nahi mili â€” neeche "Demo GPS (School Location)" tick karke dobara Check-In Try karein.');
+        toast.error(L('Device location not found — tick "Demo GPS (School Location)" below and try Check-In again.', 'ڈیوائس کی لوکیشن نہیں ملی — نیچے "Demo GPS (School Location)" ٹک کر کے دوبارہ Check-In کریں۔'));
         return;
       }
       dist = haversineMeters(schoolLocation.lat, schoolLocation.lng, pos.latitude, pos.longitude);
       if (getAttendanceSettings().gpsRestricted && dist > schoolLocation.radiusMeters) {
-        toast.error(`Aap school se ${formatDistance(dist)} door hain (radius ${schoolLocation.radiusMeters} m). Attendance sirf school ke andar se mark hoti hai.`);
+        toast.error(L(`You are ${formatDistance(dist)} away from school (radius ${schoolLocation.radiusMeters} m). Attendance can be marked only inside the school.`, `آپ اسکول سے ${formatDistance(dist)} دور ہیں (رداس ${schoolLocation.radiusMeters} میٹر)۔ حاضری صرف اسکول کے اندر سے لگتی ہے۔`));
         return;
       }
     }
@@ -463,13 +457,13 @@ export default function TeacherDashboard({
       role: 'all'
     });
     toast.success(isLate
-      ? `Check-in ho gaya (${now.toLocaleTimeString()}) â€” LATE ${useDemoPosition ? '' : 'Â· ' + formatDistance(dist || 0)}`
-      : `Check-in ho gaya (${now.toLocaleTimeString()}) âœ… ${useDemoPosition ? '' : 'Â· ' + formatDistance(dist || 0)}`);
+      ? L(`Checked in (${now.toLocaleTimeString()}) — LATE ${useDemoPosition ? '' : '· ' + formatDistance(dist || 0)}`, `حاضری لگ گئی (${now.toLocaleTimeString()}) — تاخیر ${useDemoPosition ? '' : '· ' + formatDistance(dist || 0)}`)
+      : L(`Checked in (${now.toLocaleTimeString()}) ✅ ${useDemoPosition ? '' : '· ' + formatDistance(dist || 0)}`, `حاضری لگ گئی (${now.toLocaleTimeString()}) ✅ ${useDemoPosition ? '' : '· ' + formatDistance(dist || 0)}`));
   };
 
   const handleTeacherCheckOut = async () => {
-    if (!myTodayAttendance?.checkIn) { toast.info('Pehle Check-In karein, phir Check-Out hoga.'); return; }
-    if (myTodayAttendance.checkOut) { toast.info('Aap already check-out kar chuke hain.'); return; }
+    if (!myTodayAttendance?.checkIn) { toast.info(L('Check in first, then Check-Out becomes available.', 'پہلے Check-In کریں، پھر Check-Out ہو گا۔')); return; }
+    if (myTodayAttendance.checkOut) { toast.info(L('You have already checked out.', 'آپ پہلے ہی Check-Out کر چکے ہیں۔')); return; }
     const now = new Date();
     let dist = myTodayAttendance.distanceMeters;
     let pos: { latitude: number; longitude: number } | null = null;
@@ -488,12 +482,12 @@ export default function TeacherDashboard({
     addNotification({
       type: 'attendance_complete',
       title: `Check-out: ${userSession.name}`,
-      message: `${userSession.name} ne ${now.toLocaleTimeString()} par check-out kiya. Din mukammal âœ”`,
+      message: L(`${userSession.name} checked out at ${now.toLocaleTimeString()}. Day complete ✔`, `${userSession.name} نے ${now.toLocaleTimeString()} پر Check-Out کیا۔ دن مکمل ✔`),
       teacherId: teacherId,
       classId: '',
       role: 'all'
     });
-    toast.success(`Check-out ho gaya (${now.toLocaleTimeString()}) â€” din mukammal âœ…`);
+    toast.success(L(`Checked out (${now.toLocaleTimeString()}) — day complete ✅`, `Check-Out ہو گیا (${now.toLocaleTimeString()}) — دن مکمل ✅`));
   };
 
   // Monthly self-attendance calendar
@@ -538,7 +532,7 @@ export default function TeacherDashboard({
     [teacherProfile, myPayConfig, myTeacherAttendance, payYear, payMonthIdx, teacherPaySlips]
   );
 
-  // ===== COMPLETE SALARY HISTORY â€” service tenure + saare months ka hisab =====
+  // ===== COMPLETE SALARY HISTORY — service tenure + saare months ka hisab =====
   const salaryHistory = React.useMemo(() => {
     const now = new Date();
     const curY = now.getFullYear();
@@ -564,7 +558,7 @@ export default function TeacherDashboard({
       }
     }
 
-    // Har month ka payslip â€” join month se current month tak
+    // Har month ka payslip — join month se current month tak
     const slips: TeacherPayslip[] = [];
     let y = minY, m = minM;
     while (y < curY || (y === curY && m <= curM)) {
@@ -573,7 +567,7 @@ export default function TeacherDashboard({
       if (m > 11) { m = 0; y++; }
     }
 
-    // Tenure â€” kitne saal/mahine se hain
+    // Tenure — kitne saal/mahine se hain
     let tenureMonths = (curY - minY) * 12 + (curM - minM);
     if (tenureMonths < 0) tenureMonths = 0;
     const tenureYears = Math.floor(tenureMonths / 12);
@@ -612,7 +606,7 @@ export default function TeacherDashboard({
     const s = myPayslip;
     const rows =
       `<tr><td class="lbl">Base Salary</td><td class="amt">${formatPKR(s.baseSalary)}</td></tr>
-      <tr><td class="lbl">Present Days (${s.presentDays}) Ã— Daily Bonus</td><td class="amt">+ ${formatPKR(s.presentBonus)}</td></tr>
+      <tr><td class="lbl">Present Days (${s.presentDays}) × Daily Bonus</td><td class="amt">+ ${formatPKR(s.presentBonus)}</td></tr>
       <tr><td class="lbl">Allowances</td><td class="amt">+ ${formatPKR(s.allowances)}</td></tr>
       <tr><td class="lbl">Late Deduction (${s.lateDays} day)</td><td class="amt">- ${formatPKR(s.lateDeduction)}</td></tr>
       <tr><td class="lbl">Absent Deduction (${s.absentDays} day)</td><td class="amt">- ${formatPKR(s.absentDeduction)}</td></tr>
@@ -637,7 +631,7 @@ export default function TeacherDashboard({
   </style></head><body>
   <div class="slip">
     <div class="head">
-      <div><h1>${t.name}</h1><div style="font-size:12px;opacity:.9;text-transform:uppercase;letter-spacing:.1em;">${t.subject} Â· Payslip</div></div>
+      <div><h1>${t.name}</h1><div style="font-size:12px;opacity:.9;text-transform:uppercase;letter-spacing:.1em;">${t.subject} · Payslip</div></div>
       <div class="pct"><div class="lbl">Net Payable</div><div class="big">${formatPKR(s.netPay)}</div><div style="font-size:11px;opacity:.85;">${monthLabel(s.year, s.month)}</div></div>
     </div>
     <div class="meta">
@@ -650,7 +644,7 @@ export default function TeacherDashboard({
     </div>
     <table>${rows}</table>
     <table><tr class="tot"><td>Net Payable</td><td style="text-align:right">${formatPKR(s.netPay)}</td></tr></table>
-    <div class="foot"><span>Demo School â€” Digital Registrar</span><span>Generated: ${new Date().toLocaleString()}</span></div>
+    <div class="foot"><span>Demo School — Digital Registrar</span><span>Generated: ${new Date().toLocaleString()}</span></div>
   </div>
   <script>window.onload=function(){setTimeout(function(){window.print();},300);};<\/script>
   </body></html>`;
@@ -747,25 +741,20 @@ export default function TeacherDashboard({
   const classesTaughtToday = Array.from(new Set(todayClasses.map(tt => tt.classId)));
 
   /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     ONBOARDING Â· SMART ACTIONS Â· SEARCH  (naya "easy to use" layer)
+     ONBOARDING · SMART ACTIONS · SEARCH  (naya "easy to use" layer)
      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
-  const [tourOpen, setTourOpen] = useState(false);
-  const [helpOpen, setHelpOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [pins, setPins] = useState<string[]>(() => getFavorites(userSession.role));
+  const [lang] = useLang();
+  const cls = i18nCls(lang);
 
-  // Motion preference apply karo + pehli baar login par tour khud dikhao
+  // Motion preference (reduce-motion) apply karo
   useEffect(() => {
     initMotionPreference();
-    const timer = window.setTimeout(() => {
-      if (shouldAutoStartTour(userSession.role)) setTourOpen(true);
-    }, 1400);
-    return () => window.clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Ctrl+K search + window event bus (theme toggle ka same pattern)
+  // Ctrl+K search — kahin se bhi turant dhoondein
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
@@ -773,16 +762,8 @@ export default function TeacherDashboard({
         setPaletteOpen(true);
       }
     };
-    const onTour = () => setTourOpen(true);
-    const onHelp = () => setHelpOpen(true);
     window.addEventListener('keydown', onKey);
-    window.addEventListener(TOUR_START_EVENT, onTour);
-    window.addEventListener(HELP_OPEN_EVENT, onHelp);
-    return () => {
-      window.removeEventListener('keydown', onKey);
-      window.removeEventListener(TOUR_START_EVENT, onTour);
-      window.removeEventListener(HELP_OPEN_EVENT, onHelp);
-    };
+    return () => window.removeEventListener('keydown', onKey);
   }, []);
 
   const navItems = useMemo(() => getNavItems(userSession.role), [userSession.role]);
@@ -801,7 +782,7 @@ export default function TeacherDashboard({
         timetable,
         assignments,
       }),
-    [userSession.role, userSession.id, teacherId, teachers, students, classes, attendance, marks, timetable, assignments]
+    [userSession.role, userSession.id, teacherId, teachers, students, classes, attendance, marks, timetable, assignments, lang]
   );
 
   const pinnedItems = useMemo(
@@ -866,7 +847,7 @@ export default function TeacherDashboard({
             const classStr = classObj ? `${classObj.className}-${classObj.section}` : '';
             
             // Trigger Toast Notification
-            toast.success(`ðŸ”” Class Bell: ${lecture.period} has started!`, {
+            toast.success(`🔔 Class Bell: ${lecture.period} has started!`, {
               description: `Subject "${lecture.subject}" is active for Class ${classStr}.`,
               duration: 8000
             });
@@ -909,7 +890,7 @@ export default function TeacherDashboard({
     const classStr = classObj ? `${classObj.className}-${classObj.section}` : 'General';
 
     // Show simulation toast
-    toast.info(`ðŸ”” Simulated Bell: ${lecture.period} started!`, {
+    toast.info(`🔔 Simulated Bell: ${lecture.period} started!`, {
       description: `Class: ${classStr} | Subject: ${lecture.subject}. Notification has been dispatched to both your portal and your students!`,
       duration: 6000
     });
@@ -918,7 +899,7 @@ export default function TeacherDashboard({
     addNotification({
       type: 'period_bell',
       title: `${lecture.period} Started (${lecture.subject}) â°`,
-      message: `ðŸ”” Simulated School Bell is ringing! Today's lecture "${lecture.subject}" for Class ${classStr} with instructor ${userSession.name} has begun.`,
+      message: `🔔 Simulated School Bell is ringing! Today's lecture "${lecture.subject}" for Class ${classStr} with instructor ${userSession.name} has begun.`,
       teacherId: teacherId,
       classId: lecture.classId,
       role: 'all'
@@ -1250,7 +1231,7 @@ export default function TeacherDashboard({
     });
     setMarks([...cleanMarks, ...newRecords]);
     syncMarksToFirestore(removedForReport, newRecords);
-    toast.success(`Report saved for ${student.name} â€” visible in Principal Report.`);
+    toast.success(`Report saved for ${student.name} — visible in Principal Report.`);
   };
 
   // Auto-sync marks to Supabase (cloud) so data survives refresh / other devices
@@ -1331,7 +1312,7 @@ export default function TeacherDashboard({
           <img src="/logo.png" alt="Demo School Logo" className="h-10 w-auto object-contain" referrerPolicy="no-referrer" />
           <div>
             <h1 className="font-black text-gray-900 tracking-tight uppercase text-lg leading-none">Demo School</h1>
-            <p className="text-[10px] font-bold text-teal-600 uppercase tracking-[0.2em] mt-0.5">Teacher Portal</p>
+            <p className={`text-[10px] font-bold text-teal-600 uppercase tracking-[0.2em] mt-0.5 ${cls}`}>{t('portal.teacher')}</p>
           </div>
         </div>
         <div className="flex items-center gap-2 relative">
@@ -1395,18 +1376,18 @@ export default function TeacherDashboard({
           </div>
           <div className="text-center w-full">
             <h1 className="text-slate-900 font-black text-sm tracking-widest uppercase leading-none">Demo School</h1>
-            <p className="text-teal-600 font-black text-[10px] tracking-[0.3em] uppercase mt-1">Teacher Portal</p>
+            <p className={`text-teal-600 font-black text-[10px] tracking-[0.3em] uppercase mt-1 ${cls}`}>{t('portal.teacher')}</p>
           </div>
         </div>
 
-        {/* Grouped Navigation â€” tarteeb-waar (src/lib/navConfig.ts se) */}
+        {/* Grouped Navigation — tarteeb-waar (src/lib/navConfig.ts se) */}
         <nav
           data-tour="sidebar"
           className="flex-1 overflow-y-auto overscroll-contain px-4 pb-4 mt-2 custom-scrollbar"
         >
           {pinnedItems.length > 0 && (
             <div className="mb-3">
-              <p className="nav-group">ðŸ“Œ Favourites</p>
+              <p className={`nav-group ${cls}`}>{t('sidebar.favourites')}</p>
               <div className="space-y-1">
                 {pinnedItems.map((item) => (
                   <button
@@ -1423,7 +1404,7 @@ export default function TeacherDashboard({
                     className={`nav-item ${activeTab === item.id ? 'nav-item-active' : ''}`}
                   >
                     <item.icon size={15} className="nav-icon" />
-                    <span className="truncate">{item.label}</span>
+                    <span className={`truncate ${cls}`}>{navLabel(item, userSession.role, lang)}</span>
                   </button>
                 ))}
               </div>
@@ -1432,13 +1413,13 @@ export default function TeacherDashboard({
 
           {navGroups.map((group) => (
             <div key={group.id} className="mb-3">
-              <p className="nav-group">{NAV_GROUP_LABELS[group.id as NavGroupId]}</p>
+              <p className={`nav-group ${cls}`}>{groupLabel(group.id, lang)}</p>
               <div className="space-y-1">
                 {group.items.map((item) => (
                   <button
                     key={item.id}
                     data-tour={`nav-${item.id}`}
-                    title={item.hint}
+                    title={navHint(item, userSession.role, lang)}
                     onClick={() => {
                       if (item.entry === 'attendance') handleEnterAttendanceTab(activeClassId || myClasses[0]?.id || '', attendanceDate);
                       if (item.entry === 'marks') handleEnterMarksTab(selectedMarkClassId || classes[0]?.id || '', selectedSubject, selectedExamType);
@@ -1448,13 +1429,13 @@ export default function TeacherDashboard({
                     className={`nav-item group/nav relative ${activeTab === item.id ? 'nav-item-active' : ''}`}
                   >
                     <item.icon size={15} className="nav-icon" />
-                    <span className="truncate">{item.label}</span>
+                    <span className={`truncate ${cls}`}>{navLabel(item, userSession.role, lang)}</span>
                     <span
                       role="button"
                       tabIndex={0}
                       onClick={(e) => { e.stopPropagation(); handleTogglePin(item.id); }}
-                      title={pins.includes(item.id) ? 'Pin hatayein' : 'Pin karein'}
-                      aria-label={pins.includes(item.id) ? 'Pin hatayein' : 'Pin karein'}
+                      title={pins.includes(item.id) ? L('Unpin', 'پن ہٹائیں') : L('Pin', 'پن کریں')}
+                      aria-label={pins.includes(item.id) ? L('Unpin', 'پن ہٹائیں') : L('Pin', 'پن کریں')}
                       className={`absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 transition-all ${
                         activeTab === item.id
                           ? 'text-white/80 hover:text-white'
@@ -1469,13 +1450,19 @@ export default function TeacherDashboard({
             </div>
           ))}
 
+          {/* Language Toggle in Teacher Sidebar */}
+          <div className={`mt-3 flex items-center justify-between px-1 ${cls}`}>
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t('sidebar.language')}</span>
+            <LanguageToggle />
+          </div>
+
             {/* Install Button in Teacher Sidebar */}
             <button
               onClick={onInstallApp}
               className="w-full flex items-center gap-3 px-4 py-3 text-xs font-black uppercase tracking-widest text-left transition-all bg-teal-50 text-teal-700 hover:bg-teal-100 mt-2 border border-teal-100 rounded-xl"
             >
               <Download size={14} className="text-teal-600" />
-              Install App
+              <span className={cls}>{t('sidebar.install')}</span>
             </button>
           </nav>
 
@@ -1496,7 +1483,7 @@ export default function TeacherDashboard({
             className="w-full py-3.5 bg-rose-600 text-white hover:bg-rose-700 transition-all text-xs font-black uppercase tracking-widest text-center cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-rose-100 rounded-xl"
           >
             <LogOut size={16} />
-            EXIT FACULTY PORTAL
+            <span className={cls}>{t('sidebar.logoutTeacher')}</span>
           </button>
         </div>
       </div>
@@ -1511,7 +1498,7 @@ export default function TeacherDashboard({
               <img src="/logo.png" alt="Demo School Logo" className="h-14 w-auto object-contain sm:block hidden" referrerPolicy="no-referrer" />
               <div className="sm:block hidden leading-none select-none">
                 <h2 className="text-3xl font-black text-slate-900 tracking-tight">Demo School</h2>
-                <p className="text-teal-600 font-black text-[10px] tracking-[0.3em] uppercase mt-1">Teacher Portal</p>
+                <p className={`text-teal-600 font-black text-[10px] tracking-[0.3em] uppercase mt-1 ${cls}`}>{t('portal.teacher')}</p>
               </div>
             </div>
             
@@ -1546,7 +1533,7 @@ export default function TeacherDashboard({
               return (
                 <div className="flex items-center gap-2 px-3 py-1 bg-red-50 border border-red-100 text-red-700 rounded-full text-xs font-extrabold uppercase tracking-widest animate-pulse">
                   <span className="w-1.5 h-1.5 rounded-full bg-red-650 animate-ping"></span>
-                  LIVE: {currentPeriodObj.period} ({currentPeriodObj.subject} â€” Class {classLabel})
+                  LIVE: {currentPeriodObj.period} ({currentPeriodObj.subject} — Class {classLabel})
                 </div>
               );
             })()}
@@ -1627,7 +1614,7 @@ export default function TeacherDashboard({
                             >
                               <div className="flex items-start gap-2.5">
                                 <span className="text-xs">
-                                  {notif.type === 'period_bell' ? 'ðŸ””' : notif.type === 'fee_due' ? 'ðŸ’°' : 'ðŸ“…'}
+                                  {notif.type === 'period_bell' ? '🔔' : notif.type === 'fee_due' ? '💰' : '📅'}
                                 </span>
                                 <div className="space-y-0.5 max-w-[210px] overflow-hidden">
                                   <h4 className="font-extrabold text-xs text-slate-900 leading-tight flex items-center gap-1.5">
@@ -1653,26 +1640,26 @@ export default function TeacherDashboard({
         {/* ========== TEACHER DASHBOARD HOME ========== */}
         {activeTab === 'dashboard' && (
           <div id="panel-teacher-home" className="space-y-8 animate-fade-in bg-teal-50/50 p-4 sm:p-6 -mx-4 sm:-mx-6 rounded-2xl border border-teal-100 shadow-inner">
-            {/* Header Block */}
-            <div className="bg-gradient-to-br from-slate-900 via-teal-900 to-slate-900 rounded-3xl shadow-xl shadow-teal-100 p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 overflow-hidden relative">
-              <div className="absolute -top-16 -right-16 w-64 h-64 bg-teal-500/20 rounded-full blur-3xl pointer-events-none"></div>
-              <div className="absolute -bottom-20 -left-10 w-64 h-64 bg-teal-400/20 rounded-full blur-3xl pointer-events-none"></div>
+            {/* Header Block — vibrant gradient + bilingual */}
+            <div className="greet-teacher rounded-3xl shadow-xl p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 overflow-hidden relative">
+              <div className="absolute -top-16 -right-16 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
+              <div className="absolute -bottom-20 -left-10 w-64 h-64 bg-fuchsia-400/20 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
               <div className="relative z-10">
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-teal-300 mb-1">Welcome back, Faculty</p>
-                <h1 className="text-xl md:text-2xl font-black text-white tracking-tight font-display uppercase">{userSession.name}</h1>
+                <p className={`text-[10px] font-black uppercase tracking-[0.3em] text-fuchsia-200 mb-1 ${cls}`}>{t('home.welcome')}, Faculty</p>
+                <h1 className={`text-xl md:text-2xl font-black text-white tracking-tight font-display uppercase ${cls}`}>{userSession.name}</h1>
                 <div className="flex flex-wrap items-center gap-3 mt-3">
-                  <div className="px-2.5 py-1 bg-white/10 text-amber-300 text-xs font-bold uppercase tracking-wider border border-white/10 rounded-full backdrop-blur-sm">
-                    Faculty Member
+                  <div className={`px-2.5 py-1 bg-white/10 text-amber-300 text-xs font-bold uppercase tracking-wider border border-white/10 rounded-full backdrop-blur-sm ${cls}`}>
+                    {t('home.facultyMember')}
                   </div>
                   <div className="w-1 h-1 rounded-full bg-white/30"></div>
-                  <span className="text-xs font-bold text-slate-300 uppercase tracking-tight">
+                  <span className={`text-xs font-bold text-slate-200 uppercase tracking-tight ${cls}`}>
                     {teacherSubject}
                   </span>
                   {myClasses.some(c => c.classTeacherId === teacherId) && (
                     <>
                       <div className="w-1 h-1 rounded-full bg-white/30"></div>
-                      <span className="text-xs font-bold text-amber-300 uppercase tracking-tight">
-                        Class Incharge: {myClasses.find(c => c.classTeacherId === teacherId)?.className}
+                      <span className={`text-xs font-bold text-amber-300 uppercase tracking-tight ${cls}`}>
+                        {t('home.classIncharge')}: {myClasses.find(c => c.classTeacherId === teacherId)?.className}
                       </span>
                     </>
                   )}
@@ -1684,11 +1671,11 @@ export default function TeacherDashboard({
                   const mc = myClasses.find(c => c.classTeacherId === teacherId);
                   return (
                     <div className="relative z-10 p-4 bg-white/10 rounded-2xl border border-white/10 backdrop-blur-sm flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-xl bg-amber-500/25 flex items-center justify-center">
                         <UserCheck className="text-amber-300 shrink-0" size={20} />
                       </div>
                       <div>
-                        <h4 className="text-[10px] font-extrabold text-slate-300 uppercase tracking-wider">My Designated Class</h4>
+                        <h4 className={`text-[10px] font-extrabold text-slate-300 uppercase tracking-wider ${cls}`}>{t('home.designatedClass')}</h4>
                         <p className="text-sm text-white font-bold mt-0.5">{mc?.className} - {mc?.section}</p>
                       </div>
                     </div>
@@ -1725,7 +1712,7 @@ export default function TeacherDashboard({
                 {/* Overall status pills */}
                 <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
                   <span className="bg-slate-100 text-slate-705 px-2.5 py-1 font-bold">
-                    ðŸ“… {currentDayName} Schedule
+                    📅 {currentDayName} Schedule
                   </span>
                   {pendingCount > 0 ? (
                     <span className="bg-amber-500 text-slate-950 font-extrabold px-2.5 py-1 uppercase tracking-wider flex items-center gap-1">
@@ -1752,7 +1739,7 @@ export default function TeacherDashboard({
 
                   {todayClasses.length === 0 ? (
                     <div className="bg-slate-50 border border-slate-100 p-6 text-center text-slate-500 rounded-xl text-xs">
-                      â˜• No formal lectures assigned to your ID under <strong>{currentDayName}</strong>. 
+                      ☕ No formal lectures assigned to your ID under <strong>{currentDayName}</strong>. 
                       <p className="mt-1.5 text-xs text-slate-400">Great opportunity to review grading portfolios or coordinate with fellow faculty members!</p>
                     </div>
                   ) : (
@@ -1784,7 +1771,7 @@ export default function TeacherDashboard({
 
                             <div className="text-right self-end md:self-auto">
                               <span className="text-xs font-mono font-bold bg-white text-slate-700 border border-slate-200 px-2.5 py-1">
-                                ðŸ•’ {lecture.time}
+                                🕒 {lecture.time}
                               </span>
                             </div>
                           </div>
@@ -1857,7 +1844,7 @@ export default function TeacherDashboard({
                             <div className="flex items-center gap-2">
                               {item.marked ? (
                                 <span className="text-xs font-mono font-extrabold text-amber-700 bg-amber-100/80 px-2 py-1 uppercase rounded-xl flex items-center gap-1">
-                                  âœ“ Logged
+                                  ✓ Logged
                                 </span>
                               ) : (
                                 <span className="text-xs font-mono font-extrabold text-rose-600 bg-rose-100/80 px-2 py-1 uppercase rounded-xl">
@@ -2048,7 +2035,7 @@ export default function TeacherDashboard({
                           type="password"
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
-                          placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                          placeholder="••••••••"
                           className="w-full bg-white border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:border-slate-900" 
                         />
                         <p className="text-xs text-slate-400 ">Minimum 8 characters recommended for robust security.</p>
@@ -2319,9 +2306,9 @@ export default function TeacherDashboard({
                   }}
                   className="appearance-none pl-3 pr-8 py-2 bg-white border border-slate-200 rounded-xl text-xs font-black uppercase tracking-widest text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500/20 cursor-pointer shadow-sm"
                 >
-                  <option value="grid">ðŸŽ´ Student Cards Grid</option>
-                  <option value="list">ðŸ“‹ Spreadsheet List</option>
-                  <option value="swipe">âœ¨ Swipe Card Mode</option>
+                  <option value="grid">🎴 Student Cards Grid</option>
+                  <option value="list">📋 Spreadsheet List</option>
+                  <option value="swipe">✨ Swipe Card Mode</option>
                 </select>
                 <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </div>
@@ -2348,7 +2335,7 @@ export default function TeacherDashboard({
                         }}
                         className="px-2.5 py-1 bg-amber-50 text-amber-700 hover:bg-amber-600 hover:text-white rounded-lg text-xs font-black uppercase tracking-wider transition-all border border-amber-200"
                       >
-                        âœ… All Present
+                        ✅ All Present
                       </button>
                       <button
                         type="button"
@@ -2651,7 +2638,7 @@ export default function TeacherDashboard({
                                       Roll #{currentStudent.rollNumber}
                                     </span>
                                     <span className="text-xs text-teal-600 font-bold uppercase tracking-wider bg-teal-50 px-2 py-0.5 rounded-md">
-                                      ðŸ‘ˆ Swipe Left (A) | Swipe Right (P) ðŸ‘‰
+                                      👈 Swipe Left (A) | Swipe Right (P) 👉
                                     </span>
                                   </div>
 
@@ -2675,11 +2662,11 @@ export default function TeacherDashboard({
                                 {/* Active Badge Indicator Hints inside card */}
                                 <div className="flex items-center justify-between text-xs font-bold tracking-wider pt-3 border-t border-slate-100">
                                   <div className="text-rose-600 font-black flex items-center gap-1 bg-rose-50 px-2 py-1 rounded-lg border border-rose-100">
-                                    ðŸ‘ˆ ABSENT
+                                    👈 ABSENT
                                   </div>
                                   <span className="text-slate-400 text-xs uppercase font-semibold">Or tap buttons</span>
                                   <div className="text-amber-600 font-black flex items-center gap-1 bg-amber-50 px-2 py-1 rounded-lg border border-amber-100">
-                                    PRESENT ðŸ‘‰
+                                    PRESENT 👉
                                   </div>
                                 </div>
                               </motion.div>
@@ -2725,7 +2712,7 @@ export default function TeacherDashboard({
                     /* Swiped roster collection complete */
                     <div className="bg-white border border-slate-200 p-8 text-center rounded-3xl shadow-lg max-w-sm w-full space-y-6">
                       <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-2xl mx-auto shadow-inner">
-                        âœ“
+                        ✓
                       </div>
                       <div>
                         <h3 className="text-xl font-black text-slate-900 tracking-tight">All Student Cards Swiped!</h3>
@@ -2761,7 +2748,7 @@ export default function TeacherDashboard({
                           onClick={() => setActiveSwipeIndex(0)}
                           className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold uppercase transition-all cursor-pointer"
                         >
-                          ðŸ”„ Review & Re-Swipe Cards
+                          🔄 Review & Re-Swipe Cards
                         </button>
                       </div>
                     </div>
@@ -2780,7 +2767,7 @@ export default function TeacherDashboard({
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                     <div>
                       <h3 className="text-xs font-black uppercase tracking-widest text-amber-400 flex items-center gap-1.5 font-display">
-                        ðŸ“¢ WhatsApp Absent Alert Center
+                        📢 WhatsApp Absent Alert Center
                       </h3>
                       <p className="text-xs text-teal-200">
                         Prowl through absent registers on active date {attendanceDate} and execute direct manual alerts or auto rule models to parent contacts.
@@ -2813,7 +2800,7 @@ export default function TeacherDashboard({
                     </div>
                   ) : (
                     <div className="p-4 bg-slate-850/50 border border-white/5 text-center text-xs text-slate-400 hover:text-white transition-all">
-                      â˜… Perfect Attendance Record for {viewClass?.className || 'Class Group'} on Date {attendanceDate}! No Parent pings necessary.
+                      ★ Perfect Attendance Record for {viewClass?.className || 'Class Group'} on Date {attendanceDate}! No Parent pings necessary.
                     </div>
                   )}
                 </div>
@@ -2834,7 +2821,7 @@ export default function TeacherDashboard({
                     Teacher Diary & Assignments
                   </h2>
                   <p className="text-xs text-amber-100 font-bold mt-2 uppercase tracking-widest">
-                    Post homework instantly â€” visible only to the students of the selected class.
+                    Post homework instantly — visible only to the students of the selected class.
                   </p>
                 </div>
                 <div className="flex items-center gap-2 bg-amber-900/40 backdrop-blur-sm px-4 py-2 rounded-xl border border-amber-400/20 text-xs font-bold">
@@ -3003,12 +2990,12 @@ export default function TeacherDashboard({
               </button>
             </div>
 
-            {/* Quick CTA: New Result Card (setup exam/test + enter marks) â€” opens a fresh test */}
+            {/* Quick CTA: New Result Card (setup exam/test + enter marks) — opens a fresh test */}
             <button
               onClick={() => { setCardExamName(''); setCardSubjects([]); setCardObtained({}); setCardStudentId(''); setMarksSubTab('report'); }}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-teal-600 to-teal-600 text-white font-black uppercase tracking-wider text-sm shadow-md hover:opacity-90 transition-all"
             >
-              <Plus size={16} /> New Result Card â€” Setup Exam/Test & Enter Marks
+              <Plus size={16} /> New Result Card — Setup Exam/Test & Enter Marks
             </button>
 
             {marksSubTab === 'exam' && (
@@ -3017,7 +3004,7 @@ export default function TeacherDashboard({
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">Exam Marks Entry</h1>
                   <p className="text-xs text-slate-500 mt-1 font-bold uppercase tracking-wider">
-                    Enter marks for ALL students of the selected class for any exam â€” 1st / 2nd / 3rd Term, Annual, Monthly Test, or any custom name.
+                    Enter marks for ALL students of the selected class for any exam — 1st / 2nd / 3rd Term, Annual, Monthly Test, or any custom name.
                   </p>
                 </div>
 
@@ -3071,7 +3058,7 @@ export default function TeacherDashboard({
                               <option key={sub} value={sub}>{sub}</option>
                             ));
                           })()}
-                          <option value="__manual__">âž• Add Manual Subject</option>
+                          <option value="__manual__">➕ Add Manual Subject</option>
                         </select>
                       ) : (
                         <div className="flex items-center gap-2">
@@ -3099,7 +3086,7 @@ export default function TeacherDashboard({
                             className="px-2.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-lg text-xs font-black uppercase transition-all cursor-pointer"
                             title="Back to list"
                           >
-                            âœ•
+                            ✕
                           </button>
                         </div>
                       )}
@@ -3139,7 +3126,7 @@ export default function TeacherDashboard({
                           setSelectedExamType(exam);
                           setExamNameDraft(exam);
                           handleEnterMarksTab(selectedMarkClassId, selectedSubject, exam);
-                          toast.success(`Roster loaded for ${exam} â€” enter marks below`);
+                          toast.success(`Roster loaded for ${exam} — enter marks below`);
                         }}
                         className="w-full px-4 py-2 bg-teal-600 text-white hover:bg-teal-700 rounded-lg text-xs font-black uppercase tracking-wider shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
                       >
@@ -3149,7 +3136,7 @@ export default function TeacherDashboard({
                   </div>
                 </div>
 
-                {/* Saved Exams â€” long-press to Edit (roster reload) or Delete (removes all marks) */}
+                {/* Saved Exams — long-press to Edit (roster reload) or Delete (removes all marks) */}
                 {(() => {
                   const savedExams: { key: string; exam: string; subject: string; classId: string; count: number }[] = [];
                   const seen = new Set<string>();
@@ -3167,7 +3154,7 @@ export default function TeacherDashboard({
                   return (
                     <div className="bg-white border border-slate-200 rounded-2xl p-4 mb-4 space-y-2">
                       <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                        <Award size={12} className="text-teal-500" /> Saved Exams â€” long-press to Edit / Delete
+                        <Award size={12} className="text-teal-500" /> Saved Exams — long-press to Edit / Delete
                       </h4>
                       {savedExams.map(se => {
                         const cls = classes.find(c => c.id === se.classId);
@@ -3177,10 +3164,10 @@ export default function TeacherDashboard({
                             onEdit={() => {
                               handleEnterMarksTab(se.classId, se.subject, se.exam as ExamType);
                               setExamNameDraft(se.exam);
-                              toast.success(`Editing: ${se.exam} Â· ${se.subject} â€” roster loaded with existing marks`);
+                              toast.success(`Editing: ${se.exam} · ${se.subject} — roster loaded with existing marks`);
                             }}
                             onDelete={() => {
-                              if (!window.confirm(`Delete ALL marks for "${se.exam} Â· ${se.subject}"?`)) return;
+                              if (!window.confirm(`Delete ALL marks for "${se.exam} · ${se.subject}"?`)) return;
                               const removed = marks.filter(x => (x.examType || '') === se.exam && (x.subject || '').toLowerCase() === se.subject.toLowerCase() && students.some(s => String(s.id) === String(x.studentId) && s.classId === se.classId));
                               if (removed.length === 0) { toast.error('No marks found to delete.'); return; }
                               setMarks(prev => prev.filter(m => !removed.includes(m)));
@@ -3192,7 +3179,7 @@ export default function TeacherDashboard({
                             <div className="px-3 py-2.5 flex items-center justify-between gap-2 cursor-pointer">
                               <div className="min-w-0">
                                 <p className="text-xs font-black text-slate-800 truncate">{se.exam}</p>
-                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider truncate">{se.subject} Â· {cls ? `Class ${cls.className}${cls.section ? '-' + cls.section : ''}` : 'Class'}</p>
+                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider truncate">{se.subject} · {cls ? `Class ${cls.className}${cls.section ? '-' + cls.section : ''}` : 'Class'}</p>
                               </div>
                               <span className="text-[10px] font-black text-teal-600 shrink-0">{se.count} marks</span>
                             </div>
@@ -3226,10 +3213,10 @@ export default function TeacherDashboard({
                     <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-xs">
                       <div className="p-4 sm:p-5 border-b border-gray-100 bg-teal-50/50 flex flex-wrap items-center justify-between gap-3">
                         <h3 className="text-sm font-black text-teal-900 uppercase tracking-widest flex items-center gap-2">
-                          <Award size={16} className="text-teal-600" /> {selectedExamType} Marks â€” {selectedSubject}
+                          <Award size={16} className="text-teal-600" /> {selectedExamType} Marks — {selectedSubject}
                         </h3>
                         <span className="text-xs font-black text-slate-500 uppercase tracking-wider bg-white border border-teal-100 px-3 py-1 rounded-full">
-                          {examClassStudents.length} Student(s) Â· Total {maxMarksInput}
+                          {examClassStudents.length} Student(s) · Total {maxMarksInput}
                         </span>
                       </div>
 
@@ -3325,7 +3312,7 @@ export default function TeacherDashboard({
 
                       <div className="p-4 sm:p-5 border-t border-gray-100 bg-gray-50/50 flex flex-col sm:flex-row items-center justify-between gap-3">
                         <div className="text-xs font-bold text-slate-600 uppercase tracking-widest">
-                          Exam: <span className="text-teal-700">{selectedExamType}</span> Â· Subject: <span className="text-teal-700">{selectedSubject}</span>
+                          Exam: <span className="text-teal-700">{selectedExamType}</span> · Subject: <span className="text-teal-700">{selectedSubject}</span>
                         </div>
                         <button
                           onClick={handleSaveMarks}
@@ -3410,7 +3397,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                     <div>
                       <p className="text-[10px] uppercase tracking-[0.3em] opacity-80">Report Card For</p>
                       <h3 className="text-lg font-black uppercase tracking-tight leading-tight">{student.name}</h3>
-                      <p className="text-xs opacity-90 mt-0.5">Roll #{student.rollNumber} Â· {classesMap.get(String(student.classId))?.className || 'N/A'}{classesMap.get(String(student.classId))?.section ? ` - ${classesMap.get(String(student.classId))?.section}` : ''}</p>
+                      <p className="text-xs opacity-90 mt-0.5">Roll #{student.rollNumber} · {classesMap.get(String(student.classId))?.className || 'N/A'}{classesMap.get(String(student.classId))?.section ? ` - ${classesMap.get(String(student.classId))?.section}` : ''}</p>
                     </div>
                     <div className="w-full sm:w-64">
                       <label className="block text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Exam / Assessment Name</label>
@@ -3451,7 +3438,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                             <option value="Biology">Biology</option>
                             <option value="History">History</option>
                             <option value="Geography">Geography</option>
-                            <option value="Other">âž• Manual Subject...</option>
+                            <option value="Other">➕ Manual Subject...</option>
                           </select>
                         ) : (
                           <div className="flex items-center gap-2">
@@ -3468,7 +3455,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                               className="px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-lg text-xs font-black transition-all cursor-pointer"
                               title="Back to list"
                             >
-                              âœ•
+                              ✕
                             </button>
                           </div>
                         )}
@@ -3545,7 +3532,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                         </button>
                       </div>
                       <div className="flex items-center justify-between gap-2 pt-2.5 mt-2.5 border-t border-slate-100">
-                        <span className="text-xs text-gray-500 truncate">{s.email || 'â€”'}</span>
+                        <span className="text-xs text-gray-500 truncate">{s.email || '—'}</span>
                         <span className="text-xs font-mono font-bold text-gray-600 shrink-0">{s.parentPhone}</span>
                       </div>
                     </div>
@@ -3627,7 +3614,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                     </div>
                     <div className="border-t border-gray-100 p-4 bg-gray-50/50 flex flex-col sm:flex-row items-center justify-between gap-3">
                       <div className="text-xs font-bold text-slate-600 uppercase tracking-widest">
-                        Total: <span className="text-teal-700 text-sm">{totalObtained}/{totalMax}</span> ({overallPct}%) Â·{' '}
+                        Total: <span className="text-teal-700 text-sm">{totalObtained}/{totalMax}</span> ({overallPct}%) ·{' '}
                         <span className={overallPct >= 40 ? 'text-amber-600' : 'text-rose-600'}>{overallPct >= 40 ? 'PASS' : 'RE-STUDY'}</span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -3746,7 +3733,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                    </div>
                   </div>
 
-                  {/* Saved Tests â€” view / reopen previously saved exams/tests */}
+                  {/* Saved Tests — view / reopen previously saved exams/tests */}
                   {selectedMarkClassId && (
                     <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-4 sm:p-5 space-y-3">
                       <div className="flex items-center justify-between gap-2">
@@ -3780,7 +3767,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                                   toast.success('Opened saved test: ' + tn);
                                 }} className="text-left bg-amber-50 border border-amber-100 hover:bg-amber-100 text-amber-700 text-xs font-bold px-3 py-2 rounded-xl flex flex-col gap-0.5">
                                   <span>{tn}</span>
-                                  <span className="text-[10px] font-semibold text-amber-500">{subjCount} subjects Â· {marked}/{css.length} students</span>
+                                  <span className="text-[10px] font-semibold text-amber-500">{subjCount} subjects · {marked}/{css.length} students</span>
                                 </button>
                               );
                             })}
@@ -3810,12 +3797,12 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                                 <option key={s} value={s}>{s}</option>
                               ));
                             })()}
-                            <option value="Other">âž• Manual Subject...</option>
+                            <option value="Other">➕ Manual Subject...</option>
                          </select>
                        ) : (
                          <div className="flex items-center gap-2">
                            <input type="text" value={cardManualSubject} onChange={(e) => setCardManualSubject(e.target.value)} placeholder="Type subject name" className="w-full px-3 py-1.5 bg-white border border-teal-300 rounded-lg text-xs font-semibold text-slate-950 focus:outline-none focus:border-teal-500" />
-                           <button type="button" onClick={() => { setCardManualSubject(''); setCardSubjectToAdd(''); }} className="px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-lg text-xs font-black">âœ•</button>
+                           <button type="button" onClick={() => { setCardManualSubject(''); setCardSubjectToAdd(''); }} className="px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-lg text-xs font-black">✕</button>
                          </div>
                        )}
                      </div>
@@ -3917,7 +3904,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
   <body>
     <div class="card">
       <div class="head">
-        <div><h1>${st.name}</h1><div class="sub">${examN} Â· Roll #${st.rollNumber}</div></div>
+        <div><h1>${st.name}</h1><div class="sub">${examN} · Roll #${st.rollNumber}</div></div>
         <div class="pct"><div class="lbl">Overall</div><div class="big">${pct}%</div><div class="sub">${pct >= 40 ? 'PASS' : 'RE-STUDY'}</div></div>
       </div>
       <div class="meta"><div><b>Class</b>${clsName}</div><div><b>Roll Number</b>#${st.rollNumber}</div><div><b>Total</b>${totO} / ${totM}</div></div>
@@ -3926,7 +3913,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
         <tbody>${rows}</tbody>
         <tfoot><tr><td colspan="2">Total Percentage</td><td class="c">${pct}%</td></tr></tfoot>
       </table>
-      <div class="foot"><span>Demo School â€” Result Card</span><span>Date: ${new Date().toLocaleDateString()}</span></div>
+      <div class="foot"><span>Demo School — Result Card</span><span>Date: ${new Date().toLocaleDateString()}</span></div>
     </div>
     <script>window.onload=function(){setTimeout(function(){window.print();},300);};</script>
   </body></html>`;
@@ -3948,7 +3935,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                              <div>
                                <p className="text-[10px] uppercase tracking-[0.3em] opacity-80">Entering: {examN}</p>
                                <h3 className="text-lg font-black uppercase tracking-tight">{student.name}</h3>
-                               <p className="text-xs opacity-90 mt-0.5">Roll #{student.rollNumber} Â· {classesMap.get(String(student.classId))?.className || 'N/A'}{(classesMap.get(String(student.classId))?.section) ? ` - ${classesMap.get(String(student.classId))?.section}` : ''}</p>
+                               <p className="text-xs opacity-90 mt-0.5">Roll #{student.rollNumber} · {classesMap.get(String(student.classId))?.className || 'N/A'}{(classesMap.get(String(student.classId))?.section) ? ` - ${classesMap.get(String(student.classId))?.section}` : ''}</p>
                              </div>
                              <button onClick={() => { setCardStudentId(''); setCardObtained({}); }} className="px-3 py-1.5 bg-white/15 hover:bg-white/25 rounded-lg text-xs font-black uppercase tracking-wider">â† Back to Students</button>
                            </div>
@@ -3988,7 +3975,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                                ))}
                              </div>
                              <div className="border-t border-gray-100 p-4 bg-gray-50/50 flex flex-col sm:flex-row items-center justify-between gap-3">
-                               <div className="text-xs font-bold text-slate-600 uppercase tracking-widest">Total: <span className="text-teal-700 text-sm">{totO}/{totM}</span> ({pct}%) Â· <span className={pct >= 40 ? 'text-amber-600' : 'text-rose-600'}>{pct >= 40 ? 'PASS' : 'RE-STUDY'}</span></div>
+                               <div className="text-xs font-bold text-slate-600 uppercase tracking-widest">Total: <span className="text-teal-700 text-sm">{totO}/{totM}</span> ({pct}%) · <span className={pct >= 40 ? 'text-amber-600' : 'text-rose-600'}>{pct >= 40 ? 'PASS' : 'RE-STUDY'}</span></div>
                                 <button onClick={handlePrintResultCard} className="py-2 px-5 bg-slate-900 text-white hover:bg-slate-800 rounded-lg text-xs font-black uppercase tracking-wider shadow-sm flex items-center gap-2"><Printer size={14} /> Print</button>
                                 <button onClick={handleSaveStudentTest} className="py-2 px-5 bg-teal-600 text-white hover:bg-teal-700 rounded-lg text-xs font-black uppercase tracking-wider shadow-sm flex items-center gap-2"><Save size={14} /> Save Test</button>
                              </div>
@@ -4041,7 +4028,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                      return (
                        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
                          <div className="p-4 bg-gray-50/50 border-b border-gray-100 flex items-center justify-between">
-                           <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">Students in {classesMap.get(String(selectedMarkClassId))?.className || 'N/A'} â€” click to enter {examN}</h3>
+                           <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">Students in {classesMap.get(String(selectedMarkClassId))?.className || 'N/A'} — click to enter {examN}</h3>
                            <span className="text-xs bg-slate-200 text-slate-800 font-bold px-2 py-0.5 rounded">{classStudents.length} Pupils</span>
                          </div>
                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 p-4">
@@ -4215,7 +4202,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                                       )}
                                     </div>
                                     <div className="text-xs text-slate-755 mt-0.5 truncate font-medium">
-                                      ðŸ‘¤ Teacher: {getTeacherName(entry.teacherId)}
+                                      👤 Teacher: {getTeacherName(entry.teacherId)}
                                     </div>
                                     <div className="text-xs font-mono text-slate-500 mt-1 flex items-center justify-between">
                                       <span>{entry.time}</span>
@@ -4314,7 +4301,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">My Attendance</h1>
-                <p className="text-xs text-slate-500 mt-1 uppercase tracking-widest font-bold">GPS Verified Check-in / Check-out â€” Digital Staff Register</p>
+                <p className="text-xs text-slate-500 mt-1 uppercase tracking-widest font-bold">GPS Verified Check-in / Check-out — Digital Staff Register</p>
               </div>
             </div>
 
@@ -4327,7 +4314,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                   const badge = !rec ? 'bg-slate-500 text-white' : rec.status === 'present' ? 'bg-teal-600 text-white' : rec.status === 'late' ? 'bg-amber-500 text-white' : 'bg-rose-500 text-white';
                   return (
                     <div className="relative z-10">
-                      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-teal-300 mb-1">Today Â· {todayStr}</p>
+                      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-teal-300 mb-1">Today · {todayStr}</p>
                       <div className="flex items-center gap-3 flex-wrap">
                         <h3 className="text-lg sm:text-xl font-black text-white tracking-tight uppercase">{new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' })}</h3>
                         <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${badge}`}>{rec ? rec.status.toUpperCase() : 'NOT CHECKED IN'}</span>
@@ -4335,11 +4322,11 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                       <div className="mt-4 grid grid-cols-3 gap-3">
                         <div className="bg-white/10 border border-white/10 rounded-xl p-3">
                           <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">Check-In</p>
-                          <p className="text-sm font-black text-teal-300">{rec?.checkIn ? new Date(rec.checkIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'â€”'}</p>
+                          <p className="text-sm font-black text-teal-300">{rec?.checkIn ? new Date(rec.checkIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—'}</p>
                         </div>
                         <div className="bg-white/10 border border-white/10 rounded-xl p-3">
                           <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">Check-Out</p>
-                          <p className="text-sm font-black text-teal-300">{rec?.checkOut ? new Date(rec.checkOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'â€”'}</p>
+                          <p className="text-sm font-black text-teal-300">{rec?.checkOut ? new Date(rec.checkOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—'}</p>
                         </div>
                         <div className="bg-white/10 border border-white/10 rounded-xl p-3">
                           <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">School Dist</p>
@@ -4368,7 +4355,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                       </div>
                       <p className="text-[10px] text-slate-300 font-bold mt-3 flex items-center gap-1.5">
                         <MapPin size={12} className="text-teal-300" />
-                        School: {schoolLocation.name} Â· Radius {schoolLocation.radiusMeters} m â€” check-in sirf school ke andar se hota hai.
+                        School: {schoolLocation.name} · Radius {schoolLocation.radiusMeters} m — check-in sirf school ke andar se hota hai.
                       </p>
                     </div>
                   );
@@ -4389,7 +4376,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                 </div>
 
                 <div className="mt-4">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Attendance Calendar â€” {monthLabel(selfAttYear, selfAttMonthIdx)}</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Attendance Calendar — {monthLabel(selfAttYear, selfAttMonthIdx)}</p>
                   <div className="grid grid-cols-7 gap-1 mt-2">
                     {['M','T','W','T','F','S','S'].map((d, i) => <div key={i} className="text-center text-[9px] font-black text-slate-400">{d}</div>)}
                     {selfAttGrid.map((d, i) => {
@@ -4398,7 +4385,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                       const st = statusOnDate(dateStr);
                       const cellCls = st === 'present' ? 'bg-teal-600 text-white' : st === 'late' ? 'bg-amber-400 text-white' : st === 'absent' ? 'bg-rose-500 text-white' : st === 'leave' ? 'bg-slate-300 text-slate-700' : 'bg-slate-50 text-slate-500';
                       return (
-                        <div key={d} title={dateStr + (st ? ` Â· ${st}` : '')} className={`aspect-square rounded-md flex items-center justify-center text-[10px] font-black ${cellCls}`}>
+                        <div key={d} title={dateStr + (st ? ` · ${st}` : '')} className={`aspect-square rounded-md flex items-center justify-center text-[10px] font-black ${cellCls}`}>
                           {d}
                         </div>
                       );
@@ -4426,17 +4413,17 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                   </thead>
                   <tbody className="divide-y divide-gray-150 text-sm">
                     {myTeacherAttendance.length === 0 ? (
-                      <tr><td colSpan={6} className="px-5 py-8 text-center text-xs font-bold text-slate-400 uppercase tracking-widest">Koi attendance record nahi â€” aaj check-in karein</td></tr>
+                      <tr><td colSpan={6} className="px-5 py-8 text-center text-xs font-bold text-slate-400 uppercase tracking-widest">{L('No attendance records yet — check in today', 'ابھی کوئی حاضری کا ریکارڈ نہیں — آج حاضری لگائیں')}</td></tr>
                     ) : myTeacherAttendance.slice().sort((a, b) => (b.date + (b.checkIn || '')).localeCompare(a.date + (a.checkIn || ''))).map(rec => (
                       <tr key={rec.id} className="hover:bg-gray-50/20">
                         <td className="px-5 py-3 font-bold text-slate-800">{rec.date}</td>
                         <td className="px-5 py-3">
                           <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider border ${rec.status === 'present' ? 'bg-teal-600 text-white' : rec.status === 'late' ? 'bg-amber-500 text-white' : rec.status === 'leave' ? 'bg-slate-400 text-white' : 'bg-rose-600 text-white'}`}>{rec.status}</span>
                         </td>
-                        <td className="px-5 py-3 text-slate-500">{rec.checkIn ? new Date(rec.checkIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'â€”'}</td>
-                        <td className="px-5 py-3 text-slate-500">{rec.checkOut ? new Date(rec.checkOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'â€”'}</td>
+                        <td className="px-5 py-3 text-slate-500">{rec.checkIn ? new Date(rec.checkIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—'}</td>
+                        <td className="px-5 py-3 text-slate-500">{rec.checkOut ? new Date(rec.checkOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—'}</td>
                         <td className="px-5 py-3 text-slate-500">{formatDistance(rec.distanceMeters)}</td>
-                        <td className="px-5 py-3 text-slate-500">{rec.note || 'â€”'}</td>
+                        <td className="px-5 py-3 text-slate-500">{rec.note || '—'}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -4451,7 +4438,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">My Pay & Salary Slip</h1>
-                <p className="text-xs text-slate-500 mt-1 uppercase tracking-widest font-bold">Monthly hisab-e-tankhwah â€” attendance k sath linked (Digital Registrar)</p>
+                <p className="text-xs text-slate-500 mt-1 uppercase tracking-widest font-bold">{L('Monthly salary account — linked to attendance (Digital Registrar)', 'ماہانہ تنخواہ کا حساب — حاضری سے منسلک (ڈیجیٹل رجسٹرار)')}</p>
               </div>
               <select
                 value={payMonthSel}
@@ -4473,19 +4460,19 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
             <div className="bg-gradient-to-br from-slate-900 via-teal-900 to-slate-900 animate-gradient rounded-2xl shadow-xl shadow-teal-100 p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 overflow-hidden relative animate-slide-up">
               <div className="absolute -top-16 -right-16 w-64 h-64 bg-amber-400/20 rounded-full blur-3xl pointer-events-none animate-float"></div>
               <div className="relative z-10">
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-teal-300 mb-1">Payslip Â· {monthLabel(myPayslip.year, myPayslip.month)}</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-teal-300 mb-1">Payslip · {monthLabel(myPayslip.year, myPayslip.month)}</p>
                 <h3 className="text-2xl font-black text-white tracking-tight uppercase">{teacherProfile?.name || userSession.name}</h3>
                 <p className="text-xs text-teal-200 font-bold uppercase tracking-widest mt-1">{teacherProfile?.subject || teacherSubject}</p>
                 <p className="text-[10px] text-teal-300/80 font-bold uppercase tracking-widest mt-1.5 flex items-center gap-1.5">
                   <CalendarClock size={12} />
-                  Tenure: {salaryHistory.tenureYears} Saal {salaryHistory.tenureRemMonths} Mahine Â· Since {salaryHistory.startLabel}
+                  Tenure: {salaryHistory.tenureYears} Saal {salaryHistory.tenureRemMonths} Mahine · Since {salaryHistory.startLabel}
                 </p>
               </div>
               <div className="relative z-10 text-right">
                 <p className="text-[10px] font-black uppercase tracking-widest text-amber-300">Net Payable</p>
                 <p className="text-3xl font-black text-amber-400 tracking-tight">{formatPKR(myPayslip.netPay)}</p>
                 <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${myPayslip.paid ? 'bg-teal-500 text-white' : 'bg-amber-500 text-slate-950'}`}>
-                  {myPayslip.paid ? `PAID ${myPayslip.paidDate ? 'Â· ' + myPayslip.paidDate : ''}` : 'PENDING'}
+                  {myPayslip.paid ? `PAID ${myPayslip.paidDate ? '· ' + myPayslip.paidDate : ''}` : 'PENDING'}
                 </span>
               </div>
             </div>
@@ -4494,7 +4481,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                 <div className="px-5 py-3 bg-slate-50 flex items-center gap-2"><Wallet size={14} className="text-teal-600" /><h3 className="text-xs font-black text-slate-600 uppercase tracking-widest">Earnings</h3></div>
                 <div className="space-y-2.5 px-5 py-4">
                   <div className="flex justify-between"><span className="text-xs font-bold text-slate-500">Base Salary</span><span className="text-xs font-black text-slate-900">{formatPKR(myPayslip.baseSalary)}</span></div>
-                  <div className="flex justify-between"><span className="text-xs font-bold text-slate-500">Present Bonus ({myPayslip.presentDays} days Ã— {formatPKR(myPayConfig.bonusPerPresentDay)})</span><span className="text-xs font-black text-teal-600">+ {formatPKR(myPayslip.presentBonus)}</span></div>
+                  <div className="flex justify-between"><span className="text-xs font-bold text-slate-500">Present Bonus ({myPayslip.presentDays} days × {formatPKR(myPayConfig.bonusPerPresentDay)})</span><span className="text-xs font-black text-teal-600">+ {formatPKR(myPayslip.presentBonus)}</span></div>
                   <div className="flex justify-between"><span className="text-xs font-bold text-slate-500">Allowances</span><span className="text-xs font-black text-teal-600">+ {formatPKR(myPayslip.allowances)}</span></div>
                 </div>
                 <div className="px-5 py-3 bg-teal-50 text-teal-800 border border-teal-100">
@@ -4505,8 +4492,8 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
               <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
                 <div className="px-5 py-3 bg-slate-50 flex items-center gap-2"><Coins size={14} className="text-amber-600" /><h3 className="text-xs font-black text-slate-600 uppercase tracking-widest">Deductions</h3></div>
                 <div className="space-y-2.5 px-5 py-4">
-                  <div className="flex justify-between"><span className="text-xs font-bold text-slate-500">Late ({myPayslip.lateDays} day Ã— {formatPKR(myPayConfig.lateDeductionPerDay)})</span><span className="text-xs font-black text-rose-600">- {formatPKR(myPayslip.lateDeduction)}</span></div>
-                  <div className="flex justify-between"><span className="text-xs font-bold text-slate-500">Absent ({myPayslip.absentDays} day Ã— {formatPKR(myPayConfig.absentDeductionPerDay)})</span><span className="text-xs font-black text-rose-600">- {formatPKR(myPayslip.absentDeduction)}</span></div>
+                  <div className="flex justify-between"><span className="text-xs font-bold text-slate-500">Late ({myPayslip.lateDays} day × {formatPKR(myPayConfig.lateDeductionPerDay)})</span><span className="text-xs font-black text-rose-600">- {formatPKR(myPayslip.lateDeduction)}</span></div>
+                  <div className="flex justify-between"><span className="text-xs font-bold text-slate-500">Absent ({myPayslip.absentDays} day × {formatPKR(myPayConfig.absentDeductionPerDay)})</span><span className="text-xs font-black text-rose-600">- {formatPKR(myPayslip.absentDeduction)}</span></div>
                   <div className="flex justify-between"><span className="text-xs font-bold text-slate-500">Fixed Deductions</span><span className="text-xs font-black text-rose-600">- {formatPKR(myPayslip.fixedDeductions)}</span></div>
                 </div>
                 <div className="px-5 py-3 bg-amber-50 text-amber-800 border border-amber-200">
@@ -4515,7 +4502,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
               </div>
             </div>
 
-            {/* ========== COMPLETE SALARY HISTORY â€” pura hisab, join se aaj tak ========== */}
+            {/* ========== COMPLETE SALARY HISTORY — pura hisab, join se aaj tak ========== */}
             <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm animate-slide-up">
               <div className="px-5 py-4 bg-gradient-to-r from-teal-600 via-teal-500 to-teal-600 animate-gradient flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -4523,14 +4510,14 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                   <div>
                     <h3 className="text-xs font-black text-white uppercase tracking-widest">Complete Salary History</h3>
                     <p className="text-[10px] text-teal-100 font-bold uppercase tracking-widest mt-0.5">
-                      {salaryHistory.startLabel} se {salaryHistory.monthsCount} mahine ka pura hisab-e-tankhwah
+                      {L(`Full salary account for ${salaryHistory.monthsCount} months since ${salaryHistory.startLabel}`, `${salaryHistory.startLabel} سے ${salaryHistory.monthsCount} ماہ کا مکمل تنخواہ حساب`)}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="text-[9px] font-black text-teal-100 uppercase tracking-widest">Service Tenure</p>
                   <p className="text-lg font-black text-white tracking-tight leading-none">
-                    {salaryHistory.tenureYears}<span className="text-xs"> saal</span> {salaryHistory.tenureRemMonths}<span className="text-xs"> mahine</span>
+                    {salaryHistory.tenureYears}<span className="text-xs"> {L('years', 'سال')}</span> {salaryHistory.tenureRemMonths}<span className="text-xs"> {L('months', 'ماہ')}</span>
                   </p>
                 </div>
               </div>
@@ -4587,14 +4574,14 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                             <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest whitespace-nowrap ${
                               s.paid ? 'bg-teal-100 text-teal-700' : 'bg-amber-100 text-amber-700'
                             }`}>
-                              {s.paid ? `PAID${s.paidDate ? ' Â· ' + s.paidDate : ''}` : 'PENDING'}
+                              {s.paid ? `PAID${s.paidDate ? ' · ' + s.paidDate : ''}` : 'PENDING'}
                             </span>
                           </td>
                         </tr>
                       );
                     })}
                     {salaryHistory.slips.length === 0 && (
-                      <tr><td colSpan={7} className="px-3 py-6 text-center text-xs font-bold text-slate-400 uppercase tracking-widest">Koi salary record nahi mila</td></tr>
+                      <tr><td colSpan={7} className="px-3 py-6 text-center text-xs font-bold text-slate-400 uppercase tracking-widest">{L('No salary records found', 'کوئی تنخواہ کا ریکارڈ نہیں ملا')}</td></tr>
                     )}
                   </tbody>
                   <tfoot className="bg-slate-900 text-white sticky bottom-0">
@@ -4603,7 +4590,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                       <td className="px-3 py-2.5 text-[10px] font-black tabular-nums whitespace-nowrap">{formatPKR(salaryHistory.totalNet + salaryHistory.slips.reduce((a, s) => a + s.lateDeduction + s.absentDeduction + s.fixedDeductions, 0))}</td>
                       <td className="px-3 py-2.5 text-[11px] font-black text-amber-400 tabular-nums whitespace-nowrap">{formatPKR(salaryHistory.totalNet)}</td>
                       <td className="px-3 py-2.5 text-[9px] font-bold text-slate-300 uppercase tracking-widest">
-                        {salaryHistory.totalPending > 0 ? `${formatPKR(salaryHistory.totalPending)} pending` : 'Sab Paid âœ“'}
+                        {salaryHistory.totalPending > 0 ? L(`${formatPKR(salaryHistory.totalPending)} pending`, `${formatPKR(salaryHistory.totalPending)} باقی`) : L('All Paid ✓', 'سب ادا ✓')}
                       </td>
                     </tr>
                   </tfoot>
@@ -4737,6 +4724,8 @@ const sRoll = student?.rollNumber ? ('Roll #' + student.rollNumber) : 'Student R
 
         {activeTab === 'settings' && (
           <div id="panel-teacher-settings" className="space-y-8 animate-fade-in bg-slate-50 p-4 sm:p-6 -mx-4 sm:-mx-6 rounded-2xl border border-slate-200 shadow-inner">
+            <LanguageCard />
+
             <AiSettingsSection />
 
             <div className="bg-white rounded-xl p-8 border border-slate-200 shadow-sm border-t-4 border-t-teal-600">
@@ -4856,7 +4845,7 @@ const sRoll = student?.rollNumber ? ('Roll #' + student.rollNumber) : 'Student R
               style={activeTab === 'dashboard' ? { minHeight: '52px', minWidth: '52px' } : {}}
             >
               <Sparkles size={activeTab === 'dashboard' ? 20 : 18} />
-              <span className={`text-[10px] uppercase tracking-widest mt-0.5 ${activeTab === 'dashboard' ? 'font-black' : 'font-bold'}`}>Home</span>
+              <span className={`text-[10px] uppercase tracking-widest mt-0.5 ${activeTab === 'dashboard' ? 'font-black' : 'font-bold'} ${lang === 'ur' ? 'i18n-ur' : ''}`}>{lang === 'ur' ? 'ہوم' : 'Home'}</span>
             </button>
           </div>
 
@@ -4876,7 +4865,7 @@ const sRoll = student?.rollNumber ? ('Roll #' + student.rollNumber) : 'Student R
               style={activeTab === 'marks' ? { minHeight: '52px', minWidth: '52px' } : {}}
             >
               <Award size={activeTab === 'marks' ? 20 : 18} />
-              <span className={`text-[10px] uppercase tracking-widest mt-0.5 ${activeTab === 'marks' ? 'font-black' : 'font-bold'}`}>Grades</span>
+              <span className={`text-[10px] uppercase tracking-widest mt-0.5 ${activeTab === 'marks' ? 'font-black' : 'font-bold'} ${lang === 'ur' ? 'i18n-ur' : ''}`}>{lang === 'ur' ? 'نمبر' : 'Grades'}</span>
             </button>
           </div>
 
@@ -4896,7 +4885,7 @@ const sRoll = student?.rollNumber ? ('Roll #' + student.rollNumber) : 'Student R
               style={activeTab === 'attendance' ? { minHeight: '52px', minWidth: '52px' } : {}}
             >
               <CheckSquare size={activeTab === 'attendance' ? 20 : 18} className={activeTab === 'attendance' ? 'stroke-[2.5]' : ''} />
-              <span className={`text-[10px] uppercase tracking-widest mt-0.5 ${activeTab === 'attendance' ? 'font-black' : 'font-bold'}`}>Presence</span>
+              <span className={`text-[10px] uppercase tracking-widest mt-0.5 ${activeTab === 'attendance' ? 'font-black' : 'font-bold'} ${lang === 'ur' ? 'i18n-ur' : ''}`}>{lang === 'ur' ? 'حاضری' : 'Presence'}</span>
             </button>
           </div>
 
@@ -4912,7 +4901,7 @@ const sRoll = student?.rollNumber ? ('Roll #' + student.rollNumber) : 'Student R
               style={activeTab === 'students' ? { minHeight: '52px', minWidth: '52px' } : {}}
             >
               <Users size={activeTab === 'students' ? 20 : 18} />
-              <span className={`text-[10px] uppercase tracking-widest mt-0.5 ${activeTab === 'students' ? 'font-black' : 'font-bold'}`}>Students</span>
+              <span className={`text-[10px] uppercase tracking-widest mt-0.5 ${activeTab === 'students' ? 'font-black' : 'font-bold'} ${lang === 'ur' ? 'i18n-ur' : ''}`}>{lang === 'ur' ? 'طلبہ' : 'Students'}</span>
             </button>
           </div>
 
@@ -4923,7 +4912,7 @@ const sRoll = student?.rollNumber ? ('Roll #' + student.rollNumber) : 'Student R
               className="flex flex-col items-center justify-center py-1 transition-all text-center text-slate-400 hover:text-amber-400 focus:outline-none"
             >
               <Menu size={18} />
-              <span className="text-[10px] mt-0.5 font-bold uppercase tracking-wider">Menu</span>
+              <span className={`text-[10px] mt-0.5 font-bold uppercase tracking-wider ${lang === 'ur' ? 'i18n-ur' : ''}`}>{lang === 'ur' ? 'مینیو' : 'Menu'}</span>
             </button>
           </div>
 
@@ -5196,39 +5185,7 @@ const sRoll = student?.rollNumber ? ('Roll #' + student.rollNumber) : 'Student R
         </div>
       )}
 
-      {/* ═══════════ ONBOARDING LAYER — tour, help, search (Ctrl+K) ═══════════ */}
-      {getTutorialPrefs().enabled && (
-        <button
-          type="button"
-          data-tour="help-fab"
-          onClick={() => setHelpOpen(true)}
-          className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full border border-line bg-surface text-ink shadow-[var(--shadow-elev-3)] transition-transform hover:scale-110 active:scale-95 print:hidden"
-          title="Madad, guide aur tutorial settings"
-          aria-label="Help Center kholein"
-        >
-          <HelpCircle size={19} className="text-brand-600" />
-        </button>
-      )}
-
-      <TourOverlay
-        role={userSession.role}
-        open={tourOpen}
-        onClose={() => {
-          setTourOpen(false);
-          markTourCompleted(userSession.role);
-        }}
-      />
-
-      <HelpCenter
-        role={userSession.role}
-        open={helpOpen}
-        onClose={() => setHelpOpen(false)}
-        onStartTour={() => {
-          setHelpOpen(false);
-          setTourOpen(true);
-        }}
-      />
-
+      {/* ═══════════ SEARCH OVERLAY (Ctrl+K) ═══════════ */}
       <CommandPalette
         role={userSession.role}
         open={paletteOpen}

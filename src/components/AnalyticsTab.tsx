@@ -3,6 +3,7 @@
  * Charts (attendance/fees/marks), top performers, at-risk students,
  * AI remarks (Gemini free). Recharts + existing data props.
  */
+import { L } from '../lib/i18n';
 import { useState, useMemo } from 'react';
 import { motion } from 'motion/react';
 import {
@@ -165,7 +166,7 @@ export default function AnalyticsTab({ students, classes, attendance, marks, fee
         <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
           <h3 className="text-xs font-black text-slate-600 uppercase tracking-widest mb-3 flex items-center gap-1.5"><Trophy size={14} className="text-amber-600" /> Top Performers</h3>
           <div className="space-y-2">
-            {topPerformers.length === 0 && <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest py-4 text-center">Marks data nahi hai</p>}
+            {topPerformers.length === 0 && <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest py-4 text-center">{L('No marks data', 'نمبروں کا ڈیٹا نہیں')}</p>}
             {topPerformers.map((s, i) => (
               <div key={s.student.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
                 <span className="text-sm w-8 text-center">{['🥇', '🥈', '🥉', '4️⃣', '5️⃣'][i]}</span>
@@ -185,12 +186,12 @@ export default function AnalyticsTab({ students, classes, attendance, marks, fee
             <span className="text-[9px] font-bold text-slate-400 normal-case">attendance &lt;75% ya marks &lt;40%</span>
           </h3>
           <div className="space-y-2">
-            {atRiskList.length === 0 && <p className="text-[10px] font-bold text-teal-600 uppercase tracking-widest py-4 text-center">Sab students theek hain ✅</p>}
+            {atRiskList.length === 0 && <p className="text-[10px] font-bold text-teal-600 uppercase tracking-widest py-4 text-center">{L('All students are fine ✅', 'تمام طلبہ ٹھیک ہیں ✅')}</p>}
             {atRiskList.map(s => (
               <motion.div key={s.student.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-3 p-2.5 rounded-xl bg-rose-50/60 border border-rose-100">
                 <div className="min-w-0 flex-1">
                   <p className="text-xs font-black text-slate-800 truncate">{s.student.name}</p>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{s.className} · {s.student.parentPhone || 'phone nahi'}</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{s.className} · {s.student.parentPhone || L('no phone', 'فون نمبر نہیں')}</p>
                 </div>
                 {s.attPct !== null && <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${s.attPct < 75 ? 'bg-rose-100 text-rose-700' : 'bg-teal-100 text-teal-700'}`}>Att {s.attPct}%</span>}
                 {s.avgPct !== null && <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${s.avgPct < 40 ? 'bg-rose-100 text-rose-700' : 'bg-teal-100 text-teal-700'}`}>Marks {s.avgPct}%</span>}
@@ -215,7 +216,7 @@ function AiRemarks({ aiOn, stats }: { aiOn: boolean; stats: any[] }) {
   const selected = withData.find(s => String(s.student.id) === selectedId);
 
   const generate = async () => {
-    if (!selected) { toast.error('Pehle student select karein'); return; }
+    if (!selected) { toast.error(L('Select a student first', 'پہلے طالب علم منتخب کریں')); return; }
     setLoading(true);
     setRemark('');
     try {
@@ -231,7 +232,7 @@ function AiRemarks({ aiOn, stats }: { aiOn: boolean; stats: any[] }) {
       setRemark(text);
       toast.success('AI remark ready! 🤖');
     } catch (e: any) {
-      toast.error(e?.message || 'AI fail hui');
+      toast.error(e?.message || L('AI failed', 'AI ناکام رہا'));
     } finally {
       setLoading(false);
     }
@@ -242,12 +243,12 @@ function AiRemarks({ aiOn, stats }: { aiOn: boolean; stats: any[] }) {
       <h3 className="text-sm font-black text-slate-700 uppercase tracking-widest flex items-center gap-2">
         <Sparkles size={15} className="text-indigo-600" /> AI Report-Card Remarks
         <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${aiOn ? 'bg-teal-100 text-teal-700' : 'bg-slate-200 text-slate-500'}`}>
-          {aiOn ? 'Gemini Free' : 'API key nahi'}
+          {aiOn ? L('Gemini Free', 'Gemini مفت') : L('No API key', 'API کلید نہیں')}
         </span>
       </h3>
       <div className="flex flex-wrap gap-2 items-center">
         <select value={selectedId} onChange={e => setSelectedId(e.target.value)} className="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold min-w-[200px]">
-          <option value="">Student select karein...</option>
+          <option value="">{L('Select a student...', 'طالب علم منتخب کریں…')}</option>
           {withData.map(s => <option key={s.student.id} value={s.student.id}>{s.student.name} ({s.className})</option>)}
         </select>
         <select value={tone} onChange={e => setTone(e.target.value as any)} className="px-3 py-2 bg-white border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest">
@@ -261,7 +262,7 @@ function AiRemarks({ aiOn, stats }: { aiOn: boolean; stats: any[] }) {
           className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5"
         >
           {loading ? <Loader2 size={13} className="animate-spin" /> : <Sparkles size={13} />}
-          {loading ? 'AI likh raha hai...' : 'Generate Remark'}
+          {loading ? L('AI is writing…', 'AI لکھ رہا ہے…') : L('Generate Remark', 'ریمارکس بنائیں')}
         </button>
       </div>
       {remark && (
@@ -273,7 +274,7 @@ function AiRemarks({ aiOn, stats }: { aiOn: boolean; stats: any[] }) {
             className="w-full bg-transparent text-sm text-slate-700 leading-relaxed focus:outline-none resize-none"
           />
           <button
-            onClick={() => { navigator.clipboard.writeText(remark); toast.success('Copy ho gaya!'); }}
+            onClick={() => { navigator.clipboard.writeText(remark); toast.success(L('Copied!', 'کاپی ہو گیا!')); }}
             className="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-[10px] font-black uppercase tracking-widest text-slate-600 flex items-center gap-1.5"
           >
             <Copy size={11} /> Copy
@@ -282,7 +283,7 @@ function AiRemarks({ aiOn, stats }: { aiOn: boolean; stats: any[] }) {
       )}
       {!aiOn && (
         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-          💡 Free key: aistudio.google.com → Settings → "AI API Key" mein paste karein
+          {L('💡 Free key: aistudio.google.com → Settings → paste in "AI API Key"', '💡 مفت کلید: aistudio.google.com → سیٹنگز → "AI API Key" میں پیسٹ کریں')}
         </p>
       )}
     </div>
@@ -299,7 +300,7 @@ function Header({ aiOn }: { aiOn: boolean }) {
         <p className="text-xs text-slate-500 mt-1 uppercase tracking-widest font-bold">Attendance · Fees · Performance · At-Risk Alerts</p>
       </div>
       <span className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest w-fit ${aiOn ? 'bg-teal-100 text-teal-700' : 'bg-slate-200 text-slate-500'}`}>
-        {aiOn ? '🤖 AI remarks Ready' : 'AI Off (API key nahi)'}
+        {aiOn ? L('🤖 AI remarks ready', '🤖 AI ریمارکس تیار') : L('AI Off (no API key)', 'AI بند (API کلید نہیں)')}
       </span>
     </div>
   );

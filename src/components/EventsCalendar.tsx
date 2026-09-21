@@ -3,6 +3,7 @@
  * Month grid + upcoming list. Principal manage karta hai.
  * Demo/local store: 'acadamis_events' (portalStore pattern).
  */
+import { L } from '../lib/i18n';
 import { useState, useMemo } from 'react';
 import { motion } from 'motion/react';
 import { CalendarDays, Plus, Trash2, ChevronLeft, ChevronRight, PartyPopper, BookOpen, Users, Trophy, Sparkles } from 'lucide-react';
@@ -57,7 +58,7 @@ export default function EventsCalendar({ userSession }: EventsCalendarProps) {
 
   const handleAdd = () => {
     if (!title.trim() || !date) {
-      toast.error('Title aur date dono zaroori hain');
+      toast.error(L('Both title and date are required', 'عنوان اور تاریخ دونوں ضروری ہیں'));
       return;
     }
     upsert({
@@ -71,7 +72,7 @@ export default function EventsCalendar({ userSession }: EventsCalendarProps) {
     });
     setTitle(''); setDescription('');
     setShowForm(false);
-    toast.success('Calendar mein add ho gaya! 📅');
+    toast.success(L('Added to calendar! 📅', 'کیلنڈر میں شامل ہو گیا! 📅'));
   };
 
   const prevMonth = () => {
@@ -150,7 +151,7 @@ export default function EventsCalendar({ userSession }: EventsCalendarProps) {
         <div className="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
           <h3 className="text-xs font-black uppercase tracking-widest text-slate-500 mb-3">Upcoming</h3>
           <div className="space-y-2.5">
-            {upcoming.length === 0 && <p className="text-xs font-bold text-slate-400 uppercase tracking-widest py-6 text-center">Koi event nahi</p>}
+            {upcoming.length === 0 && <p className="text-xs font-bold text-slate-400 uppercase tracking-widest py-6 text-center">{L('No events', 'کوئی ایونٹ نہیں')}</p>}
             {upcoming.map(e => {
               const meta = TYPE_META[e.type] || TYPE_META.event;
               const Icon = meta.icon;
@@ -164,7 +165,7 @@ export default function EventsCalendar({ userSession }: EventsCalendarProps) {
                     </p>
                   </div>
                   {canManage && (
-                    <button onClick={() => { remove(e.id); toast.success('Event delete ho gaya'); }} className="shrink-0 p-1.5 text-slate-300 hover:text-rose-600 rounded-lg opacity-0 group-hover:opacity-100 transition-all">
+                    <button onClick={() => { remove(e.id); toast.success(L('Event deleted', 'ایونٹ حذف ہو گیا')); }} className="shrink-0 p-1.5 text-slate-300 hover:text-rose-600 rounded-lg opacity-0 group-hover:opacity-100 transition-all">
                       <Trash2 size={13} />
                     </button>
                   )}

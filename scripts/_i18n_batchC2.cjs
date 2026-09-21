@@ -1,0 +1,19 @@
+/* TEMP — batch C2: PrincipalDashboard (headings + modals) */
+module.exports = {
+  'src/components/PrincipalDashboard.tsx': [
+    { line: 1325, find: "'Fee Payment Center - advance (zyada pay)'", replace: "L('Fee Payment Center — advance (overpayment)', 'فیس سینٹر — پیشگی (زائد ادائیگی)')" },
+    { line: 6764, find: ">Teacher Pay & Hisab</h1>", replace: ">{L('Teacher Pay & Accounts', 'اساتذہ کی تنخواہ و حساب')}</h1>" },
+    { line: 6937, find: "AI • Attendance • WhatsApp • Theme — sab kuch yahin se manage karein", replace: "{L('AI • Attendance • WhatsApp • Theme — manage everything from here', 'AI • حاضری • WhatsApp • تھیم — سب کچھ یہیں سے سنبھالیں')}" },
+    { line: 7048, find: "toast.info('Demo Mode active — app local storage par chalti hai. Cloud connection live mode (VITE_DATA_MODE hata kar) test hoga.')", replace: "toast.info(L('Demo Mode is active — the app runs on local storage. The cloud connection is tested in live mode (remove VITE_DATA_MODE).', 'ڈیمو موڈ فعال ہے — ایپ لوکل اسٹوریج پر چلتی ہے۔ کلاؤڈ کنکشن لائیو موڈ میں جانچا جاتا ہے (VITE_DATA_MODE ہٹا کر)۔'))" },
+    { line: 10090, find: "Month (Due kis mahine ki)", replace: "{L('Month (which month the due belongs to)', 'مہینہ (باقی کس مہینے کی ہے)')}" },
+    { line: 10110, find: "Same student + same month + same fund pe dobara apply nahi hoga (duplicate guard).", replace: "{L('The same fund cannot be applied twice to the same student and month (duplicate guard).', 'ایک ہی طالب علم اور مہینے پر وہی فنڈ دوبارہ نہیں لگے گا (ڈپلیکیٹ گارڈ)۔')}" },
+    { line: 10964, find: ">Is class mein koi student nahi.<", replace: ">{L('No students in this class.', 'اس کلاس میں کوئی طالب علم نہیں۔')}<" },
+    { line: 10972, find: "Foran Wasooli (Collect)", replace: "{L('Collect Now', 'فوری وصولی')}" },
+    { line: 10987, find: "? `✓ Har student se PKR ${Number(classDuesCollectAmount).toLocaleString()} collect hoga — baqi PKR ${(Math.max(0, (Number(classDuesAmount) || 0) - Number(classDuesCollectAmount))).toLocaleString()} Dues mein remaining rahega.`", replace: "? L(`✓ PKR ${Number(classDuesCollectAmount).toLocaleString()} will be collected from each student — the remaining PKR ${(Math.max(0, (Number(classDuesAmount) || 0) - Number(classDuesCollectAmount))).toLocaleString()} stays in Dues.`, `✓ ہر طالب علم سے PKR ${Number(classDuesCollectAmount).toLocaleString()} وصول ہوں گے — باقی PKR ${(Math.max(0, (Number(classDuesAmount) || 0) - Number(classDuesCollectAmount))).toLocaleString()} Dues میں رہیں گے۔`)" },
+    { line: 10988, find: ": '✓ Full amount collect hoga. Kam amount likhein to baqi remaining Dues mein reh jayega.'}", replace: ": L('✓ The full amount will be collected. Enter a smaller amount to keep the rest in Dues.', '✓ پوری رقم وصول ہو گی۔ کم رقم لکھیں تو باقی Dues میں رہ جائے گی۔')}" },
+    { line: 11001, find: "{classDuesMode === 'charge' ? 'Charge Only — Dues mein pending jayega' : 'Charge & Collect — foran wasooli, baqi remaining'}", replace: "{classDuesMode === 'charge' ? L('Charge Only — stays pending in Dues', 'صرف چارج — Dues میں باقی رہے گا') : L('Charge & Collect — collect now, rest stays pending', 'چارج و وصولی — فوری وصولی، باقی بعد میں')}" },
+    { line: 11429, find: "Advance Kitne Months Mein Lagi", replace: "{L('Months Covered by Advance', 'پیشگی کن مہینوں میں لگی')}" },
+    { line: 11435, find: ": ` (${am.remaining.toLocaleString()} baki)`}", replace: ": L(` (${am.remaining.toLocaleString()} left)`, ` (${am.remaining.toLocaleString()} باقی)`)}" },
+    { line: 11440, find: "Advance balance abhi kisi ek month ko full cover nahi kar raha - agli fee par khud lag jayega.", replace: "{L('The advance balance does not fully cover any single month yet — it will be applied to the next fee automatically.', 'پیشگی بیلنس ابھی کسی ایک مہینے کو مکمل طور پر پورا نہیں کرتا — یہ خود بخود اگلی فیس پر لگ جائے گا۔')}" },
+  ],
+};

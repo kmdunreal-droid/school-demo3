@@ -1,0 +1,18 @@
+﻿DICT keys: 141
+Keys used in code: 33
+
+--- MISSING (code calls t(), dict mein nahi) (1) ---
+  palette.placeholder   ΓåÉ src\components\CommandPalette.tsx:260
+
+--- VAR-ARG MISSING (1) ---
+  src\components\CommandPalette.tsx:274 ΓåÆ 'palette.noResultsFor' needs vars
+
+--- MALFORMED DICT ENTRIES (5) ---
+  home.todayCollection (parts=1)
+  home.todayAttendance (parts=1)
+  home.todayLectures (parts=1)
+  smart.title (parts=1)
+  settings.schoolDesc (parts=5)
+
+--- UNUSED DICT KEYS (109) ---
+  common.absent, common.actions, common.add, common.all, common.amount, common.average, common.back, common.cancel, common.close, common.collect, common.confirm, common.date, common.delete, common.download, common.edit, common.fatherName, common.fee, common.grade, common.late, common.leave, common.loading, common.month, common.more, common.name, common.no, common.notes, common.paid, common.pending, common.percentage, common.phone, common.present, common.print, common.remarks, common.save, common.section, common.status, common.student, common.subject, common.teacher, common.thisMonth, common.today, common.total, common.update, common.view, common.year, common.yes, home.assignments, home.attAvg, home.attGauge, home.basedOnActiveDate, home.dailyAgenda, home.events, home.feePending, home.feeStatus, home.latestNotices, home.live, home.monthProgress, home.myTimetable, home.noActiveLecture, home.operationalChecklist, home.pendingRollCall, home.pendingRollCalls, home.quickActions, home.readyCleared, home.schedule, home.schoolOverview, home.swipeToOpen, home.todayAttendance, home.todayCollection, home.todayLectures, home.totalClasses, home.totalStudents, home.totalTeachers, home.viewAll, landing.academics, landing.admissions, landing.cta, landing.home, landing.login, landing.mentors, login.demoAccounts, login.errBoth, login.errWrong, login.password, login.principal, login.signin, login.signing, login.student, login.subtitle, login.teacher, login.username, login.welcome, palette.close, palette.hint, palette.noResults, palette.open, portal.coordinator, settings.confirmPassword, settings.english, settings.newPassword, settings.schoolDesc, settings.schoolTitle, settings.security, settings.securityDesc, settings.urdu, settings.username, sidebar.logout, sidebar.menu, smart.do

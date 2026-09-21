@@ -60,18 +60,34 @@ A comprehensive school management PWA built with React 19, TypeScript, Vite, Sup
   - Student: Dashboard · My Attendance · My Marks · My ID Card · + Fees, Notices, Calendar, Assignments
 - Sidebar mein **group headings + 📌 Favourites (pin)**, mobile bottom nav dynamic-class bug fixed.
 
-### Onboarding & Help
-- `tutorialPrefs.ts` — keys: `acadamis_tutorial_enabled`, `acadamis_tour_done_<role>`,
-  `acadamis_reduce_motion`, `acadamis_tour_autostart`.
-- `TourOverlay.tsx` — spotlight tour (Next/Back/Skip, progress dots, Esc, auto-scroll).
-  Missing target par gracefully center-card dikhat hai (crash nahi).
-- `HelpCenter.tsx` — searchable topics + "Replay Tour" + tutorial ON/OFF.
-- **? Help button** har dashboard par (bottom-right, `data-tour="help-fab"`).
+### Onboarding & Help (v3 update — Tutorial remove ho chuka hai)
+- ~~`TourOverlay.tsx` / `HelpCenter.tsx` / `onboardingSteps.ts` / `tutorialPrefs.ts`~~ — **user request par tutorial system remove kar diya gaya hai** (files deleted, koi dangling reference nahi).
+- `motionPrefs.ts` — reduce-motion preference (`acadamis_reduce_motion`) ab yahan rehti hai.
 - `CommandPalette.tsx` — **Ctrl+K** universal search (features + students + teachers + classes).
 - `smartActions.ts` + `SmartTaskPanel.tsx` — **"Aaj ka Kaam"** panel jo app ke apne data se
   pending tasks banata hai (attendance pending, fee due, check-in, assignments) aur seedha
   sahi tab par le jata hai.
 - `favorites.ts` — per-role pinned tabs (`acadamis_favorites_<role>`).
+
+### Language — English / اردو (i18n.ts)
+- `src/lib/i18n.ts` — store: localStorage `acadamis_lang` (`'en' | 'ur'`) + window event
+  `acadamis_lang_change` (theme toggle ka wohi proven pattern).
+- `t(key)` → current-language text; `useLang()` → React hook (useSyncExternalStore) —
+  language badalte hi sab subscribed components re-render.
+- `initLang()` App start par saved language ko `html.lang-ur` class se apply karta hai.
+- Urdu typography: `--font-urdu` (Noto Naskh Arabic) + `--font-urdu-display` (Noto Nastaliq Urdu)
+  tokens; `.i18n-ur` class RTL + letter-spacing reset karti hai (colorful.css section 1).
+- `navConfig.ts` bilingual: `NAV_UR` per-role labels/hints, `NAV_GROUP_LABELS_UR`, `groupLabel()`,
+  `tabLabel(lang)`. UI components: `LanguageToggle.tsx` (sidebar chip) + `LanguageCard.tsx`
+  (settings cards with live preview).
+
+### Colorful Layer (colorful.css)
+- `src/styles/colorful.css` components.css ke baad import hoti hai — isi ke rules components
+  ko vibrant banate hain: gradient `.btn-primary/.btn-accent/.btn-success/.btn-info`,
+  `.card-acc-*` (top accent bar + tinted glow), `.tile-*` stat tiles (8 hues + accent bar),
+  `.pill-*` nav colors, `.greet-principal/teacher/student` rainbow heroes, `.title-vib`,
+  aur `.nav-item-active` indigo→violet gradient.
+- Urdu fonts Google Fonts import se aate hain (index.css line 17).
 
 
 ## Architecture
@@ -95,20 +111,21 @@ src/
 ├── supabase.ts             # Supabase client init (Data + Realtime)
 ├── types.ts                # All TypeScript interfaces
 ├── initialData.ts          # Seed data (25 students, 6 teachers, 4 classes)
-├── styles/                 # 2026 redesign design system (import order: tokens → base → components → animations → dark-mode)
-│   ├── tokens.css          # @theme palette — SINGLE source of truth (brand/accent/surface/ink/line + status ramps)
+├── styles/                 # 2026 redesign design system (import order: tokens → base → components → colorful → animations → dark-mode)
+│   ├── tokens.css          # @theme palette — SINGLE source of truth (brand/accent/surface/ink/line + status ramps + Urdu fonts)
 │   ├── base.css            # html/body, scrollbars, selection, print rules
 │   ├── components.css      # .card .stat-tile .btn-* .input .badge .nav-* .data-table .modal-shell .empty-state
+│   ├── colorful.css        # ★ vibrant layer: gradient buttons/cards/tiles/pills + greet-* heroes + .i18n-ur typography
 │   ├── animations.css      # staggerIn, shimmer, scaleIn, slideFade + reduced-motion support
 │   └── dark-mode.css       # html.dark overrides (surfaces, lines, ink)
 ├── lib/
 │   ├── supabaseSync.ts     # Queue/flush/load + realtime (postgres_changes) helpers
 │   ├── feeEngine.ts        # Core fee/dues logic (payments, otherFunds, dues)
 │   ├── payEngine.ts        # Teacher salary calc + payslips
-│   ├── navConfig.ts        # ★ Navigation source of truth (per-role items, groups, naye labels)
+│   ├── navConfig.ts        # ★ Navigation source of truth (per-role items, groups, bilingual EN/اردو labels)
+│   ├── i18n.ts             # ★ English/اردو language store (t, useLang, initLang, LANG_EVENT)
 │   ├── smartActions.ts     # ★ "Aaj ka Kaam" task builder (app data se)
-│   ├── tutorialPrefs.ts    # ★ Tour/tutorial preferences (localStorage)
-│   ├── onboardingSteps.ts  # ★ Per-role guided tour steps
+│   ├── motionPrefs.ts      # ★ reduce-motion preference
 │   ├── favorites.ts        # ★ Per-role pinned tabs
 │   ├── attendanceSettings.ts / geoUtils.ts / periodUtils.ts
 │   ├── notificationUtils.ts / safeStorage.ts / dataUtils.ts / longPress.ts
@@ -118,8 +135,8 @@ src/
 │   ├── PrincipalDashboard.tsx  # Principal/Coordinator portal (full access)
 │   ├── TeacherDashboard.tsx    # Teacher portal (limited access)
 │   ├── StudentDashboard.tsx    # Student portal (read-only + ID card)
-│   ├── TourOverlay.tsx     # ★ Spotlight guided tour (Next/Back/Skip, Esc)
-│   ├── HelpCenter.tsx      # ★ Searchable help + Replay Tour + tutorial ON/OFF
+│   ├── LanguageToggle.tsx  # ★ EN/اردو sidebar chip
+│   ├── LanguageCard.tsx    # ★ Language settings card (live preview)
 │   ├── CommandPalette.tsx  # ★ Ctrl+K universal search
 │   ├── SmartTaskPanel.tsx  # ★ "Aaj ka Kaam" dashboard panel
 │   ├── QuizModule.tsx / AiPaperGenerator.tsx / AiSettingsSection.tsx

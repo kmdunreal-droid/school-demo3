@@ -4,7 +4,7 @@ import { listChanged } from '../lib/dataUtils';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
-import { BarChart2, CheckCircle2, ChevronDown, ChevronUp, CreditCard, Database, Download, Edit2, LogOut, Mail, Menu, MessageSquare, Moon, Percent, Phone, Plus, PlusCircle, RefreshCw, Save, Search, Shield, ShieldAlert, Sparkles, Sun, Trash2, Eye, EyeOff, TrendingUp, User, Users, X, ArrowUpRight, Award, Bell, BookOpen, Calendar, CalendarDays, AlertCircle, DownloadCloud, UploadCloud, Upload, ArrowLeft, ArrowRight, Fingerprint, Send, Zap, FileText, Printer, Filter, Receipt, Clock, AlertTriangle, School, DollarSign, HardDrive, Wifi, Banknote, Wallet, MapPin, Navigation, Coins, CalendarClock, LocateFixed, Megaphone, LayoutGrid, Settings, HelpCircle, Pin } from 'lucide-react';
+import { BarChart2, CheckCircle2, ChevronDown, ChevronUp, CreditCard, Database, Download, Edit2, LogOut, Mail, Menu, MessageSquare, Moon, Percent, Phone, Plus, PlusCircle, RefreshCw, Save, Search, Shield, ShieldAlert, Sparkles, Sun, Trash2, Eye, EyeOff, TrendingUp, User, Users, X, ArrowUpRight, Award, Bell, BookOpen, Calendar, CalendarDays, AlertCircle, DownloadCloud, UploadCloud, Upload, ArrowLeft, ArrowRight, Fingerprint, Send, Zap, FileText, Printer, Filter, Receipt, Clock, AlertTriangle, School, DollarSign, HardDrive, Wifi, Banknote, Wallet, MapPin, Navigation, Coins, CalendarClock, LocateFixed, Megaphone, LayoutGrid, Settings, Pin } from 'lucide-react';
 import AnalyticsTab from './AnalyticsTab';
 import NoticeBoard from './NoticeBoard';
 import EventsCalendar from './EventsCalendar';
@@ -50,21 +50,15 @@ import { defaultPayConfig, summarizeTeacherMonth, buildPayslip, monthLabel, form
 import { DEFAULT_SCHOOL_LOCATION, haversineMeters, formatDistance } from '../lib/geoUtils';
 import { INITIAL_TEACHER_PAY_CONFIGS, INITIAL_SCHOOL_LOCATION } from '../initialData';
 // ── Naya design system + onboarding (Batch 3–5) ──
-import TourOverlay from './TourOverlay';
-import HelpCenter from './HelpCenter';
 import SmartTaskPanel from './SmartTaskPanel';
 import CommandPalette from './CommandPalette';
-import { getNavItems, groupNavItems, NAV_GROUP_LABELS, type NavGroupId } from '../lib/navConfig';
+import { getNavItems, groupNavItems, NAV_GROUP_LABELS, navLabel, navHint, groupLabel, type NavGroupId } from '../lib/navConfig';
+import { useLang, t, i18nCls, L } from '../lib/i18n';
+import LanguageToggle from './LanguageToggle';
+import LanguageCard from './LanguageCard';
 import { buildSmartTasks } from '../lib/smartActions';
 import { getFavorites, toggleFavorite } from '../lib/favorites';
-import {
-  HELP_OPEN_EVENT,
-  TOUR_START_EVENT,
-  getTutorialPrefs,
-  initMotionPreference,
-  markTourCompleted,
-  shouldAutoStartTour,
-} from '../lib/tutorialPrefs';
+import { initMotionPreference } from '../lib/motionPrefs';
 
 // ===== Month parsing helpers =====
 // Fee month strings mixed formats mein aati hain: 'Jun', 'Jun 2026', 'June 2026', 'September'.
@@ -272,22 +266,17 @@ export default function PrincipalDashboard({
      ONBOARDING · SMART ACTIONS · SEARCH  (naya "easy to use" layer)
      ═══════════════════════════════════════════════════════════════════════ */
 
-  const [tourOpen, setTourOpen] = useState(false);
-  const [helpOpen, setHelpOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [lang] = useLang();
+  const cls = i18nCls(lang);
   const [pins, setPins] = useState<string[]>(() => getFavorites(userSession.role));
 
-  // Motion preference apply karo + pehli baar login par tour khud dikhao
+  // Motion preference (reduce-motion) apply karo
   useEffect(() => {
     initMotionPreference();
-    const timer = window.setTimeout(() => {
-      if (shouldAutoStartTour(userSession.role)) setTourOpen(true);
-    }, 1400);
-    return () => window.clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Ctrl+K search + window event bus (theme toggle ka same pattern)
+  // Ctrl+K search — kahin se bhi turant dhoondein
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
@@ -295,16 +284,8 @@ export default function PrincipalDashboard({
         setPaletteOpen(true);
       }
     };
-    const onTour = () => setTourOpen(true);
-    const onHelp = () => setHelpOpen(true);
     window.addEventListener('keydown', onKey);
-    window.addEventListener(TOUR_START_EVENT, onTour);
-    window.addEventListener(HELP_OPEN_EVENT, onHelp);
-    return () => {
-      window.removeEventListener('keydown', onKey);
-      window.removeEventListener(TOUR_START_EVENT, onTour);
-      window.removeEventListener(HELP_OPEN_EVENT, onHelp);
-    };
+    return () => window.removeEventListener('keydown', onKey);
   }, []);
 
   const navItems = useMemo(() => getNavItems(userSession.role), [userSession.role]);
@@ -323,7 +304,7 @@ export default function PrincipalDashboard({
         assignments,
         now: new Date(),
       }),
-    [userSession.role, teachers, students, classes, attendance, marks, feeStudents, timetable, assignments]
+    [userSession.role, teachers, students, classes, attendance, marks, feeStudents, timetable, assignments, lang]
   );
 
   const pinnedItems = useMemo(
@@ -439,13 +420,13 @@ export default function PrincipalDashboard({
     const lng = Number(locLng);
     const radius = Number(locRadius);
     if (isNaN(lat) || isNaN(lng) || isNaN(radius) || radius <= 0) {
-      toast.error('Valid lat / lng / radius enter karein.');
+      toast.error(L('Enter a valid lat / lng / radius.', 'درست lat / lng / رداس درج کریں۔'));
       return;
     }
     setSchoolLocationP({ lat, lng, radiusMeters: Math.max(1, Math.round(radius)), name: locName.trim() || 'Demo Academy' });
     setShowLocSaved(true);
     setTimeout(() => setShowLocSaved(false), 2500);
-    toast.success('School location updated — teachers ka GPS radius ab naye coordinates se check hoga.');
+    toast.success(L('School location updated — teacher GPS will now be checked against the new coordinates.', 'اسکول کا مقام اپ ڈیٹ ہو گیا — اساتذہ کا GPS اب نئے کوآرڈینیٹس سے جانچا جائے گا۔'));
   };
 
   const openPayEditor = (t: Teacher) => {
@@ -702,7 +683,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
     setShowBulkDueModal(false);
     setBulkDueDesc('Paper Fund');
     setBulkDueAmount('');
-    toast.success(`Applied "${bulkDueDesc.trim()}" PKR ${amt.toLocaleString()} to ${addedCount > 0 ? addedCount : targetStudents.length} ${bulkDueTarget === 'student' ? 'student' : (bulkDueClassId === 'all' ? 'students (all classes)' : 'students (class)')}. Unpaid students ki Remaining/Dues mein show hogi.`);
+    toast.success(`${L('Applied', 'لاگو کیا')} "${bulkDueDesc.trim()}" PKR ${amt.toLocaleString()} ${L('to', 'برائے')} ${addedCount > 0 ? addedCount : targetStudents.length} ${bulkDueTarget === 'student' ? L('student', 'طالب علم') : (bulkDueClassId === 'all' ? L('students (all classes)', 'طلبہ (تمام کلاسز)') : L('students (class)', 'طلبہ (کلاس)'))} ${L('Unpaid students will show in Remaining / Dues.', 'غیر ادا شدہ طلبہ Remaining / Dues میں دکھیں گے۔')}`);
   };
 
   const [showMarkAttendanceModal, setShowMarkAttendanceModal] = useState(false);
@@ -908,7 +889,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
     }
 
     if (entries.length === 0 && preSelectedDueIds.length === 0) {
-      toast.error("Koi due select nahi kiya — Pending Dues se select karein ya fee amount enter karein.");
+      toast.error(L('No due selected — pick one from Pending Dues or enter a fee amount.', 'کوئی باقی منتخب نہیں — Pending Dues سے منتخب کریں یا فیس کی رقم درج کریں۔'));
       return;
     }
 
@@ -1240,10 +1221,10 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
     const amount = Number(classDuesAmount) || 0;
     const selectedIds = Object.entries(classDuesSelected).filter(([, v]) => v).map(([id]) => id)
       .filter(id => students.some(s => String(s.id) === id && (classDuesClassId === 'all' || s.classId === classDuesClassId)));
-    if (selectedIds.length === 0) { toast.error('Kam az kam aik student select karein.'); return; }
-    if (!(amount > 0)) { toast.error('Sahi amount enter karein (PKR).'); return; }
+    if (selectedIds.length === 0) { toast.error(L('Select at least one student.', 'کم از کم ایک طالب علم منتخب کریں۔')); return; }
+    if (!(amount > 0)) { toast.error(L('Enter a valid amount (PKR).', 'درست رقم درج کریں (PKR)۔')); return; }
     const collected = classDuesMode === 'collect' ? Math.max(0, Number(classDuesCollectAmount !== '' ? classDuesCollectAmount : classDuesAmount) || 0) : 0;
-    if (classDuesMode === 'collect' && collected > amount) { toast.error('Collect amount, due amount se zyada nahi ho sakta.'); return; }
+    if (classDuesMode === 'collect' && collected > amount) { toast.error(L('Collect amount cannot exceed the due amount.', 'وصول رقم باقی رقم سے زیادہ نہیں ہو سکتی۔')); return; }
     const today = new Date().toISOString().split('T')[0];
     let seq = 0;
     const newRecords: FeeRecord[] = [];
@@ -1289,11 +1270,11 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
     setShowClassDuesModal(false);
     const classText = classDuesClassId === 'all' ? 'ALL CLASSES' : getClassName(classDuesClassId);
     if (classDuesMode === 'charge') {
-      toast.success(`"${classDuesDesc}" (PKR ${amount.toLocaleString()}) charged to ${selectedIds.length} students — ${classText} • ${classDuesMonth} ${classDuesYear} — Dues mein pending hai`);
+      toast.success(`"${classDuesDesc}" (PKR ${amount.toLocaleString()}) charged to ${selectedIds.length} students — ${classText} • ${classDuesMonth} ${classDuesYear} — ${L('pending in Dues', 'Dues میں باقی')}`);
     } else if (newRecords.length === 0) {
-      toast.info(`"${classDuesDesc}" charged to ${selectedIds.length} students — collect amount 0 tha, Dues mein pending hai`);
+      toast.info(`"${classDuesDesc}" charged to ${selectedIds.length} students — ${L('collect amount was 0, pending in Dues', 'وصول رقم 0 تھی، Dues میں باقی ہے')}`);
     } else {
-      const pendingText = collected < amount ? ` • har student ka PKR ${(amount - collected).toLocaleString()} pending` : ' — FULLY PAID ✓';
+      const pendingText = collected < amount ? L(` • PKR ${(amount - collected).toLocaleString()} pending per student`, ` • ہر طالب علم کا PKR ${(amount - collected).toLocaleString()} باقی`) : L(' — FULLY PAID ✓', ' — مکمل ادا ✓');
       toast.success(`Collected PKR ${collected.toLocaleString()} "${classDuesDesc}" from ${classDuesCollectedCount} students (${classText})${pendingText}`);
     }
   };
@@ -1308,7 +1289,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
     const monthIdx = parseMonthKey(monthName, payYear).idx;
 
     let remainingAmount = Math.max(0, Number(amount) || 0);
-    if (!(remainingAmount > 0)) { toast.error('Amount enter karein (PKR).'); return; }
+    if (!(remainingAmount > 0)) { toast.error(L('Enter an amount (PKR).', 'رقم درج کریں (PKR)۔')); return; }
 
     const newPayments: { id: string; month: string; year: number; amount: number; date: string; feeType: string }[] = [];
     const newFeeRecords: FeeRecord[] = [];
@@ -1341,7 +1322,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
       const allocs = buildTuitionAllocation(fsObj, studentObj, remainingAmount, payYear, monthIdx + 1);
       let allocated = 0;
       allocs.forEach(a => {
-        pushRec(a.month, a.year, a.amount, 'Fee Payment Center - advance (zyada pay)');
+        pushRec(a.month, a.year, a.amount, L('Fee Payment Center — advance (overpayment)', 'فیس سینٹر — پیشگی (زائد ادائیگی)'));
         advanceMonths.push(`${a.month} ${a.year}: PKR ${a.amount.toLocaleString()}`);
         allocated += a.amount;
       });
@@ -1368,7 +1349,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
     const today = new Date().toISOString().split('T')[0];
     const fStudent = feeStudents.find(fs => String(fs.id) === String(studentId));
     const dueObj = fStudent?.dues?.find(d => d.id === dueId);
-    if (!dueObj) { toast.error('Due entry nahi mili.'); return; }
+    if (!dueObj) { toast.error(L('Due entry not found.', 'باقی کی انٹری نہیں ملی۔')); return; }
     const recId = fpcMakeId();
     setFeeStudents(prev => prev.map(fs => {
       if (String(fs.id) !== String(studentId)) return fs;
@@ -1392,7 +1373,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
     }, ...prev]);
     const sNameC = fStudent?.name || students.find(s => String(s.id) === String(studentId))?.name || 'Student';
     const newRemaining = Math.max(0, (Number(dueObj.amount) || 0) - (getDuePaid(dueObj) + amount));
-    toast.success(`PKR ${amount.toLocaleString()} collected — "${dueObj.desc}" ✓ ${sNameC}${newRemaining > 0 ? ` — PKR ${newRemaining.toLocaleString()} pending` : ' — DUE FULLY PAID ✓'} (Receipt #${recId})`);
+    toast.success(`PKR ${amount.toLocaleString()} collected — "${dueObj.desc}" ✓ ${sNameC}${newRemaining > 0 ? L(` — PKR ${newRemaining.toLocaleString()} pending`, ` — PKR ${newRemaining.toLocaleString()} باقی`) : L(' — DUE FULLY PAID ✓', ' — باقی مکمل ادا ✓')} (Receipt #${recId})`);
     fpcNotifyWhatsApp(studentId, amount, dueObj.desc, `${dueObj.month} ${dueObj.year}`);
   };
 
@@ -1402,7 +1383,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
     const fsObj = feeStudents.find(fs => String(fs.id) === String(studentId));
     const payYear = new Date().getFullYear();
     const allocs = buildTuitionAllocation(fsObj, studentObj, amount, payYear);
-    if (allocs.length === 0) { toast.error('Allocation fail — base fee ya amount check karein.'); return; }
+    if (allocs.length === 0) { toast.error(L('Allocation failed — check the base fee or the amount.', 'تقسیم ناکام — بنیادی فیس یا رقم چیک کریں۔')); return; }
     const today = new Date().toISOString().split('T')[0];
     const newFeeRecords: FeeRecord[] = [];
     const newPayments: { id: string; month: string; year: number; amount: number; date: string; feeType: string }[] = [];
@@ -3117,7 +3098,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
           </div>
           <div className="flex flex-col items-center gap-1 mt-2">
             <h1 className="text-slate-900 font-black text-sm tracking-[0.2em] uppercase">Demo School</h1>
-            <span className="text-[10px] font-black text-teal-600 uppercase tracking-[0.3em]">Principal Office</span>
+            <span className={`text-[10px] font-black text-teal-600 uppercase tracking-[0.3em] ${cls}`}>{t('portal.principal')}</span>
           </div>
         </div>
 
@@ -3128,7 +3109,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
         >
           {pinnedItems.length > 0 && (
             <div className="mb-3">
-              <p className="nav-group">📌 Favourites</p>
+              <p className={`nav-group ${cls}`}>{lang === 'ur' ? '📌 پسندیدہ' : '📌 Favourites'}</p>
               <div className="space-y-1">
                 {pinnedItems.map((item) => (
                   <button
@@ -3137,7 +3118,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                     className={`nav-item ${activeTab === item.id ? 'nav-item-active' : ''}`}
                   >
                     <item.icon size={15} className="nav-icon" />
-                    <span className="truncate">{item.label}</span>
+                    <span className={`truncate ${cls}`}>{navLabel(item, userSession.role, lang)}</span>
                   </button>
                 ))}
               </div>
@@ -3146,24 +3127,24 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
 
           {navGroups.map((group) => (
             <div key={group.id} className="mb-3">
-              <p className="nav-group">{NAV_GROUP_LABELS[group.id as NavGroupId]}</p>
+              <p className={`nav-group ${cls}`}>{groupLabel(group.id, lang)}</p>
               <div className="space-y-1">
                 {group.items.map((item) => (
                   <button
                     key={item.id}
                     data-tour={`nav-${item.id}`}
-                    title={item.hint}
+                    title={navHint(item, userSession.role, lang)}
                     onClick={() => { handleTabChange(item.id as TabType); setSidebarOpen(false); }}
                     className={`nav-item group/nav relative ${activeTab === item.id ? 'nav-item-active' : ''}`}
                   >
                     <item.icon size={15} className="nav-icon" />
-                    <span className="truncate">{item.label}</span>
+                    <span className={`truncate ${cls}`}>{navLabel(item, userSession.role, lang)}</span>
                     <span
                       role="button"
                       tabIndex={0}
                       onClick={(e) => { e.stopPropagation(); handleTogglePin(item.id); }}
-                      title={pins.includes(item.id) ? 'Pin hatayein' : 'Pin karein'}
-                      aria-label={pins.includes(item.id) ? 'Pin hatayein' : 'Pin karein'}
+                      title={pins.includes(item.id) ? L('Unpin', 'پن ہٹائیں') : L('Pin', 'پن کریں')}
+                      aria-label={pins.includes(item.id) ? L('Unpin', 'پن ہٹائیں') : L('Pin', 'پن کریں')}
                       className={`absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 transition-all ${
                         activeTab === item.id
                           ? 'text-white/80 hover:text-white'
@@ -3178,13 +3159,19 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
             </div>
           ))}
 
+          {/* Language Toggle in Sidebar */}
+          <div className="mt-3 flex items-center justify-between px-1">
+            <span className={`text-[10px] font-black uppercase tracking-widest text-slate-400 ${cls}`}>{t('sidebar.language')}</span>
+            <LanguageToggle />
+          </div>
+
             {/* Install Button in Sidebar */}
             <button
               onClick={onInstallApp}
               className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-bold uppercase tracking-[0.2em] transition-all text-left group rounded-xl bg-teal-50 text-teal-700 hover:bg-teal-100 mt-2 border border-teal-100 shadow-sm shadow-teal-500/20 hover:shadow-md hover:shadow-teal-500/30"
             >
               <Download size={14} className="text-teal-600" />
-              Install App
+              <span className={cls}>{t('sidebar.install')}</span>
             </button>
 
             {/* Exit System Button in Sidebar */}
@@ -3193,7 +3180,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
               className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-bold uppercase tracking-[0.2em] transition-all text-left group rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 mt-2 border border-rose-100 shadow-sm shadow-rose-500/20 hover:shadow-md hover:shadow-rose-500/30"
             >
               <LogOut size={14} className="text-rose-600" />
-              Exit System
+              <span className={cls}>{t('sidebar.logoutPrincipal')}</span>
             </button>
           </nav>
 
@@ -3217,13 +3204,15 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
         {/* ========== DASHBOARD OVERVIEW TABLEAUX ========== */}
         {activeTab === 'dashboard' && (
           <div id="panel-principal-dashboard" className="space-y-8 animate-fade-in">
-            {/* Greeting Header — page-appropriate title */}
-            <div className="bg-amber-600 p-8 -mx-4 sm:-mx-6 -mt-4 sm:-mt-6 mb-8 shadow-lg border-b border-amber-700/50">
-              <p className="text-[10px] sm:text-xs font-black text-amber-100 uppercase tracking-[0.3em] mb-1">
-                Demo School · Principal Portal
+            {/* Greeting Header — vibrant rainbow gradient + bilingual */}
+            <div className="greet-principal p-8 -mx-4 sm:-mx-6 -mt-4 sm:-mt-6 mb-8 shadow-xl animate-gradient">
+              <p className={`text-[10px] sm:text-xs font-black text-white/70 uppercase tracking-[0.3em] mb-1 ${cls}`}>
+                {lang === 'ur' ? 'ڈیمو اسکول · پرنسل پورٹل' : 'Demo School · Principal Portal'}
               </p>
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tighter font-display uppercase leading-tight truncate whitespace-nowrap">
-                {userSession.role === 'developer' ? 'System Tracking Dashboard' : 'School Overview'}
+              <h2 className={`text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tighter font-display uppercase leading-tight truncate whitespace-nowrap ${cls}`}>
+                {userSession.role === 'developer'
+                  ? (lang === 'ur' ? 'سسٹم ٹریکنگ ڈیش بورڈ' : 'System Tracking Dashboard')
+                  : (lang === 'ur' ? 'اسکول کا جائزہ' : 'School Overview')}
               </h2>
             </div>
 
@@ -3293,21 +3282,21 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 animate-fade-in pt-8 border-t border-slate-100">
                     
                     {[
-                      { label: 'Today Collection', val: `PKR ${todaysCollection.toLocaleString()}`, icon: <CreditCard size={16} className="text-teal-600" />, chip: 'bg-teal-50 border-teal-100' },
-                      { label: 'Today Attendance', val: `${todayPresent}/${todayAttendance.length}`, icon: <CheckCircle2 size={16} className="text-amber-600" />, chip: 'bg-amber-50 border-amber-100' },
-                      { label: 'Fee Paid Students', val: paidStudentsCount, icon: <User size={16} className="text-teal-600" />, chip: 'bg-teal-50 border-teal-100' },
-                      { label: 'Pending Students', val: pendingStudentsCount, icon: <AlertCircle size={16} className="text-rose-600" />, chip: 'bg-rose-50 border-rose-100' },
-                      { label: 'Teachers', val: teachers.length, icon: <Users size={16} className="text-teal-600" />, chip: 'bg-teal-50 border-teal-100' },
-                      { label: 'Students', val: students.length, icon: <Users size={16} className="text-teal-600" />, chip: 'bg-teal-50 border-teal-100' },
-                      { label: 'Classes', val: classes.length, icon: <Award size={16} className="text-amber-600" />, chip: 'bg-amber-50 border-amber-100' },
-                      { label: 'Attendance Average', val: attendanceAvg, icon: <CheckCircle2 size={16} className="text-teal-600" />, chip: 'bg-teal-50 border-teal-100' },
+                      { label: 'Today Collection', val: `PKR ${todaysCollection.toLocaleString()}`, tile: 'tile-sky', chip: 'stat-icon-sky', icon: <CreditCard size={16} /> },
+                      { label: 'Today Attendance', val: `${todayPresent}/${todayAttendance.length}`, tile: 'tile-emerald', chip: 'stat-icon-emerald', icon: <CheckCircle2 size={16} /> },
+                      { label: 'Fee Paid Students', val: paidStudentsCount, tile: 'tile-indigo', chip: 'stat-icon-indigo', icon: <User size={16} /> },
+                      { label: 'Pending Students', val: pendingStudentsCount, tile: 'tile-rose', chip: 'stat-icon-rose', icon: <AlertCircle size={16} /> },
+                      { label: 'Teachers', val: teachers.length, tile: 'tile-violet', chip: 'stat-icon-violet', icon: <Users size={16} /> },
+                      { label: 'Students', val: students.length, tile: 'tile-cyan', chip: 'stat-icon-cyan', icon: <Users size={16} /> },
+                      { label: 'Classes', val: classes.length, tile: 'tile-amber', chip: 'stat-icon-amber', icon: <Award size={16} /> },
+                      { label: 'Attendance Average', val: attendanceAvg, tile: 'tile-fuchsia', chip: 'stat-icon-fuchsia', icon: <CheckCircle2 size={16} /> },
                     ].map(stat => (
-                      <div key={stat.label} className="p-4 md:p-5 bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
+                      <div key={stat.label} className={`p-4 md:p-5 border border-line rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all ${stat.tile}`}>
                         <div className="flex items-center gap-2.5 mb-2.5">
-                          <div className={`w-8 h-8 rounded-lg border flex items-center justify-center shrink-0 ${stat.chip}`}>{stat.icon}</div>
-                          <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 leading-tight">{stat.label}</span>
+                          <div className={`stat-icon w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${stat.chip}`}>{stat.icon}</div>
+                          <span className="text-[9px] font-black uppercase tracking-widest text-ink-muted leading-tight">{stat.label}</span>
                         </div>
-                        <span className="text-xl md:text-2xl font-black tracking-tighter text-slate-900 block tabular-nums">{stat.val}</span>
+                        <span className="text-xl md:text-2xl font-black tracking-tighter text-ink block tabular-nums">{stat.val}</span>
                       </div>
                     ))}
                   </div>
@@ -4762,7 +4751,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                                   <button
                                     onClick={(e) => { e.stopPropagation(); openClassDuesModal(classId === 'other' ? undefined : classId); }}
                                     className="px-2.5 py-1 bg-teal-600 hover:bg-teal-700 text-white text-[9px] font-black uppercase tracking-widest rounded-lg transition-all flex items-center gap-1 cursor-pointer shrink-0"
-                                    title={`Class ${className} ke students ko Due/Paper Fund lagayein ya collect karein`}
+                                    title={L(`Apply a Due/Paper Fund to Class ${className} students, or collect it`, `کلاس ${className} کے طلبہ پر Due/Paper Fund لگائیں یا وصول کریں`)}
                                   >
                                     <Users size={10} /> Apply Dues
                                   </button>
@@ -5977,12 +5966,12 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                     <p className="text-xs sm:text-xs font-black text-amber-600 uppercase tracking-tight sm:tracking-widest truncate">Collected</p>
                     <p className="text-xs sm:text-xl font-black text-amber-700">{stats.totalCollected.toLocaleString()}</p>
                   </div>
-                  <button onClick={() => openFeePaymentCenter()} className="bg-rose-50 p-2 sm:p-4 rounded-2xl border border-rose-100 hover:border-rose-400 hover:shadow-md transition-all cursor-pointer text-left" title="Click karein — Fee Payment Center khulega">
+                  <button onClick={() => openFeePaymentCenter()} className="bg-rose-50 p-2 sm:p-4 rounded-2xl border border-rose-100 hover:border-rose-400 hover:shadow-md transition-all cursor-pointer text-left" title={L('Click — opens the Fee Payment Center', 'کلک کریں — فیس سینٹر کھلے گا')}>
                     <p className="text-xs sm:text-xs font-black text-rose-600 uppercase tracking-tight sm:tracking-widest truncate">Pending</p>
                     <p className="text-xs sm:text-xl font-black text-rose-700">{stats.totalPending.toLocaleString()}</p>
                     <p className="text-[9px] font-black text-rose-400 uppercase tracking-widest mt-1">Pay Now →</p>
                   </button>
-                  <button onClick={() => openFeePaymentCenter()} className="bg-amber-50 p-2 sm:p-4 rounded-2xl border border-amber-100 hover:border-amber-400 hover:shadow-md transition-all cursor-pointer text-left" title="Click karein — Fee Payment Center khulega">
+                  <button onClick={() => openFeePaymentCenter()} className="bg-amber-50 p-2 sm:p-4 rounded-2xl border border-amber-100 hover:border-amber-400 hover:shadow-md transition-all cursor-pointer text-left" title={L('Click — opens the Fee Payment Center', 'کلک کریں — فیس سینٹر کھلے گا')}>
                     <p className="text-xs sm:text-xs font-black text-amber-600 uppercase tracking-tight sm:tracking-widest truncate">Other Funds</p>
                     <p className="text-xs sm:text-xl font-black text-amber-700">{stats.totalOther.toLocaleString()}</p>
                     <p className="text-[9px] font-black text-amber-500 uppercase tracking-widest mt-1">Pay Dues →</p>
@@ -6057,7 +6046,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                           <tr
                             key={idx}
                             onClick={d.pending > 0 ? () => openFeePaymentCenter(String(d.studentId)) : undefined}
-                            title={d.pending > 0 ? 'Click karein — Fee Payment Center se pay karein' : undefined}
+                            title={d.pending > 0 ? L('Click — pay from the Fee Payment Center', 'کلک کریں — فیس سینٹر سے ادائیگی کریں') : undefined}
                             className={`transition-colors ${d.pending > 0 ? 'hover:bg-amber-50/60 cursor-pointer' : 'hover:bg-amber-50/30'}`}
                           >
                             <td className="px-4 py-3 text-slate-900 font-black">
@@ -6772,7 +6761,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
           <div id="panel-principal-teacher-pay" className="space-y-8 animate-fade-in bg-teal-50/50 p-4 sm:p-6 -mx-4 sm:-mx-6 rounded-2xl border border-teal-100 shadow-inner">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Teacher Pay & Hisab</h1>
+                <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">{L('Teacher Pay & Accounts', 'اساتذہ کی تنخواہ و حساب')}</h1>
                 <p className="text-xs text-slate-500 mt-1 uppercase tracking-widest font-bold">Salary config · GPS attendance linked payslips · Payment status (Digital Registrar)</p>
               </div>
               <div className="flex items-center gap-2">
@@ -6945,7 +6934,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                   </div>
                   <div>
                     <h2 className="text-lg font-black uppercase tracking-tight">School Settings &amp; Configuration</h2>
-                    <p className="text-xs text-teal-100/90">AI • Attendance • WhatsApp • Theme — sab kuch yahin se manage karein</p>
+                    <p className="text-xs text-teal-100/90">{L('AI • Attendance • WhatsApp • Theme — manage everything from here', 'AI • حاضری • WhatsApp • تھیم — سب کچھ یہیں سے سنبھالیں')}</p>
                   </div>
                 </div>
                 <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/15 backdrop-blur ring-1 ring-white/20 text-[10px] font-black uppercase tracking-widest w-fit">
@@ -6954,6 +6943,9 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
               </div>
             </div>
             
+            {/* ========== LANGUAGE (EN / اردو) ========== */}
+            <LanguageCard />
+
             {/* ========== AI (GEMINI) — Settings se key enter karein ========== */}
             <AiSettingsSection />
 
@@ -7053,7 +7045,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                   type="button"
                   onClick={async () => {
                     if (isDemoMode()) {
-                      toast.info('Demo Mode active — app local storage par chalti hai. Cloud connection live mode (VITE_DATA_MODE hata kar) test hoga.');
+                      toast.info(L('Demo Mode is active — the app runs on local storage. The cloud connection is tested in live mode (remove VITE_DATA_MODE).', 'ڈیمو موڈ فعال ہے — ایپ لوکل اسٹوریج پر چلتی ہے۔ کلاؤڈ کنکشن لائیو موڈ میں جانچا جاتا ہے (VITE_DATA_MODE ہٹا کر)۔'));
                       return;
                     }
                     toast.info("Testing Supabase connection...");
@@ -9039,11 +9031,11 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
       >
         <div className="flex justify-around items-center h-16">
           {([
-            { id: 'dashboard', label: 'Dashboard', icon: BarChart2, active: 'bg-brand-600 shadow-lg shadow-brand-600/40' },
-            { id: 'management_hub', label: 'Setup', icon: Shield, active: 'bg-info-600 shadow-lg shadow-info-600/40', extraMatch: 'features_hub' },
-            { id: 'monthly_report', label: 'Reports', icon: FileText, active: 'bg-accent-500 shadow-lg shadow-accent-500/40', extraMatch: 'analytics' },
-            { id: 'registers', label: 'Records', icon: Database, active: 'bg-rose-600 shadow-lg shadow-rose-600/40', extraMatch: 'fees' },
-          ] as Array<{ id: string; label: string; icon: typeof BarChart2; active: string; extraMatch?: string }>).map((item) => {
+            { id: 'dashboard', label: 'Dashboard', ur: 'ڈیش بورڈ', icon: BarChart2, active: 'bg-brand-600 shadow-lg shadow-brand-600/40' },
+            { id: 'management_hub', label: 'Setup', ur: 'سیٹ اپ', icon: Shield, active: 'bg-info-600 shadow-lg shadow-info-600/40', extraMatch: 'features_hub' },
+            { id: 'monthly_report', label: 'Reports', ur: 'رپورٹس', icon: FileText, active: 'bg-accent-500 shadow-lg shadow-accent-500/40', extraMatch: 'analytics' },
+            { id: 'registers', label: 'Records', ur: 'ریکارڈز', icon: Database, active: 'bg-rose-600 shadow-lg shadow-rose-600/40', extraMatch: 'fees' },
+          ] as Array<{ id: string; label: string; ur: string; icon: typeof BarChart2; active: string; extraMatch?: string }>).map((item) => {
             const isActive = activeTab === item.id || (item.extraMatch && activeTab === item.extraMatch);
             const Icon = item.icon;
             
@@ -9059,8 +9051,8 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                   style={isActive ? { minHeight: '52px', minWidth: '52px' } : {}}
                 >
                   <Icon size={isActive ? 20 : 18} className={isActive ? 'stroke-[2.5]' : ''} />
-                  <span className={`text-[10px] uppercase tracking-widest mt-0.5 whitespace-nowrap ${isActive ? 'font-black' : 'font-bold'}`}>
-                    {item.label}
+                  <span className={`text-[10px] uppercase tracking-widest mt-0.5 whitespace-nowrap ${isActive ? 'font-black' : 'font-bold'} ${lang === 'ur' ? 'i18n-ur' : ''}`}>
+                    {lang === 'ur' ? item.ur : item.label}
                   </span>
                 </button>
               </div>
@@ -10095,7 +10087,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Month (Due kis mahine ki)</label>
+                    <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">{L('Month (which month the due belongs to)', 'مہینہ (باقی کس مہینے کی ہے)')}</label>
                     <select
                       value={bulkDueMonth}
                       onChange={(e) => setBulkDueMonth(e.target.value)}
@@ -10115,7 +10107,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                       : `${students.filter(st => bulkDueClassId === 'all' || st.classId === bulkDueClassId).length} students`}</span>
                     {' '}— for each, a <span className="text-rose-600 font-black">PENDING due</span> will be created. Those who haven't paid will show in <span className="text-rose-600 font-black">Remaining / Dues</span>.
                   </p>
-                  <p className="text-[10px] font-bold text-slate-400 mt-1">Same student + same month + same fund pe dobara apply nahi hoga (duplicate guard).</p>
+                  <p className="text-[10px] font-bold text-slate-400 mt-1">{L('The same fund cannot be applied twice to the same student and month (duplicate guard).', 'ایک ہی طالب علم اور مہینے پر وہی فنڈ دوبارہ نہیں لگے گا (ڈپلیکیٹ گارڈ)۔')}</p>
                 </div>
               </div>
 
@@ -10969,7 +10961,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                       );
                     })}
                     {classStudentsForDues.length === 0 && (
-                      <p className="text-center text-xs font-bold text-slate-400 py-6">Is class mein koi student nahi.</p>
+                      <p className="text-center text-xs font-bold text-slate-400 py-6">{L('No students in this class.', 'اس کلاس میں کوئی طالب علم نہیں۔')}</p>
                     )}
                   </div>
                 </div>
@@ -10977,7 +10969,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                 {/* Collect mode extras */}
                 {classDuesMode === 'collect' && (
                   <div className="p-3 rounded-xl bg-amber-50/60 border border-amber-100 space-y-2">
-                    <p className="text-[10px] font-black text-amber-700 uppercase tracking-widest flex items-center gap-1.5"><Banknote size={12} /> Foran Wasooli (Collect)</p>
+                    <p className="text-[10px] font-black text-amber-700 uppercase tracking-widest flex items-center gap-1.5"><Banknote size={12} /> {L('Collect Now', 'فوری وصولی')}</p>
                     <div className="flex flex-col sm:flex-row gap-2">
                       <input
                         type="number" min="0" max={Number(classDuesAmount) || undefined}
@@ -10992,8 +10984,8 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                     </div>
                     <p className="text-[9px] font-bold text-slate-500">
                       {Number(classDuesCollectAmount) > 0 && Number(classDuesCollectAmount) < Number(classDuesAmount)
-                        ? `✓ Har student se PKR ${Number(classDuesCollectAmount).toLocaleString()} collect hoga — baqi PKR ${(Math.max(0, (Number(classDuesAmount) || 0) - Number(classDuesCollectAmount))).toLocaleString()} Dues mein remaining rahega.`
-                        : '✓ Full amount collect hoga. Kam amount likhein to baqi remaining Dues mein reh jayega.'}
+                        ? L(`✓ PKR ${Number(classDuesCollectAmount).toLocaleString()} will be collected from each student — the remaining PKR ${(Math.max(0, (Number(classDuesAmount) || 0) - Number(classDuesCollectAmount))).toLocaleString()} stays in Dues.`, `✓ ہر طالب علم سے PKR ${Number(classDuesCollectAmount).toLocaleString()} وصول ہوں گے — باقی PKR ${(Math.max(0, (Number(classDuesAmount) || 0) - Number(classDuesCollectAmount))).toLocaleString()} Dues میں رہیں گے۔`)
+                        : L('✓ The full amount will be collected. Enter a smaller amount to keep the rest in Dues.', '✓ پوری رقم وصول ہو گی۔ کم رقم لکھیں تو باقی Dues میں رہ جائے گی۔')}
                     </p>
                   </div>
                 )}
@@ -11006,7 +10998,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                     {Object.values(classDuesSelected).filter(Boolean).length} selected • PKR {Number(classDuesAmount || 0).toLocaleString()} / student
                   </span>
                   <span className="block text-[9px] font-bold text-slate-400">
-                    {classDuesMode === 'charge' ? 'Charge Only — Dues mein pending jayega' : 'Charge & Collect — foran wasooli, baqi remaining'}
+                    {classDuesMode === 'charge' ? L('Charge Only — stays pending in Dues', 'صرف چارج — Dues میں باقی رہے گا') : L('Charge & Collect — collect now, rest stays pending', 'چارج و وصولی — فوری وصولی، باقی بعد میں')}
                   </span>
                 </div>
                 <div className="flex gap-2 shrink-0">
@@ -11188,39 +11180,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
         )}
       </AnimatePresence>
 
-      {/* ═══════════ ONBOARDING LAYER — tour, help, search (Ctrl+K) ═══════════ */}
-      {getTutorialPrefs().enabled && (
-        <button
-          type="button"
-          data-tour="help-fab"
-          onClick={() => setHelpOpen(true)}
-          className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full border border-line bg-surface text-ink shadow-[var(--shadow-elev-3)] transition-transform hover:scale-110 active:scale-95 print:hidden"
-          title="Madad, guide aur tutorial settings"
-          aria-label="Help Center kholein"
-        >
-          <HelpCircle size={19} className="text-brand-600" />
-        </button>
-      )}
-
-      <TourOverlay
-        role={userSession.role}
-        open={tourOpen}
-        onClose={() => {
-          setTourOpen(false);
-          markTourCompleted(userSession.role);
-        }}
-      />
-
-      <HelpCenter
-        role={userSession.role}
-        open={helpOpen}
-        onClose={() => setHelpOpen(false)}
-        onStartTour={() => {
-          setHelpOpen(false);
-          setTourOpen(true);
-        }}
-      />
-
+      {/* ═══════════ SEARCH OVERLAY (Ctrl+K) ═══════════ */}
       <CommandPalette
         role={userSession.role}
         open={paletteOpen}
@@ -11466,18 +11426,18 @@ function FeeMonthGrid({ feeStudent, student, feeRecords = [], year, selectedMont
           </div>
           {showAdvance && (
             <div className="rounded-lg bg-white border border-amber-100 p-2 space-y-1.5">
-              <p className="text-[9px] font-black uppercase tracking-widest text-amber-600">Advance Kitne Months Mein Lagi</p>
+              <p className="text-[9px] font-black uppercase tracking-widest text-amber-600">{L('Months Covered by Advance', 'پیشگی کن مہینوں میں لگی')}</p>
               {advInfo.advanceMonths.length > 0 ? (
                 <div className="flex flex-wrap gap-1.5">
                   {advInfo.advanceMonths.map(am => (
                     <span key={`${am.month}-${am.year}`} className={`px-2 py-0.5 rounded-md border text-[9px] font-black flex items-center gap-1 ${am.remaining === 0 ? 'bg-teal-50 border-teal-200 text-teal-700' : 'bg-amber-50 border-amber-200 text-amber-700'}`}>
                       <CheckCircle2 size={10} /> {am.month} {am.year} - PKR {am.amount.toLocaleString()}
-                      {am.remaining === 0 ? ' CLEAR' : ` (${am.remaining.toLocaleString()} baki)`}
+                      {am.remaining === 0 ? ' CLEAR' : L(` (${am.remaining.toLocaleString()} left)`, ` (${am.remaining.toLocaleString()} باقی)`)}
                     </span>
                   ))}
                 </div>
               ) : (
-                <p className="text-[10px] font-bold text-slate-500">Advance balance abhi kisi ek month ko full cover nahi kar raha - agli fee par khud lag jayega.</p>
+                <p className="text-[10px] font-bold text-slate-500">{L('The advance balance does not fully cover any single month yet — it will be applied to the next fee automatically.', 'پیشگی بیلنس ابھی کسی ایک مہینے کو مکمل طور پر پورا نہیں کرتا — یہ خود بخود اگلی فیس پر لگ جائے گا۔')}</p>
               )}
               {advInfo.remainingAfter > 0 && (
                 <p className="text-[9px] font-black text-teal-700 flex items-center gap-1">

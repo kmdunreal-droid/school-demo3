@@ -1,4 +1,5 @@
-﻿import { useState, useEffect, useRef, useCallback } from 'react';
+﻿import { L } from '../lib/i18n';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Toaster, toast } from 'sonner';
 import { Download, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -21,6 +22,7 @@ import TeacherDashboard from './components/TeacherDashboard';
 import StudentDashboard from './components/StudentDashboard';
 
 import { safeStorage } from './lib/safeStorage';
+import { initLang } from './lib/i18n';
 
 
 function safeParse<T>(key: string, fallback: T): T {
@@ -49,6 +51,11 @@ export default function App() {
   const [darkTheme, setDarkTheme] = useState<boolean>(() => {
     return safeStorage.getItem('acadamis_dark_theme') === 'true';
   });
+
+  // Language (EN/اردو) — saved preference ko DOM par apply karo
+  useEffect(() => {
+    initLang();
+  }, []);
 
   useEffect(() => {
     if (darkTheme) {
@@ -370,7 +377,7 @@ export default function App() {
 
         if (loadedStudents.length === 0) {
           // ===== SEED — Supabase khali hai to initial datasets likho =====
-          console.log("Supabase records khali — initial datasets seed kar rahe hain...");
+          console.log("Supabase records are empty — seeding initial datasets...");
           try {
             const seedItems: [string, any[]][] = [
               ['teachers', INITIAL_TEACHERS],

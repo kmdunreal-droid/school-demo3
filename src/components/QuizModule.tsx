@@ -4,6 +4,7 @@
  *  - Student: attempt with timer, instant score
  * Demo/local store: 'acadamis_quizzes' + 'acadamis_quiz_attempts' (portalStore pattern).
  */
+import { L } from '../lib/i18n';
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { motion } from 'motion/react';
 import {
@@ -85,7 +86,7 @@ function StudentQuizView({ userSession, students }: { userSession: UserSession; 
         <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase flex items-center gap-2">
           <ClipboardList size={22} className="text-teal-600" /> My Quizzes
         </h1>
-        <p className="text-xs text-slate-500 mt-1 uppercase tracking-widest font-bold">Online tests — turant result ke sath</p>
+        <p className="text-xs text-slate-500 mt-1 uppercase tracking-widest font-bold">L('Online tests — with instant results', 'آن لائن ٹیسٹ — فوری نتیجے کے ساتھ')</p>
       </div>
 
       <div className="space-y-3">
@@ -242,7 +243,7 @@ function QuizRunner({
           </button>
         )}
       </div>
-      <button onClick={() => { if (window.confirm('Quiz cancel karna hai? Progress save nahi hoga.')) onCancel(); }} className="w-full text-center text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-500 transition-colors">
+      <button onClick={() => { if (window.confirm(L('Cancel this quiz? Progress will not be saved.', 'کوئز منسوخ کرنی ہے؟ پیش رفت محفوظ نہیں ہوگی۔'))) onCancel(); }} className="w-full text-center text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-500 transition-colors">
         Cancel & Exit
       </button>
     </div>
@@ -282,7 +283,7 @@ function ManagerQuizView({ userSession, students, classes }: QuizModuleProps) {
           <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase flex items-center gap-2">
             <ClipboardList size={22} className="text-teal-600" /> Online Quizzes
           </h1>
-          <p className="text-xs text-slate-500 mt-1 uppercase tracking-widest font-bold">MCQ tests banayein · AI se generate karein · auto-grading</p>
+          <p className="text-xs text-slate-500 mt-1 uppercase tracking-widest font-bold">L('Create MCQ tests · generate with AI · auto-grading', 'MCQ ٹیسٹ بنائیں · AI سے بنوائیں · خودکار جانچ')</p>
         </div>
         <button onClick={() => setShowBuilder(v => !v)} className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-teal-200 transition-all flex items-center gap-2">
           <Plus size={15} /> New Quiz
@@ -296,7 +297,7 @@ function ManagerQuizView({ userSession, students, classes }: QuizModuleProps) {
           onSave={(quiz, publish) => {
             upsert({ ...quiz, status: publish ? 'published' : 'draft' });
             setShowBuilder(false);
-            toast.success(publish ? 'Quiz publish ho gaya — students ko dikhega! 🚀' : 'Quiz draft save ho gaya');
+            toast.success(publish ? L('Quiz published — students can see it! 🚀', 'کوئز شائع ہو گئی — طلبہ دیکھ سکیں گے! 🚀') : L('Quiz saved as a draft', 'کوئز ڈرافٹ میں محفوظ ہو گئی'));
           }}
           onCancel={() => setShowBuilder(false)}
         />
@@ -311,7 +312,7 @@ function ManagerQuizView({ userSession, students, classes }: QuizModuleProps) {
       <div className="space-y-3">
         {myQuizzes.length === 0 && (
           <div className="bg-white border border-slate-200 rounded-2xl p-10 text-center text-xs font-bold text-slate-400 uppercase tracking-widest">
-            Koi quiz nahi — "New Quiz" se shuru karein
+            L('No quizzes yet — start with "New Quiz"', 'ابھی کوئی کوئز نہیں — "New Quiz" سے شروع کریں')
           </div>
         )}
         {myQuizzes.map(q => {
@@ -340,7 +341,7 @@ function ManagerQuizView({ userSession, students, classes }: QuizModuleProps) {
                 onClick={() => {
                   const next = q.status === 'published' ? 'draft' : 'published';
                   upsert({ ...q, status: next });
-                  toast.success(next === 'published' ? 'Quiz publish ho gaya 🚀' : 'Quiz draft mein wapas');
+                  toast.success(next === 'published' ? L('Quiz published 🚀', 'کوئز شائع ہو گئی 🚀') : L('Quiz moved back to draft', 'کوئز دوبارہ ڈرافٹ میں'));
                 }}
                 className="shrink-0 px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-xl text-[10px] font-black uppercase tracking-widest"
               >
@@ -348,11 +349,11 @@ function ManagerQuizView({ userSession, students, classes }: QuizModuleProps) {
               </button>
               <button
                 onClick={() => {
-                  if (!window.confirm(`"${q.title}" delete karna hai? Iske attempts bhi delete honge.`)) return;
+                  if (!window.confirm(L(`Delete "${q.title}"? Its attempts will also be deleted.`, `"${q.title}" حذف کرنی ہے؟ اس کی کوششیں بھی حذف ہو جائیں گی۔`))) return;
                   remove(q.id);
                   attempts.filter(a => a.quizId === q.id).forEach(a => removeAttempt(a.id));
                   if (resultsQuizId === q.id) setResultsQuizId(null);
-                  toast.success('Quiz delete ho gaya');
+                  toast.success(L('Quiz deleted', 'کوئز حذف ہو گئی'));
                 }}
                 className="shrink-0 p-2 text-slate-300 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
               >
@@ -405,7 +406,7 @@ function QuizBuilder({
 
   const handleAiGenerate = async () => {
     if (!aiSource.trim()) {
-      toast.error('Pehle chapter/lesson ka text paste karein');
+      toast.error(L('Paste the chapter/lesson text first', 'پہلے باب/سبق کا متن پیسٹ کریں'));
       return;
     }
     setAiLoading(true);
@@ -420,18 +421,18 @@ function QuizBuilder({
         marks: g.marks,
       }));
       setQuestions(prev => [...prev, ...mapped]);
-      toast.success(`${mapped.length} AI MCQs add ho gaye! 🤖`);
+      toast.success(L(`${mapped.length} AI MCQs added! 🤖`, `${mapped.length} AI MCQs شامل ہو گئے! 🤖`));
     } catch (e: any) {
-      toast.error(e?.message || 'AI generation fail hui');
+      toast.error(e?.message || L('AI generation failed', 'AI سے تیاری ناکام ہوئی'));
     } finally {
       setAiLoading(false);
     }
   };
 
   const handleSave = (publish: boolean) => {
-    if (!title.trim()) { toast.error('Quiz ka title likhein'); return; }
+    if (!title.trim()) { toast.error(L('Enter a quiz title', 'کوئز کا عنوان لکھیں')); return; }
     const valid = questions.filter(q => q.question.trim() && q.options.filter(o => o.trim()).length >= 2);
-    if (valid.length === 0) { toast.error('Kam az kam 1 complete question (question + 2 options) chahiye'); return; }
+    if (valid.length === 0) { toast.error(L('At least 1 complete question (question + 2 options) is required', 'کم از کم 1 مکمل سوال (سوال + 2 آپشن) درکار ہے')); return; }
     const cls = classes.find(c => c.id === classId);
     onSave({
       id: newId('quiz'),
@@ -472,15 +473,15 @@ function QuizBuilder({
       <div className="bg-gradient-to-r from-indigo-50 to-teal-50 border border-indigo-100 rounded-xl p-4 space-y-2.5">
         <div className="flex flex-wrap items-center gap-2">
           <Sparkles size={14} className="text-indigo-600" />
-          <h4 className="text-[11px] font-black uppercase tracking-widest text-indigo-700">AI se MCQs generate karo</h4>
+          <h4 className="text-[11px] font-black uppercase tracking-widest text-indigo-700">L('Generate MCQs with AI', 'AI سے MCQs بنوائیں')</h4>
           <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${aiOn ? 'bg-teal-100 text-teal-700' : 'bg-slate-200 text-slate-500'}`}>
-            {aiOn ? 'AI Ready' : 'AI Off (API key nahi)'}
+            {aiOn ? L('AI Ready', 'AI تیار') : L('AI Off (no API key)', 'AI بند (API کلید نہیں)')}
           </span>
         </div>
         <textarea
           value={aiSource}
           onChange={e => setAiSource(e.target.value)}
-          placeholder="Book chapter / lesson ka text paste karein — AI isi se MCQs banayega..."
+          placeholder="L('Paste the book chapter / lesson text — AI will build MCQs from it…', 'کتاب کا باب / سبق کا متن پیسٹ کریں — AI اسی سے MCQs بنائے گا…')"
           rows={2}
           disabled={!aiOn}
           className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-indigo-400 disabled:opacity-50"
@@ -509,7 +510,7 @@ function QuizBuilder({
       {/* Questions editor */}
       <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
         {questions.length === 0 && (
-          <p className="text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest py-4">Koi question nahi — manually add karein ya AI se generate karein</p>
+          <p className="text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest py-4">L('No questions yet — add manually or generate with AI', 'ابھی کوئی سوال نہیں — خود شامل کریں یا AI سے بنوائیں')</p>
         )}
         {questions.map((q, qi) => (
           <div key={q.id} className="border border-slate-200 rounded-xl p-3 space-y-2 bg-slate-50/50">
@@ -536,7 +537,7 @@ function QuizBuilder({
                   <button
                     onClick={() => updateQ(q.id, { correctIndex: oi })}
                     className={`w-5 h-5 rounded-full shrink-0 text-[9px] font-black flex items-center justify-center border ${q.correctIndex === oi ? 'bg-teal-600 border-teal-600 text-white' : 'bg-white border-slate-300 text-slate-400 hover:border-teal-400'}`}
-                    title="Correct answer set karein"
+                    title="L('Set the correct answer', 'درست جواب منتخب کریں')"
                   >
                     ✓
                   </button>
@@ -592,7 +593,7 @@ function QuizResultsPanel({ quiz, list, onClose }: { quiz: Quiz; list: QuizAttem
       </div>
       <div className="max-h-72 overflow-y-auto">
         {list.length === 0 ? (
-          <p className="text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest py-8">Abhi kisi student ne attempt nahi kiya</p>
+          <p className="text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest py-8">L('No student has attempted yet', 'ابھی کسی طالب علم نے کوشش نہیں کی')</p>
         ) : (
           <table className="w-full text-left">
             <thead className="bg-slate-50 sticky top-0">

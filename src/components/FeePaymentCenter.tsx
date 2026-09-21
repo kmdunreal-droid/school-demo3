@@ -1,3 +1,4 @@
+import { L } from '../lib/i18n';
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
@@ -148,7 +149,7 @@ export function FeePaymentCenter({ open, onClose, feeStudents, students, initial
     const due = (fs?.dues || []).find(x => x.id === d.id);
     if (!due) return;
     const rem = getDueRemaining(due);
-    if (!(rem > 0)) { toast.info('Yeh due already paid hai.'); return; }
+    if (!(rem > 0)) { toast.info(L('This due is already paid.', 'یہ باقی رقم پہلے ہی ادا ہو چکی ہے۔')); return; }
     setPanel({ kind: 'due', key: due.id, remaining: rem });
     setAmount(String(rem));
     setMethod('Cash');
@@ -162,7 +163,7 @@ export function FeePaymentCenter({ open, onClose, feeStudents, students, initial
 
   const confirmPay = () => {
     const amt = Number(amount) || 0;
-    if (!(amt > 0)) { toast.error('Sahi amount enter karein (PKR).'); return; }
+    if (!(amt > 0)) { toast.error(L('Enter a valid amount (PKR).', 'درست رقم درج کریں (PKR)۔')); return; }
     if (!selectedId || !panel) return;
     if (panel.kind === 'month') onPayMonth(selectedId, panel.key, year, amt, method);
     else if (panel.kind === 'due') onCollectDue(selectedId, panel.key, amt, method);
@@ -252,7 +253,7 @@ export function FeePaymentCenter({ open, onClose, feeStudents, students, initial
                         </button>
                       ))}
                       {listRows.length === 0 && (
-                        <p className="col-span-full text-center text-xs font-bold text-slate-400 py-8">Koi student match nahi hua.</p>
+                        <p className="col-span-full text-center text-xs font-bold text-slate-400 py-8">{L('No student matched.', 'کوئی طالب علم نہیں ملا۔')}</p>
                       )}
                     </div>
                   </div>
@@ -391,7 +392,7 @@ export function FeePaymentCenter({ open, onClose, feeStudents, students, initial
                     ) : (
                       <div className="p-4 rounded-xl border border-emerald-100 bg-emerald-50/50 flex items-center gap-2">
                         <BadgeCheck size={16} className="text-emerald-600" />
-                        <span className="text-xs font-black text-emerald-700 uppercase tracking-wide">Koi pending due nahi - sab clear ✓</span>
+                        <span className="text-xs font-black text-emerald-700 uppercase tracking-wide">{L('No pending dues — all clear ✓', 'کوئی باقی رقم نہیں — سب ادا ✓')}</span>
                       </div>
                     )}
                     {showPaidDues && paidDues.length > 0 && (
@@ -460,7 +461,7 @@ export function FeePaymentCenter({ open, onClose, feeStudents, students, initial
                         </div>
                       ))}
                       {monthRows.length === 0 && (
-                        <p className="text-center text-xs font-bold text-slate-400 py-4">Is year ke liye koi month data nahi.</p>
+                        <p className="text-center text-xs font-bold text-slate-400 py-4">{L('No month data for this year.', 'اس سال کے لیے مہینے کا ڈیٹا نہیں۔')}</p>
                       )}
                     </div>
                     {panel?.kind === 'all' && (
@@ -469,7 +470,7 @@ export function FeePaymentCenter({ open, onClose, feeStudents, students, initial
                           amount={amount} setAmount={setAmount} method={method} setMethod={setMethod}
                           remaining={panel.remaining} onConfirm={confirmPay}
                           onCancel={() => { setPanel(null); setAmount(''); }}
-                          note="Yeh amount purane pending months (oldest first) mein khud spread ho jayega."
+                          note={L('This amount will auto-spread across the oldest pending months.', 'یہ رقم خود بخود پرانے باقی مہینوں میں تقسیم ہو جائے گی۔')}
                         />
                       </div>
                     )}

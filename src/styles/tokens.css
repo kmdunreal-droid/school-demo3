@@ -14,6 +14,9 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  /* Urdu — Naskh (UI text) + Nastaliq (display/headings) */
+  --font-urdu: "Noto Naskh Arabic", "Jameel Noori Nastaleeq", "Segoe UI", Tahoma, serif;
+  --font-urdu-display: "Noto Nastaliq Urdu", "Noto Naskh Arabic", "Jameel Noori Nastaleeq", serif;
 }
 
 /* ───────────────────────── BRAND · Midnight Indigo ───────────────────────── */

@@ -1,0 +1,29 @@
+﻿
+=== src\components\CommandPalette.tsx  (3) ===
+86: keywords: 'fee center collect receipt dues payment paisa fees',
+95: keywords: 'add student naya admission form darj enroll',
+104: keywords: 'add teacher naya faculty staff',
+
+=== src\components\PrincipalDashboard.tsx  (5) ===
+266: ONBOARDING ┬╖ SMART ACTIONS ┬╖ SEARCH  (naya "easy to use" layer)
+3219: {/* "Aaj ka Kaam" ΓÇö app ki khud ki samajhdari (data se bane tasks) */}
+6550: {/* Bulk "Apply Due to Whole Class" modal ab fixed overlay (modals section) mein hai */}
+10623: {/* Add More Fee Categories ΓÇö ab class-level "Apply Dues" button se hota hai */}
+11489: {/* Extra payments ΓÇö ASLI fee-type name ke saath, generic 'Extra' nahi */}
+
+=== src\components\StudentDashboard.tsx  (2) ===
+212: ONBOARDING ┬╖ SMART ACTIONS ┬╖ SEARCH  (naya "easy to use" layer)
+857: {/* "Aaj ka Kaam" ΓÇö app ki khud ki samajhdari (data se bane tasks) */}
+
+=== src\components\TeacherDashboard.tsx  (2) ===
+744: ONBOARDING ┬╖ SMART ACTIONS ┬╖ SEARCH  (naya "easy to use" layer)
+1687: {/* "Aaj ka Kaam" ΓÇö app ki khud ki samajhdari (data se bane tasks) */}
+
+=== src\lib\supabaseSync.ts  (1) ===
+65: if (isDemoMode()) return true; // demo = no-op, hamesha "success"
+
+=== src\types.ts  (2) ===
+73: periodId?: string;   // Optional: period-wise attendance ke liye (e.g. "Period 1")
+303: classId: string; // 'all' = sab classes
+
+TOTAL: 15

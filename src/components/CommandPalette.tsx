@@ -15,7 +15,8 @@ import {
   UserPlus,
   Users,
 } from 'lucide-react';
-import { getNavItems, type NavItem } from '../lib/navConfig';
+import { L, t, useLang } from '../lib/i18n';
+import { getNavItems, navHint, navLabel, type NavItem } from '../lib/navConfig';
 import type { Class, Student, Teacher } from '../types';
 
 interface CommandPaletteProps {
@@ -40,6 +41,9 @@ interface Dest {
 
 const MAX_PER_SECTION = 5;
 
+/** Feature rows (nav + extra shortcuts) — students/teachers/classes alag hain. */
+const isFeatureRow = (d: { key: string }) => d.key.startsWith('nav-') || d.key.startsWith('extra-');
+
 export default function CommandPalette({
   role,
   open,
@@ -49,6 +53,7 @@ export default function CommandPalette({
   teachers,
   classes,
 }: CommandPaletteProps) {
+  const [lang] = useLang();
   const [query, setQuery] = useState('');
   const [active, setActive] = useState(0);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -62,10 +67,10 @@ export default function CommandPalette({
     const nav = getNavItems(role);
     const list: Dest[] = nav.map((item) => ({
       key: `nav-${item.id}`,
-      label: item.label,
-      hint: item.hint,
-      group: 'Features',
-      keywords: `${item.label} ${item.id} ${item.hint}`.toLowerCase(),
+      label: navLabel(item, role, lang),
+      hint: navHint(item, role, lang),
+      group: t('palette.features'),
+      keywords: `${item.id} ${navLabel(item, role, 'en')} ${navLabel(item, role, 'ur')} ${navHint(item, role, 'en')} ${navHint(item, role, 'ur')}`.toLowerCase(),
       icon: item.icon,
       run: () => onNavigate(item.id),
     }));
@@ -75,36 +80,36 @@ export default function CommandPalette({
       list.push(
         {
           key: 'extra-fee-center',
-          label: 'Fee Center',
-          hint: 'Fee collect karein, dues dekhein aur receipt banayein',
-          group: 'Features',
-          keywords: 'fee center collect receipt dues payment paisa',
+          label: L('Fee Center', 'فیس سینٹر'),
+          hint: L('Collect fees, review dues and print receipts', 'فیس وصول کریں، باقی رقم دیکھیں اور رسید بنائیں'),
+          group: t('palette.features'),
+          keywords: 'fee center collect receipt dues payment paisa fees',
           icon: CreditCard,
           run: () => onNavigate('fees'),
         },
         {
           key: 'extra-new-student',
-          label: 'Naya Student Add Karein',
-          hint: 'Admission — People & Setup → Students',
-          group: 'Features',
-          keywords: 'add student naya admission form darj',
+          label: L('Add New Student', 'نیا طالب علم شامل کریں'),
+          hint: L('Admission — People & Setup → Students', 'داخلہ — لوگ و سیٹ اپ → طلبہ'),
+          group: t('palette.features'),
+          keywords: 'add student naya admission form darj enroll',
           icon: UserPlus,
           run: () => onNavigate('management_hub'),
         },
         {
           key: 'extra-new-teacher',
-          label: 'Naya Teacher Add Karein',
-          hint: 'Faculty add karein — People & Setup → Teachers',
-          group: 'Features',
-          keywords: 'add teacher naya faculty',
+          label: L('Add New Teacher', 'نیا استاد شامل کریں'),
+          hint: L('Add faculty — People & Setup → Teachers', 'استاد شامل کریں — لوگ و سیٹ اپ → اساتذہ'),
+          group: t('palette.features'),
+          keywords: 'add teacher naya faculty staff',
           icon: UserPlus,
           run: () => onNavigate('management_hub'),
         },
         {
           key: 'extra-tools',
-          label: 'Tools (Notices, Calendar, Certificates, AI Paper)',
-          hint: 'Sab sahayak features ek jagah',
-          group: 'Features',
+          label: L('Tools (Notices, Calendar, Certificates, AI Paper)', 'ٹولز (اعلانات، کیلنڈر، سرٹیفکیٹ، AI پرچہ)'),
+          hint: L('All supporting features in one place', 'تمام معاون فیچرز ایک جگہ'),
+          group: t('palette.features'),
           keywords: 'tools notices calendar certificate ai paper alerts settings',
           icon: LayoutGrid,
           run: () => onNavigate('features_hub'),
@@ -117,12 +122,12 @@ export default function CommandPalette({
         const cls = classes.find((c) => c.id === s.classId);
         const clsLabel = cls
           ? `${cls.className}${cls.section ? ` - ${cls.section}` : ''}`
-          : 'Class N/A';
+          : L('Class N/A', 'کلاس معلوم نہیں');
         list.push({
           key: `student-${s.id}`,
           label: s.name,
-          hint: `${clsLabel} · Roll ${s.rollNumber}`,
-          group: 'Students',
+          hint: `${clsLabel} · ${L('Roll', 'رول')} ${s.rollNumber}`,
+          group: t('palette.students'),
           keywords: `${s.name} ${s.rollNumber} ${clsLabel} ${s.username ?? ''} student`.toLowerCase(),
           icon: Users,
           run: () => onNavigate(studentTab),
@@ -131,13 +136,13 @@ export default function CommandPalette({
     }
 
     if (canSeeTeachers) {
-      teachers.forEach((t) => {
+      teachers.forEach((tc) => {
         list.push({
-          key: `teacher-${t.id}`,
-          label: t.name,
-          hint: `${t.subject} · ${t.email || 'email N/A'}`,
-          group: 'Teachers',
-          keywords: `${t.name} ${t.subject} ${t.username ?? ''} teacher faculty`.toLowerCase(),
+          key: `teacher-${tc.id}`,
+          label: tc.name,
+          hint: `${tc.subject} · ${tc.email || L('email N/A', 'ای میل معلوم نہیں')}`,
+          group: t('palette.teachers'),
+          keywords: `${tc.name} ${tc.subject} ${tc.username ?? ''} teacher faculty`.toLowerCase(),
           icon: Users,
           run: () => onNavigate('management_hub'),
         });
@@ -148,8 +153,8 @@ export default function CommandPalette({
         list.push({
           key: `class-${c.id}`,
           label: clsLabel,
-          hint: `Class · ${c.subjects?.length ?? 0} subjects`,
-          group: 'Classes',
+          hint: `${t('common.class')} · ${c.subjects?.length ?? 0} ${L('subjects', 'مضامین')}`,
+          group: t('palette.classes'),
           keywords: `${clsLabel} class section grade`.toLowerCase(),
           icon: LayoutGrid,
           run: () => onNavigate('management_hub'),
@@ -158,13 +163,13 @@ export default function CommandPalette({
     }
 
     return list;
-  }, [role, students, teachers, classes, onNavigate, canSeeStudents, canSeeTeachers, studentTab]);
+  }, [role, students, teachers, classes, onNavigate, canSeeStudents, canSeeTeachers, studentTab, lang]);
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) {
       // Khaali query par sirf features — warna 400 students ki list bhar jati
-      return destinations.filter((d) => d.group === 'Features');
+      return destinations.filter(isFeatureRow);
     }
 
     const scored = destinations
@@ -173,7 +178,7 @@ export default function CommandPalette({
         const aStart = a.label.toLowerCase().startsWith(q) ? 0 : 1;
         const bStart = b.label.toLowerCase().startsWith(q) ? 0 : 1;
         if (aStart !== bStart) return aStart - bStart;
-        return a.group === 'Features' ? -1 : 1;
+        return isFeatureRow(a) ? -1 : 1;
       });
 
     // Har section se max MAX_PER_SECTION, taake ek hi qism list na bhar de
@@ -243,7 +248,7 @@ export default function CommandPalette({
         className="modal-shell max-w-2xl overflow-hidden"
         role="dialog"
         aria-modal="true"
-        aria-label="Kuch bhi dhoondein"
+        aria-label={t('common.search')}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search row */}
@@ -252,10 +257,10 @@ export default function CommandPalette({
           <input
             ref={inputRef}
             className="w-full bg-transparent text-sm font-semibold text-ink outline-none placeholder:text-ink-faint"
-            placeholder="Kuch bhi dhoondein — 'fee', 'ali', 'timetable', 'attendance'..."
+            placeholder={t('palette.placeholder')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            aria-label="Dhoondein"
+            aria-label={t('common.search')}
           />
           <kbd className="rounded-md border border-line-strong bg-surface-2 px-1.5 py-0.5 font-mono text-[10px] font-bold text-ink-muted">
             Esc
@@ -266,9 +271,9 @@ export default function CommandPalette({
         <div ref={listRef} className="max-h-[52vh] overflow-y-auto py-1">
           {results.length === 0 ? (
             <div className="px-4 py-10 text-center">
-              <p className="text-[12px] font-extrabold text-ink">"{query}" ke liye kuch nahi mila</p>
+              <p className="text-[12px] font-extrabold text-ink">{t('palette.noResultsFor', { q: query })}</p>
               <p className="mt-1 text-[11px] text-ink-muted">
-                Koi doosra lafz try karein — jaise "fee", "marks", "student" ya kisi ka naam.
+                {t('palette.tryAnother')}
               </p>
             </div>
           ) : (

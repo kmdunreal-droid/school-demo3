@@ -21,6 +21,7 @@
  * Cross-device sync WebSocket realtime (postgres_changes) se hota hai —
  * koi polling/heartbeat/quota nahi.
  */
+import { L } from './i18n';
 import { supabase, isDemoMode } from '../supabase';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
@@ -128,7 +129,7 @@ export async function loadAllFromSupabase(): Promise<Record<string, any[]>> {
       const { data, error } = await supabase.from(table).select('id,data');
       if (error) {
         if ((error as any)?.code === 'PGRST205') {
-          console.warn(`[Supabase] table "${table}" missing — SQL Editor mein scripts/supabase-schema.sql chalayein.`);
+          console.warn(`[Supabase] table "${table}" is missing — run scripts/supabase-schema.sql in the SQL Editor.`);
         } else {
           console.warn(`[Supabase] load "${table}" failed:`, (error as any).message);
         }
