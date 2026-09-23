@@ -73,9 +73,14 @@ export async function flushSupabase(): Promise<boolean> {
     const byTable: Record<string, { id: string; data: any }[]> = {};
     for (const { col, id, data } of sets) {
       if (!byTable[col]) byTable[col] = [];
-      byTable[col].push({ id: String(id), data: data === undefined ? null : data });
+      // Dedup: same id multiple times queue na ho
+      const exists = byTable[col].find(r => r.id === String(id));
+      if (!exists) {
+        byTable[col].push({ id: String(id), data: data === undefined ? null : data });
+      }
     }
     for (const [table, rows] of Object.entries(byTable)) {
+      if (rows.length === 0) continue;
       for (let i = 0; i < rows.length; i += 100) {
         const chunk = rows.slice(i, i + 100);
         const { error } = await supabase
