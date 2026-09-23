@@ -9,6 +9,7 @@ export const INITIAL_TEACHERS: Teacher[] = [
     password: 'password123',
     subject: 'Mathematics',
     phone: '+1-555-0101',
+    joinDate: '2022-04-01',
   },
   {
     id: 't2',
@@ -18,6 +19,7 @@ export const INITIAL_TEACHERS: Teacher[] = [
     password: 'password123',
     subject: 'Science',
     phone: '+1-555-0102',
+    joinDate: '2024-09-15',
   },
   {
     id: 't3',
@@ -27,6 +29,7 @@ export const INITIAL_TEACHERS: Teacher[] = [
     password: 'password123',
     subject: 'English Literature',
     phone: '+1-555-0103',
+    joinDate: '2023-01-10',
   },
   {
     id: 't4',
@@ -36,6 +39,7 @@ export const INITIAL_TEACHERS: Teacher[] = [
     password: 'password123',
     subject: 'Hindi',
     phone: '+91-9876501010',
+    joinDate: '2021-07-01',
   },
   {
     id: 't5',
@@ -45,6 +49,7 @@ export const INITIAL_TEACHERS: Teacher[] = [
     password: 'password123',
     subject: 'Social Studies',
     phone: '+91-9876501011',
+    joinDate: '2024-03-01',
   },
   {
     id: 't6',
@@ -54,6 +59,7 @@ export const INITIAL_TEACHERS: Teacher[] = [
     password: 'password123',
     subject: 'Computer Science',
     phone: '+91-9876501012',
+    joinDate: '2025-01-15',
   }
 ];
 
@@ -585,6 +591,8 @@ export const INITIAL_SCHOOL_LOCATION: SchoolLocation = {
   lat: 24.8607,
   lng: 67.0011,
   radiusMeters: 500,
-  name: 'Demo Academy (Karachi)',
+  // Khali naam — demo/placeholder naam na dikhe. Asli naam developer/principal
+  // portal se lat/lng par reverse-geocode kar ke aata hai (geoUtils.reverseGeocode).
+  name: '',
 };
 

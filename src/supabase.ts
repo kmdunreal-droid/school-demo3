@@ -13,7 +13,7 @@
  *   API/backend bhejenge to sirf .env mein VITE_DATA_MODE hatana/wapis
  *   "live" karna hai aur yeh adapter naye endpoint par point kar dena hai.
  */
-import { L } from '../lib/i18n';
+import { L } from './lib/i18n';
 import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = (import.meta.env.VITE_SUPABASE_URL as string) || '';

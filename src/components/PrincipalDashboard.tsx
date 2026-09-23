@@ -169,7 +169,7 @@ interface PrincipalDashboardProps {
   pushLocalToCloud: () => Promise<void>;
 }
 
-type PrincipalTabType = 'dashboard' | 'management_hub' | 'features_hub' | 'timetable' | 'alerts' | 'settings' | 'registers' | 'monthly_report' | 'fees' | 'teacher_pay' | 'analytics' | 'notices' | 'calendar' | 'certificates' | 'ai_paper';
+type PrincipalTabType = 'dashboard' | 'management_hub' | 'features_hub' | 'timetable' | 'alerts' | 'settings' | 'registers' | 'monthly_report' | 'fees' | 'teacher_pay' | 'analytics' | 'notices' | 'calendar' | 'certificates' | 'ai_paper' | 'admin_panel';
 type CoordinatorTabType = PrincipalTabType;
 type TabType = PrincipalTabType | CoordinatorTabType;
 
@@ -423,10 +423,44 @@ export default function PrincipalDashboard({
       toast.error(L('Enter a valid lat / lng / radius.', 'درست lat / lng / رداس درج کریں۔'));
       return;
     }
-    setSchoolLocationP({ lat, lng, radiusMeters: Math.max(1, Math.round(radius)), name: locName.trim() || 'Demo Academy' });
+    setSchoolLocationP({ lat, lng, radiusMeters: Math.max(1, Math.round(radius)), name: locName.trim() || 'Location' });
     setShowLocSaved(true);
     setTimeout(() => setShowLocSaved(false), 2500);
     toast.success(L('School location updated — teacher GPS will now be checked against the new coordinates.', 'اسکول کا مقام اپ ڈیٹ ہو گیا — اساتذہ کا GPS اب نئے کوآرڈینیٹس سے جانچا جائے گا۔'));
+  };
+
+  // Lat/Lng → asli location ka naam (OpenStreetMap Nominatim — free, no API key)
+  const [locNameFetching, setLocNameFetching] = useState(false);
+  const fetchSchoolLocationName = async () => {
+    const lat = Number(locLat), lng = Number(locLng);
+    if (isNaN(lat) || isNaN(lng)) {
+      toast.error(L('Pehle valid latitude / longitude daalein.', 'پہلے درست latitude / longitude درج کریں۔'));
+      return;
+    }
+    setLocNameFetching(true);
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=14`,
+        { headers: { 'Accept-Language': 'en' } }
+      );
+      const data = await res.json();
+      const a = data.address ?? {};
+      const parts = [
+        a.suburb || a.neighbourhood || a.city_district || a.village || a.town || a.hamlet,
+        a.city || a.state,
+      ].filter(Boolean);
+      const name = parts.length ? parts.join(', ') : (data.display_name ?? '');
+      if (name) {
+        setLocName(name);
+        toast.success(L(`Location name fetched: ${name}`, `مقام کا نام مل گیا: ${name}`));
+      } else {
+        toast.error(L('Location name nahi mila — manually type karein.', 'مقام کا نام نہیں ملا — خود لکھیں۔'));
+      }
+    } catch {
+      toast.error(L('Reverse geocoding failed (internet check karein).', 'ریورس جیوکوڈنگ ناکام (انٹرنیٹ چیک کریں)۔'));
+    } finally {
+      setLocNameFetching(false);
+    }
   };
 
   const openPayEditor = (t: Teacher) => {
@@ -467,6 +501,34 @@ export default function PrincipalDashboard({
   const updateSetting = <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {
     setAppSettings(prev => ({ ...prev, [key]: value }));
   };
+
+  // ===== Developer → Principal notifications (AdminNotification) =====
+  const devNotifications = React.useMemo(() => appSettings.notifications ?? [], [appSettings.notifications]);
+  const unreadDevCount = devNotifications.filter(n => !n.read).length;
+  const [showDevNotif, setShowDevNotif] = useState(false);
+
+  const markDevNotifRead = (id: string) => {
+    setAppSettings(prev => ({
+      ...prev,
+      notifications: (prev.notifications ?? []).map(n => n.id === id ? { ...n, read: true } : n),
+    }));
+  };
+
+  const markAllDevNotifRead = () => {
+    setAppSettings(prev => ({
+      ...prev,
+      notifications: (prev.notifications ?? []).map(n => ({ ...n, read: true })),
+    }));
+  };
+
+  // ===== Subscription expiry days =====
+  const subDaysLeft = React.useMemo(() => {
+    const sub = appSettings.subscription;
+    if (!sub || !sub.expiryDate) return null;
+    const diff = new Date(sub.expiryDate + 'T23:59:59').getTime() - Date.now();
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+  }, [appSettings.subscription]);
+
 
   // Theme support
   const [darkTheme, setDarkTheme] = useState<boolean>(() => {
@@ -2129,6 +2191,11 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
   const [currentId, setCurrentId] = useState<string | null>(null);
 
+  // ===== Teacher Profile Modal State =====
+  const [isTeacherProfileModalOpen, setIsTeacherProfileModalOpen] = useState(false);
+  const [selectedTeacherForProfile, setSelectedTeacherForProfile] = useState<Teacher | null>(null);
+  const [teacherProfileTab, setTeacherProfileTab] = useState<'overview' | 'salary' | 'attendance' | 'config'>('overview');
+
   // Validation state
   const [formErrors, setFormErrors] = useState<string[]>([]);
   const [formStep, setFormStep] = useState(1);
@@ -3174,6 +3241,57 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
               <span className={cls}>{t('sidebar.install')}</span>
             </button>
 
+            {/* Developer Notifications Bell */}
+            <div className="relative mt-2">
+              <button
+                onClick={() => setShowDevNotif(v => !v)}
+                className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-bold uppercase tracking-[0.2em] transition-all text-left group rounded-xl bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-100 shadow-sm shadow-indigo-500/20 hover:shadow-md hover:shadow-indigo-500/30"
+              >
+                <span className="relative">
+                  <Bell size={14} className="text-indigo-600" />
+                  {unreadDevCount > 0 && (
+                    <span className="absolute -top-2 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-rose-500 text-white text-[9px] font-black flex items-center justify-center">
+                      {unreadDevCount}
+                    </span>
+                  )}
+                </span>
+                <span className={cls}>Notifications{unreadDevCount > 0 ? ` (${unreadDevCount})` : ''}</span>
+              </button>
+
+              {showDevNotif && (
+                <div className="absolute left-0 bottom-full mb-2 w-80 max-h-96 overflow-y-auto bg-white rounded-xl border border-slate-200 shadow-2xl z-50">
+                  <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Developer Alerts</span>
+                    {unreadDevCount > 0 && (
+                      <button onClick={markAllDevNotifRead} className="text-[10px] font-bold text-indigo-600 hover:underline">
+                        Mark all read
+                      </button>
+                    )}
+                  </div>
+                  {devNotifications.length === 0 ? (
+                    <div className="px-4 py-6 text-center text-xs text-slate-400 font-bold">No notifications yet.</div>
+                  ) : (
+                    devNotifications.map(n => (
+                      <button
+                        key={n.id}
+                        onClick={() => markDevNotifRead(n.id)}
+                        className={`w-full text-left px-4 py-3 border-b border-slate-50 hover:bg-slate-50 transition-all ${n.read ? 'opacity-60' : ''}`}
+                      >
+                        <div className="flex items-start gap-2">
+                          {!n.read && <span className="w-2 h-2 rounded-full bg-indigo-500 mt-1.5 shrink-0" />}
+                          <div className="min-w-0">
+                            <p className="text-xs font-black text-slate-700 truncate">{n.title}</p>
+                            <p className="text-[11px] text-slate-500 line-clamp-2">{n.message}</p>
+                            <p className="text-[9px] text-slate-400 font-bold mt-0.5">{new Date(n.createdAt).toLocaleString()}</p>
+                          </div>
+                        </div>
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+
             {/* Exit System Button in Sidebar */}
             <button
               onClick={onLogout}
@@ -3188,7 +3306,24 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
 
       {/* Main Panel */}
       <main className={`flex-1 min-h-screen flex flex-col p-4 md:p-8 lg:p-10 max-w-7xl mx-auto w-full font-sans text-slate-800 ${selectedStudentReport ? 'print:hidden' : ''}`}>
-        
+
+        {/* Subscription Expiry Warning */}
+        {appSettings.subscription && subDaysLeft !== null && subDaysLeft <= 7 && (
+          <div className={`p-3 mb-4 flex items-center justify-between shadow-sm border ${subDaysLeft <= 0 ? 'bg-rose-50 border-rose-200' : 'bg-amber-50 border-amber-200'}`}>
+            <div className={`flex items-center gap-2 ${subDaysLeft <= 0 ? 'text-rose-700' : 'text-amber-700'}`}>
+              <AlertTriangle size={16} />
+              <span className="text-xs font-black uppercase tracking-widest">
+                {subDaysLeft <= 0
+                  ? 'Subscription Expired — Renew immediately'
+                  : `Subscription expiring in ${subDaysLeft} day${subDaysLeft === 1 ? '' : 's'}`}
+              </span>
+            </div>
+            <div className="text-xs font-bold text-slate-500 uppercase">
+              Plan: {appSettings.subscription.plan}
+            </div>
+          </div>
+        )}
+
         {userSession.role === 'developer' && (
           <div className="bg-amber-100 border border-amber-200 p-3 mb-6 flex items-center justify-between shadow-sm animate-pulse">
             <div className="flex items-center gap-2 text-amber-800">
@@ -6736,6 +6871,184 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
         {activeTab === 'analytics' && (
           <AnalyticsTab userSession={userSession} students={students} classes={classes} attendance={attendance} marks={marks} fees={fees} />
         )}
+        {/* ========== ADMIN PANEL (DEVELOPER) ========== */}
+        {activeTab === 'admin_panel' && (
+          <div className="space-y-8 animate-fade-in">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl p-6 text-white shadow-xl">
+              <div className="flex items-center gap-3 mb-2">
+                <Shield size={28} className="text-teal-400" />
+                <h1 className="text-2xl font-black uppercase tracking-tight">Admin Panel</h1>
+              </div>
+              <p className="text-sm text-slate-300 font-bold">Developer controls — enable or disable app features from here.</p>
+              <div className="flex flex-wrap gap-4 mt-4">
+                <div className="bg-white/10 rounded-xl px-4 py-2.5">
+                  <p className="text-[10px] text-slate-400 uppercase tracking-widest font-black">Total Students</p>
+                  <p className="text-xl font-black text-teal-400">{students.length}</p>
+                </div>
+                <div className="bg-white/10 rounded-xl px-4 py-2.5">
+                  <p className="text-[10px] text-slate-400 uppercase tracking-widest font-black">Total Teachers</p>
+                  <p className="text-xl font-black text-teal-400">{teachers.length}</p>
+                </div>
+                <div className="bg-white/10 rounded-xl px-4 py-2.5">
+                  <p className="text-[10px] text-slate-400 uppercase tracking-widest font-black">Total Classes</p>
+                  <p className="text-xl font-black text-teal-400">{classes.length}</p>
+                </div>
+                <div className="bg-white/10 rounded-xl px-4 py-2.5">
+                  <p className="text-[10px] text-slate-400 uppercase tracking-widest font-black">Features Active</p>
+                  <p className="text-xl font-black text-emerald-400">
+                    {Object.values(appSettings.featureFlags || {}).filter(Boolean).length} / {Object.keys(appSettings.featureFlags || {}).length}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Feature Flags — Core Modules */}
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="px-5 py-4 bg-slate-50 border-b border-slate-200 flex items-center gap-2">
+                <LayoutGrid size={16} className="text-teal-600" />
+                <h2 className="text-sm font-black text-slate-800 uppercase tracking-widest">Core Modules</h2>
+              </div>
+              <div className="divide-y divide-slate-100">
+                {([
+                  { key: 'teacher_pay', label: 'Teacher Pay & Salary', desc: 'Salary config, payslips, GPS attendance' },
+                  { key: 'analytics', label: 'Analytics Dashboard', desc: 'Charts and stats overview' },
+                  { key: 'fees_module', label: 'Fees Module', desc: 'Fee collection, dues, payments' },
+                  { key: 'monthly_report', label: 'Monthly Report', desc: 'Monthly attendance & fee reports' },
+                  { key: 'id_cards', label: 'ID Cards', desc: 'Student & teacher ID card generator' },
+                  { key: 'assignments', label: 'Assignments', desc: 'Teacher assignments for students' },
+                ]).map((item) => (
+                  <div key={item.key} className="flex items-center justify-between px-5 py-3.5 hover:bg-slate-50/60 transition-colors">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-slate-800">{item.label}</p>
+                      <p className="text-[11px] text-slate-400 font-medium">{item.desc}</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        const current = appSettings.featureFlags?.[item.key] !== false;
+                        setAppSettings({ ...appSettings, featureFlags: { ...appSettings.featureFlags, [item.key]: !current } });
+                        toast.success(`${item.label} ${!current ? 'enabled' : 'disabled'}`);
+                      }}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 ml-4 ${
+                        appSettings.featureFlags?.[item.key] !== false ? 'bg-teal-600' : 'bg-slate-300'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow ${
+                          appSettings.featureFlags?.[item.key] !== false ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* Feature Flags — Features Hub */}
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="px-5 py-4 bg-slate-50 border-b border-slate-200 flex items-center gap-2">
+                <Sparkles size={16} className="text-amber-500" />
+                <h2 className="text-sm font-black text-slate-800 uppercase tracking-widest">Features Hub</h2>
+              </div>
+              <div className="divide-y divide-slate-100">
+                {([
+                  { key: 'ai_paper', label: 'AI Paper Maker', desc: 'Generate exam papers with Gemini AI' },
+                  { key: 'certificates', label: 'Certificates', desc: 'Create and print student certificates' },
+                  { key: 'notices', label: 'Notice Board', desc: 'School notices and announcements' },
+                  { key: 'calendar', label: 'School Calendar', desc: 'Events, functions and holidays' },
+                ]).map((item) => (
+                  <div key={item.key} className="flex items-center justify-between px-5 py-3.5 hover:bg-slate-50/60 transition-colors">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-slate-800">{item.label}</p>
+                      <p className="text-[11px] text-slate-400 font-medium">{item.desc}</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        const current = appSettings.featureFlags?.[item.key] !== false;
+                        setAppSettings({ ...appSettings, featureFlags: { ...appSettings.featureFlags, [item.key]: !current } });
+                        toast.success(`${item.label} ${!current ? 'enabled' : 'disabled'}`);
+                      }}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 ml-4 ${
+                        appSettings.featureFlags?.[item.key] !== false ? 'bg-teal-600' : 'bg-slate-300'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow ${
+                          appSettings.featureFlags?.[item.key] !== false ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Feature Flags — Attendance & Communication */}
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="px-5 py-4 bg-slate-50 border-b border-slate-200 flex items-center gap-2">
+                <Fingerprint size={16} className="text-violet-500" />
+                <h2 className="text-sm font-black text-slate-800 uppercase tracking-widest">Attendance & Communication</h2>
+              </div>
+              <div className="divide-y divide-slate-100">
+                {([
+                  { key: 'attendance_swipe', label: 'Attendance Swipe', desc: 'Swipe-based attendance for teachers' },
+                  { key: 'gps_checkin', label: 'GPS Check-In', desc: 'Location-based teacher check-in' },
+                  { key: 'whatsapp_auto', label: 'WhatsApp Auto', desc: 'Auto fee / absence / result WhatsApp' },
+                  { key: 'quiz_module', label: 'Quiz Module', desc: 'Student quizzes and tests' },
+                  { key: 'student_remarks', label: 'Student Remarks', desc: 'Teacher remarks on students' },
+                  { key: 'class_diary', label: 'Class Diary', desc: 'Daily class diary for teachers' },
+                ]).map((item) => (
+                  <div key={item.key} className="flex items-center justify-between px-5 py-3.5 hover:bg-slate-50/60 transition-colors">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-slate-800">{item.label}</p>
+                      <p className="text-[11px] text-slate-400 font-medium">{item.desc}</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        const current = appSettings.featureFlags?.[item.key] !== false;
+                        setAppSettings({ ...appSettings, featureFlags: { ...appSettings.featureFlags, [item.key]: !current } });
+                        toast.success(`${item.label} ${!current ? 'enabled' : 'disabled'}`);
+                      }}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 ml-4 ${
+                        appSettings.featureFlags?.[item.key] !== false ? 'bg-teal-600' : 'bg-slate-300'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow ${
+                          appSettings.featureFlags?.[item.key] !== false ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* System Info */}
+            <div className="bg-gradient-to-r from-slate-50 to-slate-100 rounded-2xl p-5 border border-slate-200">
+              <div className="flex items-center gap-2 mb-3">
+                <Database size={16} className="text-slate-500" />
+                <h3 className="text-xs font-black text-slate-600 uppercase tracking-widest">System Info</h3>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="bg-white rounded-xl p-3 border border-slate-200">
+                  <p className="text-[9px] text-slate-400 uppercase tracking-widest font-black">Data Mode</p>
+                  <p className="text-sm font-black text-slate-700">{isDemoMode() ? 'Demo (Local)' : 'Live (Supabase)'}</p>
+                </div>
+                <div className="bg-white rounded-xl p-3 border border-slate-200">
+                  <p className="text-[9px] text-slate-400 uppercase tracking-widest font-black">App Version</p>
+                  <p className="text-sm font-black text-slate-700">1.0.0</p>
+                </div>
+                <div className="bg-white rounded-xl p-3 border border-slate-200">
+                  <p className="text-[9px] text-slate-400 uppercase tracking-widest font-black">Logged In As</p>
+                  <p className="text-sm font-black text-slate-700">{userSession.role}</p>
+                </div>
+                <div className="bg-white rounded-xl p-3 border border-slate-200">
+                  <p className="text-[9px] text-slate-400 uppercase tracking-widest font-black">Storage</p>
+                  <p className="text-sm font-black text-slate-700">{isDemoMode() ? 'localStorage' : 'Supabase Cloud'}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         {/* ========== NOTICE BOARD ========== */}
         {activeTab === 'features_hub' && featuresSubTab === 'notices' && (
           <div className="bg-white/40 rounded-2xl p-2 sm:p-4">
@@ -6799,7 +7112,13 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                   </div>
                   <div className="space-y-1">
                     <label className="block text-[9px] font-black text-slate-400 uppercase tracking-widest">Location Name</label>
-                    <input value={locName} onChange={(e) => setLocName(e.target.value)} className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800" />
+                    <div className="flex gap-1.5">
+                      <input value={locName} onChange={(e) => setLocName(e.target.value)} placeholder="e.g. Gulshan-e-Iqbal, Karachi" className="flex-1 min-w-0 px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800" />
+                      <button type="button" onClick={fetchSchoolLocationName} disabled={locNameFetching} title="Lat/Lng se asli area naam fetch karein (OpenStreetMap, free)"
+                        className="shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-[9px] font-black uppercase tracking-widest disabled:opacity-50">
+                        <MapPin size={12} /> {locNameFetching ? '…' : 'Fetch'}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -6816,8 +7135,25 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                 const slip = teacherPayslipsMap[t.id];
                 const key = `${t.id}_${payYearP}_${payMonthIdxP}`;
                 const paid = teacherPaySlips[key]?.paid === true;
+
+                // Lifetime stats — saare payslips se total nikalte hain
+                const allSlips = Object.values(teacherPaySlips).filter(s => String(s.teacherId) === String(t.id)) as TeacherPayslip[];
+                const totalNet = allSlips.reduce((a, s) => a + s.netPay, 0);
+                const totalPending = totalNet - allSlips.filter(s => s.paid).reduce((a, s) => a + s.netPay, 0);
+
                 return (
-                  <div key={t.id} className="bg-white border-2 border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all flex flex-col">
+                  <div
+                    key={t.id}
+                    className="bg-white border-2 border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all flex flex-col cursor-pointer"
+                    onClick={() => {
+                      setSelectedTeacherForProfile(t);
+                      setIsTeacherProfileModalOpen(true);
+                    }}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedTeacherForProfile(t); setIsTeacherProfileModalOpen(true); } }}
+                    tabIndex={0}
+                    role="button"
+                    aria-label={`View ${t.name} profile`}
+                  >
                     <div className={`px-4 py-3 flex items-center gap-3 ${paid ? 'bg-teal-600' : 'bg-slate-900'}`}>
                       <div className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center text-white font-black shrink-0"><User size={16} /></div>
                       <div className="min-w-0">
@@ -6825,6 +7161,14 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                         <p className="text-[10px] text-white/80 font-bold uppercase tracking-widest truncate">{t.subject}</p>
                       </div>
                       <span className={`ml-auto px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${paid ? 'bg-white text-teal-900' : 'bg-amber-400 text-slate-950'}`}>{paid ? 'PAID' : 'PENDING'}</span>
+                    </div>
+                    <div className="px-4 py-2 flex items-center gap-2 text-[10px] text-slate-500 font-bold uppercase tracking-widest bg-slate-50/50">
+                      <Calendar size={12} className="text-slate-400" />
+                      <span className="truncate">{t.joinDate ? `Joined: ${t.joinDate}` : 'Join Date N/A'}</span>
+                      <span className="text-slate-300">·</span>
+                      <span className="text-teal-600">Total Earned: {formatPKR(totalNet)}</span>
+                      <span className="text-slate-300">·</span>
+                      <span className={totalPending > 0 ? 'text-rose-600' : 'text-slate-400'}>Pending: {formatPKR(totalPending)}</span>
                     </div>
                     <div className="px-4 py-3 space-y-1.5">
                       <div className="flex justify-between"><span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Base Salary</span><span className="text-[11px] font-black text-slate-900">{formatPKR(cfg.baseSalary)}</span></div>
@@ -11194,6 +11538,284 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
         classes={classes}
       />
 
+      {/* ===== TEACHER PROFILE MODAL ===== */}
+      {isTeacherProfileModalOpen && selectedTeacherForProfile && (
+        <div className="fixed inset-0 bg-black/65 flex items-center justify-center p-4 z-[120] overflow-y-auto animate-fade-in" onClick={() => setIsTeacherProfileModalOpen(false)}>
+          <div className="bg-white rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-teal-600 to-teal-500">
+              <div className="flex items-center gap-3">
+                <User size={20} className="text-white" />
+                <h2 className="text-lg font-black text-white uppercase tracking-tight">Teacher Profile — {selectedTeacherForProfile.name}</h2>
+              </div>
+              <button onClick={() => setIsTeacherProfileModalOpen(false)} className="p-1.5 rounded-lg bg-white/20 hover:bg-white/40 text-white transition-all"><X size={20} /></button>
+            </div>
+            {/* Teacher Filter Dropdown */}
+            <div className="px-6 pt-4 pb-3 border-b border-gray-100 bg-slate-50">
+              <label className="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Select Teacher</label>
+              <select
+                value={String(selectedTeacherForProfile.id)}
+                onChange={(e) => {
+                  const t = teachers.find((x) => String(x.id) === e.target.value);
+                  if (t) setSelectedTeacherForProfile(t);
+                }}
+                className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500"
+              >
+                {teachers.map((t) => (
+                  <option key={t.id} value={String(t.id)}>{t.name} — {t.subject}</option>
+                ))}
+              </select>
+            </div>
+            {/* Tabs */}
+            <div className="px-6 pt-3 pb-2 border-b border-gray-100 bg-gray-50">
+              <div className="flex items-center gap-2 flex-wrap">
+                {(['overview', 'salary', 'attendance', 'config'] as const).map((tab) => (
+                  <button key={tab} onClick={() => setTeacherProfileTab(tab)} className={`px-4 py-2 text-xs font-black uppercase tracking-widest rounded-lg border transition-all ${teacherProfileTab === tab ? 'bg-teal-600 text-white border-teal-600 shadow-md shadow-teal-600/30' : 'bg-white text-slate-600 border-slate-200 hover:border-teal-300 hover:text-teal-700'}`}>
+                    {tab === 'overview' && '👤 Overview'}
+                    {tab === 'salary' && '💰 Salary'}
+                    {tab === 'attendance' && '📋 Attendance'}
+                    {tab === 'config' && '⚙️ Config'}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {/* Content Body */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              {/* TAB: Overview */}
+              {teacherProfileTab === 'overview' && (
+                <div className="space-y-4 animate-fade-in">
+                  <div className="flex items-start gap-5 p-5 bg-gradient-to-br from-teal-50 to-slate-50 rounded-2xl border border-teal-100">
+                    <div className="w-20 h-20 rounded-2xl bg-teal-600 flex items-center justify-center text-white text-3xl font-black border-2 border-teal-300 shadow-md shrink-0">
+                      {selectedTeacherForProfile.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">{selectedTeacherForProfile.name}</h3>
+                      <p className="text-sm text-slate-500 font-bold uppercase tracking-widest mt-0.5">{selectedTeacherForProfile.subject}</p>
+                      <div className="flex items-center gap-2 mt-2 flex-wrap">
+                        {selectedTeacherForProfile.joinDate && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-teal-100 text-teal-700 rounded-md text-[10px] font-black uppercase tracking-widest">
+                            <Calendar size={10} /> Joined: {selectedTeacherForProfile.joinDate}
+                          </span>
+                        )}
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-100 text-slate-600 rounded-md text-[10px] font-black uppercase tracking-widest">
+                          <Mail size={10} /> {selectedTeacherForProfile.email}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                      <div className="flex items-center gap-2 mb-2"><Phone size={14} className="text-teal-600" /><span className="text-xs font-black text-slate-500 uppercase tracking-widest">Phone</span></div>
+                      <p className="text-sm font-bold text-slate-900 font-mono">{selectedTeacherForProfile.phone}</p>
+                    </div>
+                    <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                      <div className="flex items-center gap-2 mb-2"><Mail size={14} className="text-teal-600" /><span className="text-xs font-black text-slate-500 uppercase tracking-widest">Email</span></div>
+                      <p className="text-sm font-bold text-slate-900">{selectedTeacherForProfile.email}</p>
+                    </div>
+                    <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                      <div className="flex items-center gap-2 mb-2"><Calendar size={14} className="text-teal-600" /><span className="text-xs font-black text-slate-500 uppercase tracking-widest">Join Date</span></div>
+                      <p className="text-sm font-bold text-slate-900">{selectedTeacherForProfile.joinDate || 'Not set'}</p>
+                    </div>
+                    <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                      <div className="flex items-center gap-2 mb-2"><User size={14} className="text-teal-600" /><span className="text-xs font-black text-slate-500 uppercase tracking-widest">Username</span></div>
+                      <p className="text-sm font-bold text-slate-900">{selectedTeacherForProfile.username}</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {[
+                      { label: 'Subject', value: selectedTeacherForProfile.subject, color: 'text-teal-600' },
+                      { label: 'Username', value: selectedTeacherForProfile.username, color: 'text-slate-700' },
+                      { label: 'Phone', value: selectedTeacherForProfile.phone, color: 'text-slate-700' },
+                      { label: 'Status', value: 'Active', color: 'text-emerald-600' },
+                    ].map((stat, i) => (
+                      <div key={i} className="bg-white border border-slate-200 rounded-2xl p-3 shadow-sm">
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
+                        <p className={`text-sm font-black ${stat.color}`}>{stat.value}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {/* TAB: Salary History */}
+              {teacherProfileTab === 'salary' && (
+                <div className="space-y-4 animate-fade-in">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {(() => {
+                      const tId = String(selectedTeacherForProfile.id);
+                      const allSlips = Object.values(teacherPaySlips).filter(s => String(s.teacherId) === tId) as TeacherPayslip[];
+                      const totalNet = allSlips.reduce((a, s) => a + s.netPay, 0);
+                      const totalPaid = allSlips.filter(s => s.paid).reduce((a, s) => a + s.netPay, 0);
+                      const totalPending = totalNet - totalPaid;
+                      const avgMonthly = allSlips.length > 0 ? Math.round(totalNet / allSlips.length) : 0;
+                      return [
+                        { label: 'Total Earned', value: formatPKR(totalNet), color: 'text-slate-900', sub: `${allSlips.length} months` },
+                        { label: 'Total Paid', value: formatPKR(totalPaid), color: 'text-teal-600', sub: '' },
+                        { label: 'Pending', value: formatPKR(totalPending), color: totalPending > 0 ? 'text-rose-600' : 'text-slate-400', sub: '' },
+                        { label: 'Avg / Month', value: formatPKR(avgMonthly), color: 'text-amber-600', sub: '(avg)' }
+                      ].map((stat, i) => (
+                        <div key={i} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
+                          <p className={`text-lg font-black ${stat.color}`}>{stat.value}</p>
+                          {stat.sub && <p className="text-[9px] text-slate-400 mt-0.5">{stat.sub}</p>}
+                        </div>
+                      ));
+                    })()}
+                  </div>
+                  <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                    <div className="px-4 py-3 bg-gradient-to-r from-teal-600 to-teal-500">
+                      <h3 className="text-xs font-black text-white uppercase tracking-widest">Complete Salary History — {selectedTeacherForProfile.name}</h3>
+                    </div>
+                    <div className="overflow-x-auto max-h-[400px]">
+                      <table className="w-full text-left">
+                        <thead className="bg-slate-50 sticky top-0">
+                          <tr>{['Month', 'P', 'L', 'A', 'Gross', 'Net Pay', 'Status'].map(h => (<th key={h} className="px-3 py-2 text-[9px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">{h}</th>))}</tr>
+                        </thead>
+                        <tbody>
+                          {(() => {
+                            const tId = String(selectedTeacherForProfile.id);
+                            const allSlips = Object.values(teacherPaySlips).filter(s => String(s.teacherId) === tId) as TeacherPayslip[];
+                            const sorted = allSlips.slice().sort((a, b) => a.year === b.year ? b.month - a.month : b.year - a.year);
+                            return sorted.map((s, idx) => {
+                              const gross = s.baseSalary + s.presentBonus + s.allowances;
+                              const isPaid = s.paid;
+                              return (
+                                <tr key={idx} className={`border-b border-slate-100 ${isPaid ? 'hover:bg-teal-50/30' : 'hover:bg-amber-50/30'} transition-colors`}>
+                                  <td className="px-3 py-2 text-xs font-bold text-slate-800">{monthLabel(s.year, s.month)}</td>
+                                  <td className="px-3 py-2 text-xs font-bold text-teal-700">{s.presentDays}</td>
+                                  <td className="px-3 py-2 text-xs font-bold text-amber-700">{s.lateDays}</td>
+                                  <td className="px-3 py-2 text-xs font-bold text-rose-700">{s.absentDays}</td>
+                                  <td className="px-3 py-2 text-xs font-bold text-slate-800">{formatPKR(gross)}</td>
+                                  <td className="px-3 py-2 text-xs font-black text-teal-700">{formatPKR(s.netPay)}</td>
+                                  <td className="px-3 py-2"><span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${isPaid ? 'bg-teal-100 text-teal-700' : 'bg-amber-100 text-amber-700'}`}>{isPaid ? `PAID · ${s.paidDate || ''}` : 'PENDING'}</span></td>
+                                </tr>
+                              );
+                            });
+                          })()}
+                        </tbody>
+                      </table>
+                      {Object.values(teacherPaySlips).filter(s => String(s.teacherId) === String(selectedTeacherForProfile.id)).length === 0 && (
+                        <div className="py-8 text-center"><Wallet size={32} className="mx-auto text-slate-300 mb-2" /><p className="text-xs font-bold text-slate-400 uppercase tracking-widest">No salary records yet</p><p className="text-[10px] text-slate-400 mt-1">Salary data will appear after first payslip is generated</p></div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+              {/* TAB: Attendance */}
+              {teacherProfileTab === 'attendance' && (
+                <div className="space-y-4 animate-fade-in">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {(() => {
+                      const tId = String(selectedTeacherForProfile.id);
+                      const recs = allTeacherAttendance.filter(r => String(r.teacherId) === tId);
+                      const present = recs.filter(r => r.status === 'present' && r.checkIn).length;
+                      const late = recs.filter(r => r.status === 'late' && r.checkIn).length;
+                      const absent = recs.filter(r => r.status === 'absent').length;
+                      const leave = recs.filter(r => r.status === 'leave').length;
+                      return [
+                        { label: 'Present', value: present, color: 'text-teal-600', bg: 'bg-teal-50' },
+                        { label: 'Late', value: late, color: 'text-amber-600', bg: 'bg-amber-50' },
+                        { label: 'Absent', value: absent, color: 'text-rose-600', bg: 'bg-rose-50' },
+                        { label: 'Leave', value: leave, color: 'text-violet-600', bg: 'bg-violet-50' }
+                      ].map((stat, i) => (
+                        <div key={i} className={`${stat.bg} border border-slate-200 rounded-2xl p-4 shadow-sm`}>
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
+                          <p className={`text-xl font-black ${stat.color}`}>{stat.value}</p>
+                          <p className="text-[9px] text-slate-400 mt-0.5">of {recs.length} total</p>
+                        </div>
+                      ));
+                    })()}
+                  </div>
+                  <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                    <div className="px-4 py-3 bg-gradient-to-r from-teal-600 to-teal-500">
+                      <h3 className="text-xs font-black text-white uppercase tracking-widest">Recent Attendance — {selectedTeacherForProfile.name}</h3>
+                    </div>
+                    <div className="overflow-x-auto max-h-[400px]">
+                      <table className="w-full text-left">
+                        <thead className="bg-slate-50 sticky top-0">
+                          <tr>{['Date', 'Check In', 'Check Out', 'Status', 'Distance'].map(h => (<th key={h} className="px-3 py-2 text-[9px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">{h}</th>))}</tr>
+                        </thead>
+                        <tbody>
+                          {(() => {
+                            const tId = String(selectedTeacherForProfile.id);
+                            const recs = allTeacherAttendance.filter(r => String(r.teacherId) === tId).sort((a, b) => b.date.localeCompare(a.date));
+                            return recs.slice(0, 20).map((r, idx) => (
+                              <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
+                                <td className="px-3 py-2 text-xs font-bold text-slate-800">{r.date}</td>
+                                <td className="px-3 py-2 text-xs font-mono text-slate-600">{r.checkIn ? r.checkIn.slice(11, 16) : '-'}</td>
+                                <td className="px-3 py-2 text-xs font-mono text-slate-600">{r.checkOut ? r.checkOut.slice(11, 16) : '-'}</td>
+                                <td className="px-3 py-2"><span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${r.status === 'present' ? 'bg-teal-100 text-teal-700' : r.status === 'late' ? 'bg-amber-100 text-amber-700' : r.status === 'absent' ? 'bg-rose-100 text-rose-700' : 'bg-violet-100 text-violet-700'}`}>{r.status}</span></td>
+                                <td className="px-3 py-2 text-xs font-mono text-slate-500">{r.distanceMeters ? `${Math.round(r.distanceMeters)}m` : '-'}</td>
+                              </tr>
+                            ));
+                          })()}
+                        </tbody>
+                      </table>
+                      {allTeacherAttendance.filter(r => String(r.teacherId) === String(selectedTeacherForProfile.id)).length === 0 && (
+                        <div className="py-8 text-center"><Calendar size={32} className="mx-auto text-slate-300 mb-2" /><p className="text-xs font-bold text-slate-400 uppercase tracking-widest">No attendance records yet</p><p className="text-[10px] text-slate-400 mt-1">Attendance data will appear after teacher check-in</p></div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+              {/* TAB: Config */}
+              {teacherProfileTab === 'config' && (
+                <div className="space-y-4 animate-fade-in">
+                  <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                    <div className="px-4 py-3 bg-gradient-to-r from-teal-600 to-teal-500">
+                      <h3 className="text-xs font-black text-white uppercase tracking-widest">Pay Configuration — {selectedTeacherForProfile.name}</h3>
+                    </div>
+                    <div className="p-4">
+                      {(() => {
+                        const cfg = teacherPayConfigs.find(c => String(c.teacherId) === String(selectedTeacherForProfile.id)) || defaultPayConfig(selectedTeacherForProfile.id);
+                        return (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {[
+                              { label: 'Base Salary (Monthly)', value: formatPKR(cfg.baseSalary), color: 'text-slate-900' },
+                              { label: 'Bonus per Present Day', value: formatPKR(cfg.bonusPerPresentDay), color: 'text-teal-600' },
+                              { label: 'Late Docking / Day', value: formatPKR(cfg.lateDeductionPerDay), color: 'text-rose-600' },
+                              { label: 'Absent Docking / Day', value: formatPKR(cfg.absentDeductionPerDay), color: 'text-rose-600' },
+                              { label: 'Monthly Allowance', value: formatPKR(cfg.allowances), color: 'text-teal-600' },
+                              { label: 'Fixed Deductions', value: formatPKR(cfg.deductions), color: 'text-rose-600' }
+                            ].map((item, i) => (
+                              <div key={i} className="bg-slate-50 border border-slate-200 rounded-xl p-3">
+                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{item.label}</p>
+                                <p className={`text-base font-black ${item.color}`}>{item.value}</p>
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => {
+                        const t = selectedTeacherForProfile;
+                        setIsTeacherProfileModalOpen(false);
+                        openPayEditor(t);
+                      }}
+                      className="flex-1 py-3 bg-teal-600 hover:bg-teal-700 text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-md shadow-teal-600/30 flex items-center justify-center gap-2"
+                    >
+                      <Edit2 size={14} /> Edit Pay Config
+                    </button>
+                  </div>
+                  <div className="p-4 bg-amber-50 border border-amber-100 rounded-2xl">
+                    <div className="flex items-start gap-3">
+                      <AlertCircle size={16} className="text-amber-600 shrink-0 mt-0.5" />
+                      <p className="text-xs text-amber-800 leading-relaxed"><span className="font-bold">Pay Config Editor</span> ke zariye aap teacher ki salary settings edit kar sakte hain.</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            {/* Modal Footer */}
+            <div className="px-6 py-3 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Showing: {selectedTeacherForProfile.name}</span>
+              <button onClick={() => setIsTeacherProfileModalOpen(false)} className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-black uppercase tracking-widest rounded-lg transition-all">Close</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

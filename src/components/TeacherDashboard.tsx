@@ -538,9 +538,19 @@ export default function TeacherDashboard({
     const curY = now.getFullYear();
     const curM = now.getMonth();
 
-    // Sab se pehla record dhundo (attendance + payslips dono se)
+    // Sab se pehla record dhundo (joinDate + attendance + payslips — teeno se)
     let minY = curY, minM = curM;
     let hasRecord = false;
+
+    // 1) joinDate se tenure start karein (agar available ho)
+    if (teacherProfile?.joinDate) {
+      const jd = monthKeyOf(teacherProfile.joinDate);
+      if (!hasRecord || jd.year < minY || (jd.year === minY && jd.month < minM)) {
+        minY = jd.year; minM = jd.month; hasRecord = true;
+      }
+    }
+
+    // 2) Attendance records se bhi check karein
     for (const r of myTeacherAttendance) {
       if (String(r.teacherId) !== String(teacherId)) continue;
       const k = monthKeyOf(r.date);
@@ -548,6 +558,8 @@ export default function TeacherDashboard({
         minY = k.year; minM = k.month; hasRecord = true;
       }
     }
+
+    // 3) Payslips se bhi check karein
     for (const key of Object.keys(teacherPaySlips)) {
       const parts = key.split('_');
       if (parts[0] !== String(teacherId)) continue;
@@ -597,6 +609,7 @@ export default function TeacherDashboard({
       totalPresent,
       totalAbsent,
       monthsCount: slips.length,
+      joinDate: teacherProfile?.joinDate || null, // ← naya field: join date UI ke liye
     };
   }, [teacherProfile, myPayConfig, myTeacherAttendance, teacherId, teacherPaySlips]);
 
@@ -4465,7 +4478,11 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                 <p className="text-xs text-teal-200 font-bold uppercase tracking-widest mt-1">{teacherProfile?.subject || teacherSubject}</p>
                 <p className="text-[10px] text-teal-300/80 font-bold uppercase tracking-widest mt-1.5 flex items-center gap-1.5">
                   <CalendarClock size={12} />
-                  Tenure: {salaryHistory.tenureYears} Saal {salaryHistory.tenureRemMonths} Mahine · Since {salaryHistory.startLabel}
+                  {salaryHistory.joinDate ? (
+                    <>Joined: {salaryHistory.joinDate} · {salaryHistory.tenureYears} Saal {salaryHistory.tenureRemMonths} Mahine</>
+                  ) : (
+                    <>Since {salaryHistory.startLabel} · {salaryHistory.tenureYears} Saal {salaryHistory.tenureRemMonths} Mahine</>
+                  )}
                 </p>
               </div>
               <div className="relative z-10 text-right">

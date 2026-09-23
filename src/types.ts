@@ -17,6 +17,7 @@ export interface Teacher {
   password: string; // Added for login
   subject: string;
   phone: string;
+  joinDate?: string; // YYYY-MM-DD — service start date, tenure calculate ke liye
 }
 
 export interface Student {
@@ -131,6 +132,30 @@ export interface TimetableEntry {
   teacherId: string;   // References Teacher.id
 }
 
+// ============================================================
+// DEVELOPER / ADMIN PORTAL — notifications, subscription, control
+// ============================================================
+export interface AdminNotification {
+  id: string;
+  title: string;
+  message: string;
+  createdAt: string; // ISO
+  read: boolean;
+}
+
+export type SubscriptionPlan = 'free' | 'monthly' | 'quarterly' | 'yearly';
+export type SubscriptionStatus = 'active' | 'expired' | 'trial';
+
+export interface SubscriptionInfo {
+  plan: SubscriptionPlan;
+  pricePKR: number;
+  startDate: string;  // YYYY-MM-DD
+  expiryDate: string; // YYYY-MM-DD
+  status: SubscriptionStatus;
+  paymentMethod?: string;
+  notes?: string;
+}
+
 export interface AppSettings {
   absentTemplate: string;
   feeTemplate: string;
@@ -142,6 +167,16 @@ export interface AppSettings {
   extraPeriods: Record<string, string[]>;
   deletedPeriods: Record<string, string[]>;
   periodColors: Record<string, string>;
+  /** Developer admin panel ke feature on/off switches. */
+  featureFlags: Record<string, boolean>;
+  /** Teacher attendance GPS geofence (developer portal se set hota hai). */
+  attendanceLocation?: SchoolLocation | null;
+  /** App on/off — jab true ho, non-developer users ko maintenance screen dikhti hai. */
+  maintenanceMode?: boolean;
+  /** Developer → Principal notifications. */
+  notifications?: AdminNotification[];
+  /** Monthly subscription record. */
+  subscription?: SubscriptionInfo | null;
 }
 
 export interface Assignment {

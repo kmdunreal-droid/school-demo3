@@ -246,6 +246,14 @@ export const TEACHER_NAV: NavItem[] = [
     hint: 'Events, functions and holidays',
   },
   {
+    id: 'admin_panel',
+    label: 'Admin Panel',
+    icon: Shield,
+    group: 'administration',
+    hint: 'Developer controls — toggle features on/off',
+    accent: 'info',
+  },
+  {
     id: 'settings',
     label: 'My Settings',
     icon: Settings,

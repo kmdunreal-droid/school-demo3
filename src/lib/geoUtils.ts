@@ -5,13 +5,23 @@
 import { L } from './i18n';
 import type { SchoolLocation } from '../types';
 
-/** Default school location (Karachi — demo). Principal settings mein change ho sakta hai. */
+/**
+ * Default school location (fallback jab tak developer location set na kare).
+ * `name` khali rakha gaya hai taake UI mein galat demo naam na dikhe —
+ * asli naam developer portal se lat/lng par reverse-geocode kar ke aata hai.
+ */
 export const DEFAULT_SCHOOL_LOCATION: SchoolLocation = {
   lat: 24.8607,
   lng: 67.0011,
   radiusMeters: 500,
-  name: 'Demo Academy (Karachi)',
+  name: '',
 };
+
+/**
+ * Purane demo / placeholder naam. Jab location set ki jati hai aur naam abhi bhi
+ * yeh placeholder ho, to reverse-geocode se ASLI naam fetch kar ke replace karte hain.
+ */
+export const DEMO_LOCATION_NAME_PATTERN = /demo\s*academy|not\s*set|unknown|^school$/i;
 
 export interface GeoPosition {
   latitude: number;
@@ -69,4 +79,67 @@ export function formatDistance(meters: number | null | undefined): string {
   if (meters === null || meters === undefined) return '—';
   if (meters < 1000) return `${Math.round(meters)} m`;
   return `${(meters / 1000).toFixed(2)} km`;
+}
+
+/** Duplicate hisse hata kar "Area, City" jaisa short friendly naam banata hai. */
+function buildFriendlyName(parts: (string | undefined | null)[], fallback?: string): string {
+  const clean = parts
+    .map(p => (typeof p === 'string' ? p.trim() : ''))
+    .filter(p => p.length > 0);
+  const unique = clean.filter((p, i) => clean.indexOf(p) === i);
+  if (unique.length) return unique.slice(0, 3).join(', ');
+  return (fallback ?? '').split(',').slice(0, 3).join(',').trim();
+}
+
+/**
+ * Lat/Lng → asli jagah ka friendly naam (area, city).
+ * Provider 1: OpenStreetMap Nominatim (free, no API key).
+ * Provider 2: BigDataCloud reverse-geocode-client (free, no API key) — fallback.
+ * Dono fail ho jayein ya internet na ho → null (caller purana naam rakhta hai).
+ */
+export async function reverseGeocode(lat: number, lng: number): Promise<string | null> {
+  if (!isFinite(lat) || !isFinite(lng)) return null;
+
+  // ---- Provider 1: OpenStreetMap Nominatim ----
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=18&addressdetails=1`,
+      { headers: { 'Accept-Language': 'en' } }
+    );
+    if (res.ok) {
+      const data: any = await res.json();
+      const a: any = data?.address ?? {};
+      const name = buildFriendlyName(
+        [
+          a.neighbourhood || a.suburb || a.quarter || a.residential || a.city_block,
+          a.village || a.hamlet || a.town || a.city_district || a.borough,
+          a.city || a.county || a.state_district || a.state,
+        ],
+        data?.display_name
+      );
+      if (name) return name;
+    }
+  } catch {
+    /* agla provider try karein */
+  }
+
+  // ---- Provider 2: BigDataCloud (fallback) ----
+  try {
+    const res = await fetch(
+      `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`
+    );
+    if (res.ok) {
+      const d: any = await res.json();
+      const name = buildFriendlyName([
+        d?.locality || d?.localityInfo?.administrative?.[3]?.name,
+        d?.city || d?.principalSubdivision,
+        d?.countryName,
+      ]);
+      if (name) return name;
+    }
+  } catch {
+    /* ignore */
+  }
+
+  return null;
 }

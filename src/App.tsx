@@ -1,4 +1,4 @@
-﻿import { L } from '../lib/i18n';
+﻿import { L } from './lib/i18n';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Toaster, toast } from 'sonner';
 import { Download, X } from 'lucide-react';
@@ -20,6 +20,7 @@ import Login from './components/Login';
 import PrincipalDashboard from './components/PrincipalDashboard';
 import TeacherDashboard from './components/TeacherDashboard';
 import StudentDashboard from './components/StudentDashboard';
+import DeveloperPortal from './components/DeveloperPortal';
 
 import { safeStorage } from './lib/safeStorage';
 import { initLang } from './lib/i18n';
@@ -144,7 +145,25 @@ export default function App() {
       autoWhatsAppRedirect: true,
       extraPeriods: {},
       deletedPeriods: {},
-      periodColors: {}
+      periodColors: {},
+      featureFlags: {
+        teacher_pay: true,
+        analytics: true,
+        monthly_report: true,
+        ai_paper: true,
+        certificates: true,
+        notices: true,
+        calendar: true,
+        attendance_swipe: true,
+        quiz_module: true,
+        student_remarks: true,
+        class_diary: true,
+        gps_checkin: true,
+        whatsapp_auto: true,
+        fees_module: true,
+        id_cards: true,
+        assignments: true,
+      }
     })
   );
 
@@ -1040,7 +1059,23 @@ export default function App() {
             onBackToLanding={() => setViewPortal(false)}
           />
         )
-      ) : (userSession.role === 'principal' || userSession.role === 'coordinator' || userSession.role === 'developer') ? (
+      ) : userSession.role === 'developer' ? (
+        <DeveloperPortal
+          userSession={userSession}
+          appSettings={appSettings}
+          setAppSettings={setAppSettings}
+          onLogout={handleLogout}
+        />
+      ) : appSettings.maintenanceMode ? (
+        <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center p-6 text-center">
+          <p className="text-4xl mb-3">🛠️</p>
+          <h1 className="text-xl font-black uppercase tracking-widest">App Maintenance Mein Hai</h1>
+          <p className="text-sm text-slate-400 font-bold mt-2">Thodi der mein wapas aa jayega. Developer se rabta karein.</p>
+          <button onClick={handleLogout} className="mt-6 px-5 py-2 rounded-lg bg-teal-600 text-white text-xs font-black uppercase tracking-widest hover:bg-teal-700 transition-all">
+            Logout
+          </button>
+        </div>
+      ) : (userSession.role === 'principal' || userSession.role === 'coordinator') ? (
         <PrincipalDashboard
           userSession={userSession}
           teachers={teachers}

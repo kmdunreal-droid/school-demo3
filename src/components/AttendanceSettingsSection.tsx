@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { MapPin, Navigation, LocateFixed, CheckCircle2, XCircle, ShieldCheck, ShieldAlert } from 'lucide-react';
 import type { SchoolLocation } from '../types';
 import { getAttendanceSettings, setAttendanceSettings, saveSchoolLocation } from '../lib/attendanceSettings';
+import { reverseGeocode, DEMO_LOCATION_NAME_PATTERN } from '../lib/geoUtils';
 
 interface AttendanceSettingsSectionProps {
   schoolLocation: SchoolLocation;
@@ -59,7 +60,7 @@ export default function AttendanceSettingsSection({ schoolLocation, onSaved }: A
     );
   };
 
-  const handleSaveLocation = () => {
+  const handleSaveLocation = async () => {
     const nLat = Number(lat);
     const nLng = Number(lng);
     const nRadius = Number(radius);
@@ -71,12 +72,19 @@ export default function AttendanceSettingsSection({ schoolLocation, onSaved }: A
       toast.error(L('Enter a valid radius in meters — minimum 1 m.', 'درست رداس (میٹر میں) درج کریں — کم از کم 1 میٹر۔'));
       return;
     }
+    // Naam khali ho ya purana demo/placeholder (e.g. "Demo Academy") ho → lat/lng se ASLI naam fetch karein
+    let resolvedName = name.trim();
+    if (!resolvedName || DEMO_LOCATION_NAME_PATTERN.test(resolvedName)) {
+      const fetched = await reverseGeocode(nLat, nLng);
+      if (fetched) resolvedName = fetched;
+    }
     const loc: SchoolLocation = {
       lat: nLat,
       lng: nLng,
       radiusMeters: Math.max(1, Math.round(nRadius)),
-      name: name.trim() || 'Demo Academy',
+      name: resolvedName || `${nLat.toFixed(4)}, ${nLng.toFixed(4)}`,
     };
+    setName(loc.name);
     saveSchoolLocation(loc);
     setAttendanceSettings({ gpsRestricted });
     onSaved?.(loc);
@@ -179,7 +187,7 @@ export default function AttendanceSettingsSection({ schoolLocation, onSaved }: A
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Demo Academy"
+              placeholder="Gulshan-e-Iqbal, Karachi"
               className="w-full px-2.5 py-2 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/30 dark:focus:ring-sky-400/30"
             />
           </div>
