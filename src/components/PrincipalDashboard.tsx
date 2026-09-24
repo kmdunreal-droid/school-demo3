@@ -8959,21 +8959,53 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                           const aDate = new Date(a.date);
                           return a.studentId === selectedStudentReport.id && MONTHS[aDate.getMonth()] === month;
                         });
-                        
+
                         if (monthLogs.length === 0) return null;
 
                         const present = monthLogs.filter(l => l.status === 'present').length;
                         const leave = monthLogs.filter(l => l.status === 'leave').length;
                         const absent = monthLogs.filter(l => l.status === 'absent').length;
+                        const late = monthLogs.filter(l => l.status === 'late').length;
+
+                        // Status ke din date + weekday ke sath: "2 Fri", "3 Sat", ...
+                        const WD = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                        const dayChips = (st: 'absent' | 'late' | 'leave'): string[] =>
+                          monthLogs
+                            .filter(l => l.status === st)
+                            .map(l => {
+                              const [y, m, d] = String(l.date || '').split('-').map(Number);
+                              if (!y || !m || !d) return { key: String(l.date), label: String(l.date) };
+                              const dt = new Date(y, m - 1, d);
+                              return { key: `${y}-${m}-${d}`, label: `${dt.getDate()} ${WD[dt.getDay()]}` };
+                            })
+                            .sort((a, b) => a.key.localeCompare(b.key))
+                            .map(c => c.label);
+
+                        const chipRows: { label: string; days: string[]; labelCls: string; chipCls: string }[] = [
+                          { label: 'Absent', days: dayChips('absent'), labelCls: 'text-rose-500', chipCls: 'bg-rose-50 text-rose-700 border-rose-200' },
+                          { label: 'Late', days: dayChips('late'), labelCls: 'text-amber-500', chipCls: 'bg-amber-50 text-amber-700 border-amber-200' },
+                          { label: 'Leave', days: dayChips('leave'), labelCls: 'text-teal-600', chipCls: 'bg-teal-50 text-teal-700 border-teal-200' },
+                        ];
 
                         return (
-                          <div key={month} className="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-100">
-                            <span className="text-xs font-bold text-slate-800 uppercase">{month}</span>
-                            <div className="flex gap-3 text-xs">
-                              <span className="font-bold text-amber-600">P: {present}</span>
-                              <span className="font-bold text-amber-600">L: {leave}</span>
-                              <span className="font-bold text-rose-600">A: {absent}</span>
+                          <div key={month} className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+                            <div className="flex items-center justify-between gap-2 flex-wrap">
+                              <span className="text-xs font-bold text-slate-800 uppercase">{month}</span>
+                              <div className="flex gap-3 text-xs">
+                                <span className="font-bold text-slate-500">P: {present}</span>
+                                <span className="font-bold text-rose-600">A: {absent}</span>
+                                <span className="font-bold text-amber-500">Late: {late}</span>
+                                <span className="font-bold text-teal-600">Leave: {leave}</span>
+                              </div>
                             </div>
+                            {chipRows.map(row => row.days.length > 0 && (
+                              <div key={row.label} className="flex flex-wrap items-center gap-1.5 pt-2 mt-2 border-t border-slate-200/70 first:border-t-0 first:pt-2 first:mt-1.5">
+                                <span className={`text-[9px] font-black uppercase tracking-wider ${row.labelCls} w-12 shrink-0`}>{row.label}</span>
+                                {row.days.map((t, i) => (
+                                  <span key={i} className={`text-[10px] font-black px-1.5 py-0.5 rounded-md border leading-none ${row.chipCls}`}>{t}</span>
+                                ))}
+                              </div>
+                            ))}
                           </div>
                         );
                       })}

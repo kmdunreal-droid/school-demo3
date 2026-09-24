@@ -3,7 +3,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Toaster, toast } from 'sonner';
 import { Download, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { sbQueueWrite, sbQueueDelete, flushSupabase, loadAllFromSupabase, subscribeRecords } from './lib/supabaseSync';
+import { sbQueueWrite, sbQueueDelete, flushSupabase, loadAllFromSupabase, subscribeRecords, getSupabaseLastError } from './lib/supabaseSync';
 import { Teacher, Student, Coordinator, Class, TimetableEntry, Attendance, Mark, UserSession, FeeRecord, AppSettings, StudentFeeData, Assignment, Notice, SchoolEvent, Quiz, QuizAttempt, PeriodAttendance } from './types';
 import { 
   INITIAL_TEACHERS, 
@@ -276,8 +276,11 @@ export default function App() {
     if (ok) {
       setSyncError(null);
       setSyncPaused(false);
+      syncPausedUntil.current = 0;
     } else {
-      setSyncError('Cloud sync failed — changes saved locally, retrying');
+      // Actual server/RLS error dikhao (pehle sirf generic text tha)
+      setSyncError(getSupabaseLastError() || 'Cloud sync failed');
+      setSyncPaused(true); // banner par "Retry Now" button enable kare
     }
   };
 
