@@ -3,8 +3,9 @@
 // Direct Postgres (PG_CONNECTION_STRING) se chalta hai — SERVICE KI NAHI ZAROORAT.
 //
 // Run:
-//   node scripts/provision-users.cjs               → provision + provisioned passwords strip
-//   node scripts/provision-users.cjs --no-strip    → passwords cloud me rehne dein
+//   node scripts/provision-users.cjs               → provision (DB records ke passwords safe rehte hain)
+//   node scripts/provision-users.cjs --strip       → provision + DB records se password field hata dein
+//   node scripts/provision-users.cjs --keep-passwords  → mojood users ka auth password na chhero
 //   node scripts/provision-users.cjs --only=ali,teacher1
 //
 // Principal/Developer (env se override):
@@ -20,7 +21,7 @@ const crypto = require('crypto');
 const { Client } = require('pg');
 
 const DOMAIN = '@app.school';
-const STRIP = !process.argv.includes('--no-strip');
+const STRIP = process.argv.includes('--strip');
 const ONLY = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean);
 const KEEP_PW = process.argv.includes('--keep-passwords');
 
@@ -205,7 +206,7 @@ async function main() {
 
   // 5) Report
   console.log('[3/5] created=' + created + ' exists=' + exists + ' skipped=' + skipped + ' failed=' + failed);
-  console.log('[4/5] password strip: ' + (STRIP ? stripped + ' records clean' : 'OFF (--no-strip)'));
+  console.log('[4/5] password strip: ' + (STRIP ? stripped + ' records se password hata diya' : 'OFF (default — DB records me password rehta hai)'));
   summary.forEach(s => console.log('   ' + s));
   console.log('[5/5] DONE. Ab test karein:  node scripts/test-auth-login.cjs');
   console.log('   Principal  : ' + splitKey(process.env.SUPABASE_ADMIN_EMAIL, 'ali') + ' / ' + (process.env.SUPABASE_ADMIN_PASSWORD || 'Ali@2026!'));

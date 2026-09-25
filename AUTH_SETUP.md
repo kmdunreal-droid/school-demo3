@@ -55,11 +55,13 @@ fake-email pattern se Supabase Auth me map kiya jata hai. Role/record linking
 
    ```
    npm install                      # pg + dotenv (devDependencies)
-   node scripts/provision-users.cjs --no-strip
+   node scripts/provision-users.cjs
    ```
 
    Ye har principal/dev + DB ke teachers/students/coordinators ka auth user banata hai
-   (ya mojood user ka password/profile sync karta hai). `--only=ali,teacher1` se selective.
+   (ya mojood user ka password/profile sync karta hai). `--only=ali,teacher1` se selective,
+   `--keep-passwords` se mojood users ka password na chherein, `--strip` se DB records se
+   `password` field hata dein (default: records me rehne dein — wahi provisioning ka source hai).
    Passwords `.env` ke `SUPABASE_ADMIN_PASSWORD` / `DEV_PASSWORD` (defaults: `Ali@2026!`, `Km@6016!`).
 
 3. **Supabase Dashboard → Authentication → Providers → Email**:
