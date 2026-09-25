@@ -187,6 +187,24 @@ export default function DeveloperPortal({ userSession, appSettings, setAppSettin
     toast[on ? 'warning' : 'success'](on ? 'App is now OFF for non-developer users.' : 'App is now ON for everyone.');
   };
 
+  const togglePortal = (portalKey: 'teacher' | 'student' | 'principal') => {
+    setAppSettings(prev => {
+      const field = `${portalKey}PortalDisabled` as const;
+      const nextVal = !prev[field];
+      toast[nextVal ? 'warning' : 'success'](
+        `${portalKey.charAt(0).toUpperCase() + portalKey.slice(1)} Portal is now ${nextVal ? 'SUSPENDED (OFF)' : 'ACTIVE (ON)'}.`
+      );
+      return { ...prev, [field]: nextVal };
+    });
+  };
+
+  const setPortalMsg = (portalKey: 'teacher' | 'student' | 'principal', msg: string) => {
+    setAppSettings(prev => ({
+      ...prev,
+      [`${portalKey}PortalMessage`]: msg,
+    }));
+  };
+
   const sendNotification = () => {
     if (!notifTitle.trim() || !notifBody.trim()) {
       toast.error('Title and message are required.');
@@ -304,6 +322,63 @@ export default function DeveloperPortal({ userSession, appSettings, setAppSettin
                   <p className="text-sm font-black text-slate-900 uppercase">{sub?.plan ?? 'free'}</p>
                 </div>
               </div>
+
+              {/* Portal Status Quick Overview */}
+              <div className="bg-white rounded-xl p-5 border border-slate-200 space-y-3">
+                <p className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center justify-between">
+                  <span>Portals Access Status</span>
+                  <button
+                    onClick={() => setActiveTab('app_control')}
+                    className="text-[10px] font-bold text-teal-600 hover:underline uppercase"
+                  >
+                    Manage Access →
+                  </button>
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className={`p-3 rounded-lg border flex items-center justify-between ${
+                    appSettings.principalPortalDisabled ? 'bg-rose-50 border-rose-200' : 'bg-slate-50 border-slate-200'
+                  }`}>
+                    <div className="flex items-center gap-2">
+                      <span>🏛️</span>
+                      <span className="text-xs font-bold text-slate-800">Principal</span>
+                    </div>
+                    <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
+                      appSettings.principalPortalDisabled ? 'bg-rose-200 text-rose-800' : 'bg-emerald-100 text-emerald-800'
+                    }`}>
+                      {appSettings.principalPortalDisabled ? 'OFF' : 'ON'}
+                    </span>
+                  </div>
+
+                  <div className={`p-3 rounded-lg border flex items-center justify-between ${
+                    appSettings.teacherPortalDisabled ? 'bg-amber-50 border-amber-200' : 'bg-slate-50 border-slate-200'
+                  }`}>
+                    <div className="flex items-center gap-2">
+                      <span>👨‍🏫</span>
+                      <span className="text-xs font-bold text-slate-800">Teacher</span>
+                    </div>
+                    <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
+                      appSettings.teacherPortalDisabled ? 'bg-amber-200 text-amber-800' : 'bg-emerald-100 text-emerald-800'
+                    }`}>
+                      {appSettings.teacherPortalDisabled ? 'OFF' : 'ON'}
+                    </span>
+                  </div>
+
+                  <div className={`p-3 rounded-lg border flex items-center justify-between ${
+                    appSettings.studentPortalDisabled ? 'bg-sky-50 border-sky-200' : 'bg-slate-50 border-slate-200'
+                  }`}>
+                    <div className="flex items-center gap-2">
+                      <span>🎓</span>
+                      <span className="text-xs font-bold text-slate-800">Student</span>
+                    </div>
+                    <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
+                      appSettings.studentPortalDisabled ? 'bg-sky-200 text-sky-800' : 'bg-emerald-100 text-emerald-800'
+                    }`}>
+                      {appSettings.studentPortalDisabled ? 'OFF' : 'ON'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
             </section>
           )}
 
@@ -409,11 +484,18 @@ export default function DeveloperPortal({ userSession, appSettings, setAppSettin
             </section>
           )}
 
-          {/* --- APP ON / OFF --- */}
+          {/* --- APP ON / OFF & PORTAL ACCESS CONTROL --- */}
           {activeTab === 'app_control' && (
-            <section className="space-y-4">
-              <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">App On / Off</h2>
-              <div className={`rounded-xl border-2 p-6 max-w-lg ${
+            <section className="space-y-6">
+              <div>
+                <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">App & Portal Access Control</h2>
+                <p className="text-xs text-slate-500 font-bold mt-1">
+                  Global app kill-switch or fine-grained portal suspension for Principal, Teachers, and Students.
+                </p>
+              </div>
+
+              {/* Master App Switch */}
+              <div className={`rounded-xl border-2 p-6 max-w-2xl ${
                 appSettings.maintenanceMode ? 'border-red-300 bg-red-50' : 'border-emerald-300 bg-emerald-50'
               }`}>
                 <div className="flex items-center gap-3">
@@ -422,7 +504,7 @@ export default function DeveloperPortal({ userSession, appSettings, setAppSettin
                     : <Power size={28} className="text-emerald-500" />}
                   <div>
                     <p className="text-sm font-black text-slate-900 uppercase">
-                      App is {appSettings.maintenanceMode ? 'OFF' : 'ON'}
+                      Global App is {appSettings.maintenanceMode ? 'OFF' : 'ON'}
                     </p>
                     <p className="text-xs text-slate-500 font-bold">
                       {appSettings.maintenanceMode
@@ -433,14 +515,183 @@ export default function DeveloperPortal({ userSession, appSettings, setAppSettin
                 </div>
                 <button
                   onClick={() => setMaintenance(!appSettings.maintenanceMode)}
-                  className={`mt-4 w-full py-3 rounded-xl text-xs font-black uppercase tracking-widest text-white transition-all ${
+                  className={`mt-4 w-full py-3 rounded-xl text-xs font-black uppercase tracking-widest text-white transition-all shadow-md ${
                     appSettings.maintenanceMode
                       ? 'bg-emerald-600 hover:bg-emerald-700'
                       : 'bg-red-600 hover:bg-red-700'
                   }`}
                 >
-                  {appSettings.maintenanceMode ? 'Turn App ON' : 'Turn App OFF'}
+                  {appSettings.maintenanceMode ? 'Turn Entire App ON' : 'Turn Entire App OFF (Maintenance Mode)'}
                 </button>
+              </div>
+
+              {/* Individual Portal Controls */}
+              <div className="max-w-2xl space-y-4 pt-2">
+                <h3 className="text-xs font-black uppercase tracking-widest text-slate-500">
+                  Individual Portal Switches
+                </h3>
+
+                {/* 1. Teacher Portal */}
+                <div className={`p-4 rounded-xl border transition-all ${
+                  appSettings.teacherPortalDisabled
+                    ? 'bg-amber-50/70 border-amber-300'
+                    : 'bg-white border-slate-200'
+                }`}>
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${
+                        appSettings.teacherPortalDisabled ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-700'
+                      }`}>
+                        👨‍🏫
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-sm font-black uppercase text-slate-900">Teacher Portal</h4>
+                          <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
+                            appSettings.teacherPortalDisabled
+                              ? 'bg-amber-200 text-amber-900'
+                              : 'bg-emerald-100 text-emerald-800'
+                          }`}>
+                            {appSettings.teacherPortalDisabled ? 'Suspended (OFF)' : 'Active (ON)'}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-500 font-medium">Control whether teachers can log in or access dashboard.</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => togglePortal('teacher')}
+                      className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider text-white transition-all shrink-0 ${
+                        appSettings.teacherPortalDisabled
+                          ? 'bg-emerald-600 hover:bg-emerald-700'
+                          : 'bg-amber-600 hover:bg-amber-700'
+                      }`}
+                    >
+                      {appSettings.teacherPortalDisabled ? 'Enable Portal' : 'Suspend Portal'}
+                    </button>
+                  </div>
+                  {appSettings.teacherPortalDisabled && (
+                    <div className="mt-3 pt-3 border-t border-amber-200/60">
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-amber-800 mb-1">
+                        Notice message shown to teachers
+                      </label>
+                      <input
+                        type="text"
+                        value={appSettings.teacherPortalMessage ?? ''}
+                        onChange={(e) => setPortalMsg('teacher', e.target.value)}
+                        placeholder="Teacher portal is temporarily suspended by administration."
+                        className="w-full text-xs font-bold px-3 py-2 border border-amber-300 rounded-lg bg-white"
+                      />
+                    </div>
+                  )}
+                </div>
+                {/* 2. Student Portal */}
+                <div className={`p-4 rounded-xl border transition-all ${
+                  appSettings.studentPortalDisabled
+                    ? 'bg-sky-50/70 border-sky-300'
+                    : 'bg-white border-slate-200'
+                }`}>
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${
+                        appSettings.studentPortalDisabled ? 'bg-sky-100 text-sky-700' : 'bg-slate-100 text-slate-700'
+                      }`}>
+                        🎓
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-sm font-black uppercase text-slate-900">Student Portal</h4>
+                          <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
+                            appSettings.studentPortalDisabled
+                              ? 'bg-sky-200 text-sky-900'
+                              : 'bg-emerald-100 text-emerald-800'
+                          }`}>
+                            {appSettings.studentPortalDisabled ? 'Suspended (OFF)' : 'Active (ON)'}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-500 font-medium">Block or allow student portal view, marks, quizzes & diary.</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => togglePortal('student')}
+                      className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider text-white transition-all shrink-0 ${
+                        appSettings.studentPortalDisabled
+                          ? 'bg-emerald-600 hover:bg-emerald-700'
+                          : 'bg-sky-600 hover:bg-sky-700'
+                      }`}
+                    >
+                      {appSettings.studentPortalDisabled ? 'Enable Portal' : 'Suspend Portal'}
+                    </button>
+                  </div>
+                  {appSettings.studentPortalDisabled && (
+                    <div className="mt-3 pt-3 border-t border-sky-200/60">
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-sky-800 mb-1">
+                        Notice message shown to students
+                      </label>
+                      <input
+                        type="text"
+                        value={appSettings.studentPortalMessage ?? ''}
+                        onChange={(e) => setPortalMsg('student', e.target.value)}
+                        placeholder="Student portal is temporarily closed for maintenance."
+                        className="w-full text-xs font-bold px-3 py-2 border border-sky-300 rounded-lg bg-white"
+                      />
+                    </div>
+                  )}
+                </div>
+                {/* 3. Principal Portal */}
+                <div className={`p-4 rounded-xl border transition-all ${
+                  appSettings.principalPortalDisabled
+                    ? 'bg-rose-50/70 border-rose-300'
+                    : 'bg-white border-slate-200'
+                }`}>
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${
+                        appSettings.principalPortalDisabled ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-700'
+                      }`}>
+                        🏛️
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-sm font-black uppercase text-slate-900">Principal Portal</h4>
+                          <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
+                            appSettings.principalPortalDisabled
+                              ? 'bg-rose-200 text-rose-900'
+                              : 'bg-emerald-100 text-emerald-800'
+                          }`}>
+                            {appSettings.principalPortalDisabled ? 'Suspended (OFF)' : 'Active (ON)'}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-500 font-medium">Disable Principal/Coordinator administrative workspace.</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => togglePortal('principal')}
+                      className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider text-white transition-all shrink-0 ${
+                        appSettings.principalPortalDisabled
+                          ? 'bg-emerald-600 hover:bg-emerald-700'
+                          : 'bg-rose-600 hover:bg-rose-700'
+                      }`}
+                    >
+                      {appSettings.principalPortalDisabled ? 'Enable Portal' : 'Suspend Portal'}
+                    </button>
+                  </div>
+                  {appSettings.principalPortalDisabled && (
+                    <div className="mt-3 pt-3 border-t border-rose-200/60">
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-rose-800 mb-1">
+                        Notice message shown to Principal/Coordinator
+                      </label>
+                      <input
+                        type="text"
+                        value={appSettings.principalPortalMessage ?? ''}
+                        onChange={(e) => setPortalMsg('principal', e.target.value)}
+                        placeholder="Principal portal access is temporarily disabled by developer admin."
+                        className="w-full text-xs font-bold px-3 py-2 border border-rose-300 rounded-lg bg-white"
+                      />
+                    </div>
+                  )}
+                </div>
+
+
               </div>
             </section>
           )}

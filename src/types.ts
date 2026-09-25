@@ -177,6 +177,13 @@ export interface AppSettings {
   notifications?: AdminNotification[];
   /** Monthly subscription record. */
   subscription?: SubscriptionInfo | null;
+  /** Individual portal access control switches (set by Developer). */
+  teacherPortalDisabled?: boolean;
+  teacherPortalMessage?: string;
+  studentPortalDisabled?: boolean;
+  studentPortalMessage?: string;
+  principalPortalDisabled?: boolean;
+  principalPortalMessage?: string;
 }
 
 export interface Assignment {

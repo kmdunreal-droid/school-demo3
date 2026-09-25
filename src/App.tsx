@@ -1082,6 +1082,19 @@ export default function App() {
             Logout
           </button>
         </div>
+      ) : (userSession.role === 'principal' || userSession.role === 'coordinator') && appSettings.principalPortalDisabled ? (
+        <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center p-6 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-3xl mb-4">
+            🔒
+          </div>
+          <h1 className="text-xl font-black uppercase tracking-widest text-rose-400">Principal Portal Suspended</h1>
+          <p className="text-sm text-slate-300 font-bold mt-3 max-w-md leading-relaxed">
+            {appSettings.principalPortalMessage || 'Principal portal access is temporarily disabled by developer admin.'}
+          </p>
+          <button onClick={handleLogout} className="mt-6 px-6 py-2.5 rounded-xl bg-rose-600 text-white text-xs font-black uppercase tracking-widest hover:bg-rose-700 transition-all shadow-lg shadow-rose-900/30">
+            Back to Login
+          </button>
+        </div>
       ) : (userSession.role === 'principal' || userSession.role === 'coordinator') ? (
         <PrincipalDashboard
           userSession={userSession}
@@ -1112,6 +1125,19 @@ export default function App() {
           onInstallApp={handleInstallClick}
           pushLocalToCloud={pushLocalToCloud}
         />
+      ) : userSession.role === 'teacher' && appSettings.teacherPortalDisabled ? (
+        <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center p-6 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-3xl mb-4">
+            👨‍🏫
+          </div>
+          <h1 className="text-xl font-black uppercase tracking-widest text-amber-400">Teacher Portal Suspended</h1>
+          <p className="text-sm text-slate-300 font-bold mt-3 max-w-md leading-relaxed">
+            {appSettings.teacherPortalMessage || 'Teacher portal is temporarily suspended by administration.'}
+          </p>
+          <button onClick={handleLogout} className="mt-6 px-6 py-2.5 rounded-xl bg-amber-600 text-white text-xs font-black uppercase tracking-widest hover:bg-amber-700 transition-all shadow-lg shadow-amber-900/30">
+            Back to Login
+          </button>
+        </div>
       ) : userSession.role === 'teacher' ? (
         <TeacherDashboard
           userSession={userSession}
@@ -1137,6 +1163,19 @@ export default function App() {
           installPromptEvent={installPromptEvent}
           onInstallApp={handleInstallClick}
         />
+      ) : userSession.role === 'student' && appSettings.studentPortalDisabled ? (
+        <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center p-6 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-3xl mb-4">
+            🎓
+          </div>
+          <h1 className="text-xl font-black uppercase tracking-widest text-sky-400">Student Portal Suspended</h1>
+          <p className="text-sm text-slate-300 font-bold mt-3 max-w-md leading-relaxed">
+            {appSettings.studentPortalMessage || 'Student portal is temporarily closed for maintenance.'}
+          </p>
+          <button onClick={handleLogout} className="mt-6 px-6 py-2.5 rounded-xl bg-sky-600 text-white text-xs font-black uppercase tracking-widest hover:bg-sky-700 transition-all shadow-lg shadow-sky-900/30">
+            Back to Login
+          </button>
+        </div>
       ) : userSession.role === 'student' ? (
         <StudentDashboard
           userSession={userSession}
