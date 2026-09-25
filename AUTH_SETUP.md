@@ -40,6 +40,7 @@ fake-email pattern se Supabase Auth me map kiya jata hai. Role/record linking
 | `scripts/profiles-schema.sql` | `profiles` table + RLS (`profiles_read_own`) |
 | `scripts/provision-users.cjs` | Bulk provisioning (direct Postgres, service key ke bina) |
 | `scripts/test-auth-login.cjs` | Real login test (password grant + profiles RLS) |
+| `scripts/check-auth-config.cjs` | Poora setup verify (GoTrue settings + Edge Function + DB health), `npm run auth:check` |
 | `scripts/db-status.cjs` / `db-diag.cjs` | DB health / deep dump |
 | `scripts/lint-check.cjs` | `tsc --noEmit` (kyunki is machine par `npx.ps1` blocked hai) |
 
@@ -70,14 +71,37 @@ fake-email pattern se Supabase Auth me map kiya jata hai. Role/record linking
    - Confirm email: **OFF** (provisioning khud email_confirm karta hai)
    - Allow new sign-ups: **OFF** (users sirf principal/developer banayein)
 
+   Is project par ye settings **verified ON/OFF/OFF hain** (`npm run auth:check` se confirm).
+
 4. **Edge Function deploy** (principal dashboard se user add karne ke liye):
 
-   ```
+   Is machine par Supabase CLI aur `supabase/config.toml` dono nahi hain, is liye ek dafa link karna hoga:
+
+   ```bash
+   npm i -g supabase                                  # CLI
+   supabase login                                     # ya: $env:SUPABASE_ACCESS_TOKEN = "sbp_..."
+   supabase link --project-ref nswcyuadlimkdcmubrzp   # ek dafa
    supabase functions deploy create-auth-user
    supabase secrets set SUPABASE_SECRET_KEY=sb_secret_...
    ```
 
    (Alternate secret name: `SUPABASE_SERVICE_ROLE_KEY` — dono support hain.)
+   Deploy hone tak app chalta rehta hai: record save hota hai, sirf "Auth function deploy nahi hai"
+   warning aata hai — logins baad me `npm run auth:provision` se ban jate hain.
+
+5. **Verify (ek command):**
+
+   ```bash
+   npm run auth:check      # ya: node scripts/check-auth-config.cjs
+   ```
+
+   12 checks: (1) GoTrue dashboard settings — Email provider ON, Confirm email OFF
+   (`mailer_autoconfirm=true`), Sign-ups OFF; (2) Edge Function `create-auth-user` deployed hai ya nahi;
+   (3) DB health — `auth.users = profiles = email identities`, NULL token columns, orphan/missing
+   profiles, unconfirmed emails, aur **kaun se records ke login abhi nahi bane** (naam ke saath list).
+
+   Is project par aakhri status: **11/12 PASS** — sirf Edge Function deploy baaki hai.
+   (Ek student record `probe_save_1` bina password hai — purani testing ka junk data, iska login nahi banta.)
 
 ## Roz-marra (day-to-day)
 
@@ -97,12 +121,14 @@ fake-email pattern se Supabase Auth me map kiya jata hai. Role/record linking
 
 | Error | Wajah / Fix |
 | --- | --- |
-| `500 Database error querying schema` (login par) | `auth.users` ke token columns (`confirmation_token`, `email_change`, `recovery_token`, ...) NULL hain. `node scripts/provision-users.cjs --no-strip` dobara chalayein — ye normalize kar deta hai. |
+| `500 Database error querying schema` (login par) | `auth.users` ke token columns (`confirmation_token`, `email_change`, `recovery_token`, ...) NULL hain. `node scripts/provision-users.cjs` dobara chalayein — ye normalize kar deta hai. |
 | `Invalid login credentials` | Password mismatch (record vs auth) — provisioning dobara chalayein (password record se sync hota hai). |
-| `Auth function deploy nahi hai` | `supabase functions deploy create-auth-user`. |
+| `Auth function deploy nahi hai` | `supabase functions deploy create-auth-user` (detect: `npm run auth:check` ka `[2/3]` section). |
 | `Permission nahi hai (sirf apna password)` | Caller ki `profiles.role` principal/developer nahi hai. |
 | `account kisi staff/student profile se linked nahi` | `profiles` row missing → `node scripts/provision-users.cjs`. |
 | Real email provider off | Dashboard → Providers → Email ON (password grant 500/400 de sakta hai). |
+| New sign-ups khule hain | Dashboard → Authentication → "Allow new sign-ups" OFF (`auth:check` ke `[1/3]` me `disable_signup`). |
+| `npm.ps1 / npx.ps1 cannot be loaded` (Windows) | PowerShell execution policy is machine par scripts block karti hai → `node scripts/check-auth-config.cjs` direct chalayein, ya `cmd /c npm run auth:check`. |
 
 ## Purana behaviour (remove ho gaya)
 

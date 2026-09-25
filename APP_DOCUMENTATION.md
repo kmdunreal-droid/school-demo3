@@ -34,6 +34,7 @@ A comprehensive school management PWA built with React 19, TypeScript, Vite, Sup
 - Hardcoded credentials (`km/6016`, `ali/111222`) hata diye gaye; logout par `supabase.auth.signOut()`
 - Naye teacher/student/coordinator add karne par auth user Edge Function `create-auth-user` banata hai (service key server-side)
 - Password cloud par jaata hi nahi (`src/lib/supabaseSync.ts` mein strip); bulk setup `scripts/provision-users.cjs`
+- Setup verify: `npm run auth:check` (GoTrue settings + Edge Function + DB health, read-only)
 - Poori tafseel + troubleshooting: **`AUTH_SETUP.md`**
 
 ### Theme (purana — 2026 redesign se badal gaya, upar "Design System & Onboarding" dekhein)

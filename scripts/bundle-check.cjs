@@ -19,6 +19,8 @@ try {
       '.css': 'css', '.svg': 'dataurl', '.png': 'dataurl',
     },
     define: { 'import.meta.env.VITE_DATA_MODE': '"live"' },
+    // CSS/tailwind resolve na ho to bundling ruk jati hai — ye check sirf JS/TS syntax ke liye hai
+    external: ['*.css'],
   });
   const size = r.outputFiles && r.outputFiles[0] ? r.outputFiles[0].text.length : 0;
   console.log('BUNDLE OK — ' + path.basename(entry) + ' (' + size + ' chars)');

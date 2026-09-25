@@ -11,7 +11,10 @@
     "lint": "tsc --noEmit",
     "keepalive": "node scripts/supabase-keepalive.cjs",
     "keepalive:watch": "node scripts/supabase-keepalive.cjs --watch",
-    "supabase:check": "node scripts/check-supabase.cjs"
+    "supabase:check": "node scripts/check-supabase.cjs",
+    "auth:check": "node scripts/check-auth-config.cjs",
+    "auth:provision": "node scripts/provision-users.cjs",
+    "auth:test": "node scripts/test-auth-login.cjs"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
