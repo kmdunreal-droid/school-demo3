@@ -41,6 +41,7 @@ fake-email pattern se Supabase Auth me map kiya jata hai. Role/record linking
 | `scripts/provision-users.cjs` | Bulk provisioning (direct Postgres, service key ke bina) |
 | `scripts/test-auth-login.cjs` | Real login test (password grant + profiles RLS) |
 | `scripts/check-auth-config.cjs` | Poora setup verify (GoTrue settings + Edge Function + DB health), `npm run auth:check` |
+| `scripts/copy-edge-function.cjs` | Edge Function code clipboard me copy karein, `npm run auth:copy` |
 | `scripts/db-status.cjs` / `db-diag.cjs` | DB health / deep dump |
 | `scripts/lint-check.cjs` | `tsc --noEmit` (kyunki is machine par `npx.ps1` blocked hai) |
 
@@ -75,17 +76,24 @@ fake-email pattern se Supabase Auth me map kiya jata hai. Role/record linking
 
 4. **Edge Function deploy** (principal dashboard se user add karne ke liye):
 
-   Is machine par Supabase CLI aur `supabase/config.toml` dono nahi hain, is liye ek dafa link karna hoga:
+   **Aasan rasta — Dashboard se (CLI aur secret dono ki zarurat nahi):**
+
+   1. Code clipboard me lein: `node scripts/copy-edge-function.cjs`
+   2. Supabase Dashboard → **Edge Functions** → **Deploy a new function** → **Via Editor**
+   3. Name: **`create-auth-user`** (exact), editor me purana template hata kar **paste** karein → **Deploy function**
+
+   Keys platform khud inject karta hai (`SUPABASE_URL`, `SUPABASE_SECRET_KEYS` / legacy
+   `SUPABASE_SERVICE_ROLE_KEY`), is liye **koi secret manually set nahi karna padta**.
+
+   **Ya CLI se** (agar CLI install karna chahein):
 
    ```bash
    npm i -g supabase                                  # CLI
    supabase login                                     # ya: $env:SUPABASE_ACCESS_TOKEN = "sbp_..."
    supabase link --project-ref nswcyuadlimkdcmubrzp   # ek dafa
    supabase functions deploy create-auth-user
-   supabase secrets set SUPABASE_SECRET_KEY=sb_secret_...
    ```
 
-   (Alternate secret name: `SUPABASE_SERVICE_ROLE_KEY` — dono support hain.)
    Deploy hone tak app chalta rehta hai: record save hota hai, sirf "Auth function deploy nahi hai"
    warning aata hai — logins baad me `npm run auth:provision` se ban jate hain.
 

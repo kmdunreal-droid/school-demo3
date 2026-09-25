@@ -13,6 +13,7 @@
     "keepalive:watch": "node scripts/supabase-keepalive.cjs --watch",
     "supabase:check": "node scripts/check-supabase.cjs",
     "auth:check": "node scripts/check-auth-config.cjs",
+    "auth:copy": "node scripts/copy-edge-function.cjs",
     "auth:provision": "node scripts/provision-users.cjs",
     "auth:test": "node scripts/test-auth-login.cjs"
   },

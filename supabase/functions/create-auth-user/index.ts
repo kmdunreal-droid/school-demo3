@@ -1,9 +1,15 @@
 // ============================================================
 // CREATE-AUTH-USER — principal/developer ke liye Supabase Auth provisioning.
 //
-// Deploy:  supabase functions deploy create-auth-user
-// Secret:  supabase secrets set SUPABASE_SECRET_KEY=sb_secret_...
-//          (fallback: SUPABASE_SERVICE_ROLE_KEY jo platform khud deta hai)
+// Deploy (dono raste chalte hain):
+//   A) Dashboard (CLI/secret ki zarurat NAHI):
+//      Dashboard → Edge Functions → Deploy a new function → Via Editor
+//      → name: create-auth-user → is file ka code paste karein → Deploy function
+//   B) CLI:  supabase functions deploy create-auth-user
+//
+// Keys: platform khud inject karta hai — SUPABASE_URL + SUPABASE_SECRET_KEYS (naye
+//       sb_secret_) ya legacy SUPABASE_SERVICE_ROLE_KEY. Custom secret bhi chalega:
+//       SUPABASE_SECRET_KEY. Manual secrets set karna zaroori nahi hai.
 //
 // Body:  { action, loginKey, password, role, refId, displayName }
 // Auth:  caller ka Supabase session JWT zaroori; profiles.role se permission check.
@@ -26,6 +32,24 @@ const json = (body: unknown, status = 200) =>
 
 const sanitize = (v: unknown) => String(v ?? '').trim().toLowerCase().replace(/[^a-z0-9._-]/g, '');
 
+// Platform kuch keys JSON dict me deta hai (jaise {"default":"sb_secret_..."}).
+// Pehli valid value nikalte hain; plain string ho to waisi hi return.
+function firstKey(...candidates: (string | undefined)[]): string {
+  for (const raw of candidates) {
+    const t = String(raw ?? '').trim();
+    if (!t) continue;
+    if (t.startsWith('{')) {
+      try {
+        const vals = Object.values(JSON.parse(t) as Record<string, unknown>)
+          .filter((v): v is string => typeof v === 'string' && v.trim().length > 0);
+        if (vals.length) return vals[0].trim();
+      } catch { /* JSON nahi hai — neeche plain string ki tarah use karein */ }
+    }
+    return t;
+  }
+  return '';
+}
+
 // listUsers me email filter nahi hota — pages scan karte hain
 async function findUserByEmail(admin: any, email: string): Promise<string | null> {
   for (let page = 1; page <= 20; page++) {
@@ -43,9 +67,18 @@ Deno.serve(async (req: Request) => {
   if (req.method !== 'POST') return json({ error: 'POST required' }, 405);
 
   const url = Deno.env.get('SUPABASE_URL') ?? '';
-  const anonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? Deno.env.get('SUPABASE_PUBLISHABLE_KEY') ?? '';
-  const secretKey = Deno.env.get('SUPABASE_SECRET_KEY') ?? Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
-  if (!secretKey) return json({ error: 'Server secret set nahi hai (SUPABASE_SECRET_KEY)' }, 500);
+  const anonKey = firstKey(
+    Deno.env.get('SUPABASE_PUBLISHABLE_KEYS'),  // naye sb_publishable_ (platform-injected dict)
+    Deno.env.get('SUPABASE_ANON_KEY'),          // legacy anon JWT
+    Deno.env.get('SUPABASE_PUBLISHABLE_KEY'),
+  );
+  const secretKey = firstKey(
+    Deno.env.get('SUPABASE_SECRET_KEYS'),       // naye sb_secret_ (platform-injected dict)
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'),  // legacy service_role JWT
+    Deno.env.get('SUPABASE_SECRET_KEY'),        // custom/self-set secret
+  );
+  if (!secretKey) return json({ error: 'Server secret nahi mila (SUPABASE_SECRET_KEYS ya SUPABASE_SERVICE_ROLE_KEY)' }, 500);
+  if (!anonKey) return json({ error: 'Publishable key nahi mili (SUPABASE_PUBLISHABLE_KEYS ya SUPABASE_ANON_KEY)' }, 500);
 
   const jwt = (req.headers.get('Authorization') ?? '').replace(/^Bearer\s+/i, '');
   if (!jwt) return json({ error: 'Session token missing' }, 401);

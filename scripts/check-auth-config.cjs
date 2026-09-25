@@ -52,7 +52,10 @@ async function checkFunction() {
   });
   const body = await res.json().catch(() => ({}));
   if (res.status === 404 && String(body?.code || '') === 'NOT_FOUND') {
-    bad('deployed nahi hai (404)', 'supabase functions deploy create-auth-user\n        → supabase secrets set SUPABASE_SECRET_KEY=sb_secret_...');
+    bad('deployed nahi hai (404)',
+      'Dashboard → Edge Functions → Deploy a new function → Via Editor (name: create-auth-user,\n' +
+      '        code: supabase/functions/create-auth-user/index.ts paste karein) → Deploy function\n' +
+      '        ya CLI: supabase functions deploy create-auth-user');
   } else if (res.status === 401 || res.status === 403) {
     ok('deployed hai (unauth request par ' + res.status + ')', 'principal dashboard se user create kar sakta hai');
   } else if (res.status === 500) {
