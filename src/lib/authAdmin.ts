@@ -50,10 +50,23 @@ export async function provisionAuthUser(args: ProvisionAuthArgs): Promise<Provis
     });
 
     if (error) {
+      let detail = '';
+      try {
+        const ctx = (error as any)?.context;
+        if (ctx && typeof ctx.json === 'function') {
+          const body = await ctx.json();
+          detail = body?.error || body?.message || '';
+        } else if (ctx && typeof ctx.text === 'function') {
+          detail = await ctx.text();
+        }
+      } catch {
+        // ignore context read errors
+      }
+
       const status = (error as any)?.context?.status;
       const msg = status === 404
         ? 'Auth function deploy nahi hai (supabase functions deploy create-auth-user)'
-        : (error.message || 'Auth function error');
+        : (detail || error.message || 'Auth function error');
       return { ok: false, error: msg };
     }
     if (data && (data as any).error) return { ok: false, error: (data as any).error };
