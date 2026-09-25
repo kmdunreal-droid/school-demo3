@@ -24,6 +24,7 @@ import { buildSmartTasks } from '../lib/smartActions';
 import { getFavorites, toggleFavorite } from '../lib/favorites';
 import { initMotionPreference } from '../lib/motionPrefs';
 import { useLang, t, i18nCls, L } from '../lib/i18n';
+import { useSchoolIdentity } from '../lib/schoolIdentity';
 
 interface StudentDashboardProps {
   userSession: UserSession;
@@ -75,6 +76,9 @@ export default function StudentDashboard({
   onInstallApp
 }: StudentDashboardProps) {
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
+
+  // School naam + logo (Developer Portal → School Identity se set hote hain)
+  const { schoolName, logoSrc } = useSchoolIdentity();
 
   // Browser Back Button Support for Tabs
   useEffect(() => {
@@ -529,9 +533,9 @@ export default function StudentDashboard({
       {/* Mobile Top Navigation Indicator */}
       <div id="student-mobile-bar" className="md:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 shadow-sm z-20">
         <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="Demo School Logo" className="w-20 h-20 object-contain" referrerPolicy="no-referrer" />
+          <img src={logoSrc} alt={`${schoolName} Logo`} className="w-20 h-20 object-contain" referrerPolicy="no-referrer" />
           <div className="leading-none">
-            <h1 className="font-black text-gray-900 tracking-tight uppercase tracking-[0.1em] text-xl sm:text-2xl">Demo School</h1>
+            <h1 className="font-black text-gray-900 tracking-tight uppercase tracking-[0.1em] text-xl sm:text-2xl">{schoolName}</h1>
             <p className="text-teal-600 font-black text-[10px] tracking-[0.3em] uppercase mt-1">Student Portal</p>
           </div>
         </div>
@@ -588,8 +592,8 @@ export default function StudentDashboard({
         <div className="p-4 border-b border-slate-50 flex flex-col items-center gap-2">
           <div className="flex items-center justify-between w-full">
             <img 
-              src="/logo.png" 
-              alt="DEMO ACADEMY" 
+              src={logoSrc} 
+              alt={schoolName} 
               className="h-16 w-auto object-contain animate-bounce-slow"
               referrerPolicy="no-referrer"
             />
@@ -598,7 +602,7 @@ export default function StudentDashboard({
             </button>
           </div>
           <div className="text-center w-full">
-            <h1 className="text-slate-900 font-black text-sm tracking-widest uppercase leading-none">Demo Academy</h1>
+            <h1 className="text-slate-900 font-black text-sm tracking-widest uppercase leading-none">{schoolName}</h1>
             <p className={`text-slate-400 font-bold text-[10px] tracking-[0.3em] uppercase mt-1 ${cls}`}>{t('portal.student')}</p>
           </div>
         </div>
@@ -694,9 +698,9 @@ export default function StudentDashboard({
         <div className="flex items-center justify-between border-b border-slate-200 pb-4 mb-6 z-30 relative font-sans">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-3">
-              <img src="/logo.png" alt="Demo School Logo" className="h-20 w-auto object-contain sm:block hidden" referrerPolicy="no-referrer" />
+              <img src={logoSrc} alt={`${schoolName} Logo`} className="h-20 w-auto object-contain sm:block hidden" referrerPolicy="no-referrer" />
               <div className="sm:block hidden leading-none select-none">
-                <h2 className="text-3xl font-black text-slate-900 tracking-tight">Demo School</h2>
+                <h2 className="text-3xl font-black text-slate-900 tracking-tight">{schoolName}</h2>
                 <p className={`text-teal-600 font-black text-[10px] tracking-[0.3em] uppercase mt-1 ${cls}`}>{t('portal.student')}</p>
               </div>
             </div>
@@ -1736,13 +1740,13 @@ export default function StudentDashboard({
                       <div>
                         <div className="flex items-center gap-2 mb-3">
                           <img
-                            src="/logo.png"
-                            alt="Demo School Logo"
+                            src={logoSrc}
+                            alt={`${schoolName} Logo`}
                             referrerPolicy="no-referrer"
                             className="w-9 h-9 rounded-lg object-contain bg-white p-0.5 shadow-sm"
                           />
                           <div>
-                            <span className="text-xs font-black tracking-widest uppercase block leading-none">Demo Academy</span>
+                            <span className="text-xs font-black tracking-widest uppercase block leading-none">{schoolName}</span>
                             <span className="text-[8px] font-bold tracking-widest uppercase opacity-60 block mt-0.5">Saddar Campus</span>
                           </div>
                         </div>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Student, Mark, FeeRecord, Class } from '../types';
+import { useSchoolIdentity } from '../lib/schoolIdentity';
 
 interface PrintableReportProps {
   student: Student;
@@ -9,6 +10,8 @@ interface PrintableReportProps {
 }
 
 export default function PrintableReport({ student, studentClass, marks, fees }: PrintableReportProps) {
+  // School naam + logo (Developer Portal → School Identity)
+  const { schoolName, logoSrc } = useSchoolIdentity();
   const totalBilled = fees.reduce((sum, f) => sum + f.amount, 0);
   const totalPaid = fees.filter(f => f.status === 'paid').reduce((sum, f) => sum + f.amount, 0);
   const totalUnpaid = totalBilled - totalPaid;
@@ -17,7 +20,8 @@ export default function PrintableReport({ student, studentClass, marks, fees }: 
     <div id="printable-report" className="p-10 bg-white text-slate-900 font-sans max-w-4xl mx-auto border-2 border-slate-900 print:p-0 print:border-0 print:w-full">
       {/* School Header */}
       <div className="text-center border-b-2 border-slate-900 pb-6 mb-8">
-        <h1 className="text-3xl font-black uppercase tracking-tighter ">Demo School</h1>
+        <img src={logoSrc} alt={schoolName} className="mx-auto h-16 w-auto object-contain mb-2" referrerPolicy="no-referrer" />
+        <h1 className="text-3xl font-black uppercase tracking-tighter ">{schoolName}</h1>
         <p className="text-xs font-bold text-slate-500 uppercase tracking-[0.3em] mt-1">Official Student Performance & Account Statement</p>
         <div className="mt-4 flex justify-between items-end text-[10px] font-bold uppercase tracking-wider text-slate-400">
           <span>Date Issued: {new Date().toLocaleDateString()}</span>

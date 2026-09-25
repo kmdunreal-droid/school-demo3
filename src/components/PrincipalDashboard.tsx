@@ -49,6 +49,7 @@ import {
   Month,
   DEFAULT_FEE_CATEGORY
 } from '../lib/feeEngine';
+import { useSchoolIdentity, applySchoolBrand, slugifySchoolName } from '../lib/schoolIdentity';
 import { defaultPayConfig, summarizeTeacherMonth, buildPayslip, monthLabel, formatPKR } from '../lib/payEngine';
 import { DEFAULT_SCHOOL_LOCATION, haversineMeters, formatDistance } from '../lib/geoUtils';
 import { INITIAL_TEACHER_PAY_CONFIGS, INITIAL_SCHOOL_LOCATION } from '../initialData';
@@ -226,6 +227,9 @@ export default function PrincipalDashboard({
   onInstallApp,
   pushLocalToCloud
 }: PrincipalDashboardProps) {
+  // School naam + logo (Developer Portal → School Identity se set hote hain)
+  const { schoolName, logoSrc } = useSchoolIdentity();
+
   const [activeTab, setActiveTab] = useState<TabType>(() => {
     const saved = safeStorage.getItem('acadamis_active_tab');
     // Legacy tabs jo ab Features Hub mein merge ho chuke hain → hub par map karo
@@ -1217,7 +1221,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
       const className = sClass ? `${sClass.className} - ${sClass.section}` : 'N/A';
       
       const periodText = monthsText ? ` for ${monthsText}` : ` for ${month}`;
-      const template = `Greetings! We have received a payment of PKR ${totalAmount.toLocaleString()}${periodText} (${collectedCategories.join(', ')}) from ${studentName} (${className}). Your remaining balance is PKR ${totalPending.toLocaleString()}. Thank you for your cooperation. Demo School.`;
+      const template = applySchoolBrand(`Greetings! We have received a payment of PKR ${totalAmount.toLocaleString()}${periodText} (${collectedCategories.join(', ')}) from ${studentName} (${className}). Your remaining balance is PKR ${totalPending.toLocaleString()}. Thank you for your cooperation. ${schoolName}.`, schoolName);
       
       const phone = studentObj.parentPhone.replace(/\D/g, '');
       let countryCodePhone = phone;
@@ -1254,7 +1258,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
     const classId = studentObj?.classId;
     const sClass = classId ? classes.find(c => c.id === classId) : null;
     const className = sClass ? `${sClass.className} - ${sClass.section}` : 'N/A';
-    const template = `Greetings! We have received a payment of PKR ${totalAmount.toLocaleString()}${periodText ? ` for ${periodText}` : ''} (${categoriesText}) from ${studentObj.name} (${className}). Your remaining balance is PKR ${totalPending.toLocaleString()}. Thank you for your cooperation. Demo School.`;
+    const template = applySchoolBrand(`Greetings! We have received a payment of PKR ${totalAmount.toLocaleString()}${periodText ? ` for ${periodText}` : ''} (${categoriesText}) from ${studentObj.name} (${className}). Your remaining balance is PKR ${totalPending.toLocaleString()}. Thank you for your cooperation. ${schoolName}.`, schoolName);
     const phone = String(studentObj.parentPhone).replace(/\D/g, '');
     let countryCodePhone = phone;
     if (countryCodePhone.startsWith('0')) {
@@ -1579,7 +1583,8 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
     try {
       const exportData = {
         exportDate: new Date().toISOString(),
-        appName: 'NSB Academy Manager',
+        appName: `${schoolName} Manager`,
+        schoolName,
         students,
         teachers,
         classes,
@@ -1598,7 +1603,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
       const link = document.createElement('a');
       const dateStr = new Date().toISOString().slice(0, 10);
       link.href = url;
-      link.download = `nsb_backup_${dateStr}.json`;
+      link.download = `${slugifySchoolName(schoolName)}_backup_${dateStr}.json`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -1726,11 +1731,11 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
     const sClass = classId ? classes.find(c => c.id === classId) : null;
     const className = sClass ? `${sClass.className} - ${sClass.section}` : ((student as any).class || 'N/A');
 
-    const template = type === 'payment' 
-      ? `Greetings! We have received a payment of ${amount} for ${details} from ${student.name} (${className}). Your remaining balance is ${totalPending}. Thank you for your cooperation. Demo School.`
+    const template = applySchoolBrand(type === 'payment' 
+      ? `Greetings! We have received a payment of ${amount} for ${details} from ${student.name} (${className}). Your remaining balance is ${totalPending}. Thank you for your cooperation. ${schoolName}.`
       : type === 'charge'
-      ? `Greetings! A charge of ${amount} has been added for ${details} to ${student.name}'s (${className}) school account. Your total pending balance is ${totalPending}. Please contact office for details. Demo School.`
-      : `Greetings! This is a reminder regarding the pending school fees for ${student.name} (${className}). Total outstanding balance is ${totalPending}. Please settle the dues at your earliest convenience. Demo School.`;
+      ? `Greetings! A charge of ${amount} has been added for ${details} to ${student.name}'s (${className}) school account. Your total pending balance is ${totalPending}. Please contact office for details. ${schoolName}.`
+      : `Greetings! This is a reminder regarding the pending school fees for ${student.name} (${className}). Total outstanding balance is ${totalPending}. Please settle the dues at your earliest convenience. ${schoolName}.`, schoolName);
     
     // Check both potential phone fields
     const phone = (student as any).parentPhone || (student as any).studentPhone || (student as any).phone || '';
@@ -1816,7 +1821,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
     const className = sClass ? `${sClass.className} - ${sClass.section}` : (fs?.class || 'N/A');
     const curMi = new Date().getMonth();
     const monthsText = pendingMonths.map(m => `${m.month} ${m.year}`).join(', ');
-    const template = appSettings.feeTemplate || "Dear parent, your child {name}'s fee for {month} is {amount} which is due on {date}. Demo Academy.";
+    const template = appSettings.feeTemplate || "Dear parent, your child {name}'s fee for {month} is {amount} which is due on {date}. {school_name}.";
     const date = new Date().toISOString().split('T')[0];
     let msg = template
       .replace(/{student_name}/g, student.name)
@@ -1827,6 +1832,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
       .replace(/{amount}/g, `PKR ${totalPending.toLocaleString()}`)
       .replace(/{total_pending}/g, `PKR ${totalPending.toLocaleString()}`)
       .replace(/{date}/g, date);
+    msg = applySchoolBrand(msg, schoolName);
     if (monthsText) msg += `\n\nPending months: ${monthsText}`;
     if (dues > 0) msg += `\nDues/Paper Fund: PKR ${dues.toLocaleString()}`;
     return { message: msg, totalPending, pendingMonths, dues };
@@ -1944,8 +1950,8 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
     const pct = totalMax > 0 ? Math.round((totalObtained / totalMax) * 100) : 0;
     const status = pct >= 40 ? 'PASS' : 'RE-STUDY';
 
-    const template = appSettings.resultTemplate || "Greetings, Respected Parent! Result of {student_name} (Roll: {roll_number}, {class_name}) for {exam_name}:\n{subjects}\nTotal: {total_obtained}/{total_max} ({percentage}%). Status: {status}.\n- Demo Academy.";
-    return template
+    const template = appSettings.resultTemplate || "Greetings, Respected Parent! Result of {student_name} (Roll: {roll_number}, {class_name}) for {exam_name}:\n{subjects}\nTotal: {total_obtained}/{total_max} ({percentage}%). Status: {status}.\n- {school_name}.";
+    return applySchoolBrand(template
       .replace(/{student_name}/g, student.name)
       .replace(/{roll_number}/g, student.rollNumber || 'N/A')
       .replace(/{class_name}/g, className)
@@ -1954,7 +1960,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
       .replace(/{total_obtained}/g, String(totalObtained))
       .replace(/{total_max}/g, String(totalMax))
       .replace(/{percentage}/g, String(pct))
-      .replace(/{status}/g, status);
+      .replace(/{status}/g, status), schoolName);
   };
 
   const handleSendResultWhatsApp = (student: Student, exam: string) => {
@@ -3093,9 +3099,9 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
       {/* Mobile Top Header Indicator */}
       <div id="mobile-top-bar" className={`md:hidden sticky top-0 z-30 flex items-center justify-between px-3 py-2 bg-white/95 backdrop-blur border-b border-gray-200 shadow-sm ${selectedStudentReport ? 'print:hidden' : ''}`}>
         <div className="flex items-center gap-2.5 min-w-0">
-          <img src="/logo.png" alt="Demo School Logo" className="h-9 w-auto object-contain shrink-0" referrerPolicy="no-referrer" />
+          <img src={logoSrc} alt={`${schoolName} Logo`} className="h-9 w-auto object-contain shrink-0" referrerPolicy="no-referrer" />
           <div className="min-w-0 flex flex-col leading-none">
-            <h1 className="font-black text-gray-900 tracking-tight uppercase text-sm truncate">Demo School</h1>
+            <h1 className="font-black text-gray-900 tracking-tight uppercase text-sm truncate">{schoolName}</h1>
             <span className="text-[9px] font-black text-teal-600 uppercase tracking-[0.2em]">Principal Portal</span>
           </div>
         </div>
@@ -3208,10 +3214,10 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
         {/* Brand header - Minimalist */}
         <div className="p-4 pb-5 border-b border-slate-50 mb-4">
           <div className="flex items-center justify-between w-full">
-            <img src="/logo.png" alt="Demo School Logo" className="h-16 w-auto object-contain animate-bounce-slow" referrerPolicy="no-referrer" />
+            <img src={logoSrc} alt={`${schoolName} Logo`} className="h-16 w-auto object-contain animate-bounce-slow" referrerPolicy="no-referrer" />
           </div>
           <div className="flex flex-col items-center gap-1 mt-2">
-            <h1 className="text-slate-900 font-black text-sm tracking-[0.2em] uppercase">Demo School</h1>
+            <h1 className="text-slate-900 font-black text-sm tracking-[0.2em] uppercase">{schoolName}</h1>
             <span className={`text-[10px] font-black text-teal-600 uppercase tracking-[0.3em] ${cls}`}>{t('portal.principal')}</span>
           </div>
         </div>
@@ -3389,7 +3395,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
             {/* Greeting Header — vibrant rainbow gradient + bilingual */}
             <div className="greet-principal p-8 -mx-4 sm:-mx-6 -mt-4 sm:-mt-6 mb-8 shadow-xl animate-gradient">
               <p className={`text-[10px] sm:text-xs font-black text-white/70 uppercase tracking-[0.3em] mb-1 ${cls}`}>
-                {lang === 'ur' ? 'ڈیمو اسکول · پرنسل پورٹل' : 'Demo School · Principal Portal'}
+                {lang === 'ur' ? `${schoolName} · پرنسل پورٹل` : `${schoolName} · Principal Portal`}
               </p>
               <h2 className={`text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tighter font-display uppercase leading-tight truncate whitespace-nowrap ${cls}`}>
                 {userSession.role === 'developer'
@@ -4689,12 +4695,12 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                   const totalPending = sFees.reduce((acc, curr) => acc + curr.amount, 0);
                   const months = sFees.map(f => f.month).join(', ');
                   
-                  const waMessage = appSettings.feeTemplate
+                  const waMessage = applySchoolBrand(appSettings.feeTemplate
                     .replace(/{student_name}/g, student.name)
                     .replace(/{class_name}/g, classObj ? `${classObj.className}-${classObj.section}` : '')
                     .replace(/{total_pending}/g, totalPending.toString())
                     .replace(/{months}/g, months || 'Current Month')
-                    .replace(/{date}/g, new Date().toISOString().split('T')[0]);
+                    .replace(/{date}/g, new Date().toISOString().split('T')[0]), schoolName);
                   
                   const waUrl = `https://api.whatsapp.com/send?phone=${student.parentPhone.replace(/[^0-9]/g, '') || '923001234567'}&text=${encodeURIComponent(waMessage)}`;
 
@@ -5272,7 +5278,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                                                       )}
                                                       <button
                                                         onClick={() => {
-                                                          const text = `Fee Reminder: A payment is pending for ${student.name}. Balance: ${monthlyFee - totalPaid}. Please clear it soon. - NSB Academy`;
+                                                          const text = applySchoolBrand(`Fee Reminder: A payment is pending for ${student.name}. Balance: ${monthlyFee - totalPaid}. Please clear it soon. - ${schoolName}`, schoolName);
                                                           if (student.parentPhone) window.open(`https://api.whatsapp.com/send?phone=${student.parentPhone.replace(/[^0-9]/g, '')}&text=${encodeURIComponent(text)}`, '_blank');
                                                         }}
                                                         className="p-2 bg-white border border-slate-200 hover:border-amber-500 hover:text-amber-600 text-slate-700 rounded-xl transition-all flex items-center justify-center cursor-pointer shadow-sm"
@@ -7956,8 +7962,8 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                             const val = e.target.value;
                             let newTpl = "";
                             if (val === "short") newTpl = "Reminder: {total_pending} pending for {student_name}. Please settle soon. - Principal.";
-                            else if (val === "standard") newTpl = "Greetings! Demo School Reminder: Guardian of {student_name}. Pending balance: {total_pending}. Kindly settle today. Thank you.";
-                            else if (val === "urgent") newTpl = "🚨 URGENT: {total_pending} pending for {student_name}. Pay today to avoid portal suspension. - Principal Demo School.";
+                            else if (val === "standard") newTpl = "Greetings! {school_name} Reminder: Guardian of {student_name}. Pending balance: {total_pending}. Kindly settle today. Thank you.";
+                            else if (val === "urgent") newTpl = "🚨 URGENT: {total_pending} pending for {student_name}. Pay today to avoid portal suspension. - Principal {school_name}.";
                             
                             if (newTpl) {
                               updateSetting('feeTemplate', newTpl);
@@ -8016,9 +8022,9 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                           onChange={(e) => {
                             const val = e.target.value;
                             let newTpl = "";
-                            if (val === "standard") newTpl = "Greetings, Respected Parent! Result of {student_name} (Roll: {roll_number}, {class_name}) for {exam_name}:\n{subjects}\nTotal: {total_obtained}/{total_max} ({percentage}%). Status: {status}.\n- Demo Academy.";
-                            else if (val === "detailed") newTpl = "Assalam-o-Alaikum! {exam_name} RESULT of {student_name} (Roll: {roll_number}, {class_name}):\n{subjects}\nGRAND TOTAL: {total_obtained} out of {total_max} ({percentage}%)\nRemarks: {status}\nBest regards, Demo Academy.";
-                            else if (val === "short") newTpl = "{exam_name} result {student_name}: {percentage}% ({status}). Total {total_obtained}/{total_max}. Demo Academy.";
+                            if (val === "standard") newTpl = "Greetings, Respected Parent! Result of {student_name} (Roll: {roll_number}, {class_name}) for {exam_name}:\n{subjects}\nTotal: {total_obtained}/{total_max} ({percentage}%). Status: {status}.\n- {school_name}.";
+                            else if (val === "detailed") newTpl = "Assalam-o-Alaikum! {exam_name} RESULT of {student_name} (Roll: {roll_number}, {class_name}):\n{subjects}\nGRAND TOTAL: {total_obtained} out of {total_max} ({percentage}%)\nRemarks: {status}\nBest regards, {school_name}.";
+                            else if (val === "short") newTpl = "{exam_name} result {student_name}: {percentage}% ({status}). Total {total_obtained}/{total_max}. {school_name}.";
                             
                             if (newTpl) {
                               updateSetting('resultTemplate', newTpl);

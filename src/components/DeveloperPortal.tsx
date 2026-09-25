@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react';
 import {
   Shield, MapPin, Sparkles, Power, Bell, CreditCard, LogOut,
-  Save, Crosshair, Trash2, Send, AlertTriangle,
+  Save, Crosshair, Trash2, Send, AlertTriangle, Building2, ImagePlus, RotateCcw,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import {
+  DEFAULT_SCHOOL_NAME, DEFAULT_LOGO_SRC, getSchoolName, getLogoSrc,
+  fileToLogoDataUrl, slugifySchoolName,
+} from '../lib/schoolIdentity';
 import type { AppSettings, SchoolLocation, UserSession, AdminNotification, SubscriptionPlan, SubscriptionStatus } from '../types';
 import { DEFAULT_SCHOOL_LOCATION, getCurrentPosition, reverseGeocode, DEMO_LOCATION_NAME_PATTERN as DEFAULT_LOC_NAME_PATTERN } from '../lib/geoUtils';
 import { saveSchoolLocation, getAttendanceSettings, setAttendanceSettings } from '../lib/attendanceSettings';
@@ -15,10 +19,11 @@ interface DeveloperPortalProps {
   onLogout: () => void;
 }
 
-type DevTab = 'overview' | 'location' | 'features' | 'app_control' | 'notifications' | 'subscription';
+type DevTab = 'overview' | 'identity' | 'location' | 'features' | 'app_control' | 'notifications' | 'subscription';
 
 const DEV_TABS: { id: DevTab; label: string; icon: React.ReactNode }[] = [
   { id: 'overview', label: 'Overview', icon: <Shield size={16} /> },
+  { id: 'identity', label: 'School Identity', icon: <Building2 size={16} /> },
   { id: 'location', label: 'Attendance Location', icon: <MapPin size={16} /> },
   { id: 'features', label: 'AI & Features', icon: <Sparkles size={16} /> },
   { id: 'app_control', label: 'App On / Off', icon: <Power size={16} /> },
@@ -100,8 +105,66 @@ export default function DeveloperPortal({ userSession, appSettings, setAppSettin
   const [subMethod, setSubMethod] = useState(sub?.paymentMethod ?? '');
   const [subNotes, setSubNotes] = useState(sub?.notes ?? '');
 
+  // ---- School Identity state (naam + logo — poore app mein yehi use hota hai) ----
+  const [idName, setIdName] = useState(() => getSchoolName(appSettings));
+  const [idLogo, setIdLogo] = useState(() => getLogoSrc(appSettings));
+  const [idLogoSaving, setIdLogoSaving] = useState(false);
+
   const notifications: AdminNotification[] = appSettings.notifications ?? [];
   const features = appSettings.featureFlags ?? {};
+
+  /** Naam/logo sirf `appSettings` mein likhte hain — baqi sync (localStorage +
+   *  Supabase `app_settings/global`) aur poori app ka display khud ho jata hai. */
+  const applyIdentity = (next: { schoolName?: string; logoSrc?: string }) => {
+    setAppSettings(prev => ({
+      ...prev,
+      ...(next.schoolName !== undefined ? { schoolName: next.schoolName } : {}),
+      ...(next.logoSrc !== undefined ? { logoSrc: next.logoSrc } : {}),
+    }));
+  };
+
+  const handleIdentitySave = () => {
+    const clean = idName.trim();
+    if (!clean) {
+      toast.error('School name khali nahi ho sakta — "Reset Default" se default naam wapas lein.');
+      return;
+    }
+    if (clean.length > 60) {
+      toast.error('Naam bohat lamba hai (max 60 characters).');
+      return;
+    }
+    setIdName(clean);
+    applyIdentity({ schoolName: clean });
+    toast.success(`School name saved: ${clean} — ab poori app mein yehi naam dikhega.`);
+  };
+
+  const handleIdentityReset = () => {
+    setIdName(DEFAULT_SCHOOL_NAME);
+    setIdLogo(DEFAULT_LOGO_SRC);
+    applyIdentity({ schoolName: DEFAULT_SCHOOL_NAME, logoSrc: DEFAULT_LOGO_SRC });
+    toast.success('Default school identity restore ho gayi.');
+  };
+
+  const handleLogoPick = async (file?: File | null) => {
+    if (!file) return;
+    setIdLogoSaving(true);
+    try {
+      const dataUrl = await fileToLogoDataUrl(file);
+      setIdLogo(dataUrl);
+      applyIdentity({ logoSrc: dataUrl });
+      toast.success('Logo save ho gaya — headers, login screen aur printouts par update ho gaya.');
+    } catch (e: any) {
+      toast.error(e?.message || 'Logo save nahi ho saka.');
+    } finally {
+      setIdLogoSaving(false);
+    }
+  };
+
+  const handleLogoReset = () => {
+    setIdLogo(DEFAULT_LOGO_SRC);
+    applyIdentity({ logoSrc: DEFAULT_LOGO_SRC });
+    toast.success('Default logo wapas laga diya.');
+  };
 
   const toggleFlag = (key: string) => {
     setAppSettings(prev => ({
@@ -382,7 +445,120 @@ export default function DeveloperPortal({ userSession, appSettings, setAppSettin
             </section>
           )}
 
-          {/* --- ATTENDANCE LOCATION --- */}
+          {/* --- SCHOOL IDENTITY (school name + logo) --- */}
+          {activeTab === 'identity' && (
+            <section className="space-y-4">
+              <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">School Identity</h2>
+              <p className="text-xs text-slate-500 font-bold max-w-3xl">
+                Yahan set kiya gaya <b>naam</b> aur <b>logo</b> poori app mein use hota hai — sare portals ke headers,
+                login screen, fee receipts, report cards, certificates, AI papers, WhatsApp messages aur backup file ke
+                naam mein. Ye settings cloud (Supabase) mein sync hoti hain, is liye har device par khud update ho jati hain.
+              </p>
+
+              <div className="grid lg:grid-cols-2 gap-4 max-w-4xl">
+                {/* ---- School Name ---- */}
+                <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-3">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">School / Academy Name</p>
+                  <input
+                    value={idName}
+                    onChange={e => setIdName(e.target.value)}
+                    maxLength={60}
+                    placeholder="e.g. Al-Noor Public School"
+                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold"
+                  />
+                  <div className="flex flex-wrap gap-2">
+                    <button onClick={handleIdentitySave}
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-teal-600 text-white text-[10px] font-black uppercase tracking-widest hover:bg-teal-700">
+                      <Save size={14} /> Save Name
+                    </button>
+                    <button onClick={handleIdentityReset}
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 text-slate-600 text-[10px] font-black uppercase tracking-widest hover:bg-slate-200">
+                      <RotateCcw size={14} /> Reset Default
+                    </button>
+                  </div>
+                  <p className="text-[10px] font-bold text-slate-400">
+                    Backup file banega:{' '}
+                    <span className="font-mono text-slate-500">
+                      {slugifySchoolName(idName)}_backup_{new Date().toISOString().slice(0, 10)}.json
+                    </span>
+                  </p>
+                  <p className="text-[10px] font-bold text-slate-400">
+                    Blank chhodne par default <b>{DEFAULT_SCHOOL_NAME}</b> chalega.
+                  </p>
+                </div>
+
+                {/* ---- School Logo ---- */}
+                <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-3">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">School Logo</p>
+                  <div className="flex items-center gap-4">
+                    <img src={idLogo} alt="logo preview"
+                      className="h-20 w-20 object-contain rounded-lg border border-slate-200 bg-white p-1.5" />
+                    <div className="flex flex-col gap-2">
+                      <label className={`flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-slate-800 ${idLogoSaving ? 'opacity-60 pointer-events-none' : ''}`}>
+                        <ImagePlus size={14} /> {idLogoSaving ? 'Saving…' : 'Upload Logo'}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={e => {
+                            const f = e.target.files?.[0] ?? null;
+                            e.target.value = '';
+                            void handleLogoPick(f);
+                          }}
+                        />
+                      </label>
+                      <button onClick={handleLogoReset}
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 text-slate-600 text-[10px] font-black uppercase tracking-widest hover:bg-slate-200">
+                        <RotateCcw size={14} /> Default Logo
+                      </button>
+                    </div>
+                  </div>
+                  <p className="text-[10px] font-bold text-slate-400">
+                    PNG / JPG / WebP / SVG — 5 MB tak. Upload par khud compress (max 512px, WebP) hota hai taake cloud
+                    sync halka rahe. Default logo: <span className="font-mono text-slate-500">{DEFAULT_LOGO_SRC}</span>
+                  </p>
+                </div>
+              </div>
+              {/* ---- Live preview (aisa hi poore app mein dikhega) ---- */}
+              <div className="max-w-4xl space-y-2">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Live Preview</p>
+                <div className="bg-slate-900 rounded-xl p-4 flex items-center gap-3">
+                  <img src={idLogo} alt="logo preview" className="h-10 w-auto object-contain" />
+                  <div>
+                    <p className="text-sm font-black text-white uppercase tracking-tight">
+                      {idName.trim() || DEFAULT_SCHOOL_NAME}
+                    </p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                      Principal Portal · Fee Receipt · Report Card
+                    </p>
+                  </div>
+                </div>
+                <div className="bg-white rounded-xl border border-slate-200 p-4 flex items-center gap-3">
+                  <img src={idLogo} alt="logo preview" className="h-10 w-auto object-contain" />
+                  <div>
+                    <p className="text-sm font-black text-slate-900 uppercase tracking-tight">
+                      {idName.trim() || DEFAULT_SCHOOL_NAME}
+                    </p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                      Printable / Certificate / AI Paper header
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 max-w-4xl flex gap-2">
+                <AlertTriangle size={16} className="text-amber-600 shrink-0 mt-0.5" />
+                <p className="text-xs font-bold text-amber-800">
+                  Save karte hi localStorage + Supabase (<span className="font-mono">app_settings/global</span>) mein likha
+                  jata hai aur sab portals par turant update ho jata hai. Purane WhatsApp/receipt texts mein jo bhi
+                  "Demo School / Demo Academy / NSB Academy" likha ho, woh bhi naye naam se replace ho jata hai.
+                </p>
+              </div>
+            
+            </section>
+          )}
+
+
           {activeTab === 'location' && (
             <section className="space-y-4">
               <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">Teacher Attendance Location</h2>

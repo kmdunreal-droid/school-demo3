@@ -4,6 +4,7 @@ import { Role, UserSession, Teacher, Student, Coordinator } from '../types';
 import { supabase, isDemoMode } from '../supabase';
 import { toAuthEmail, sanitizeLoginKey } from '../lib/authId';
 import { toast } from 'sonner';
+import { useSchoolIdentity } from '../lib/schoolIdentity';
 
 interface LoginProps {
   teachers: Teacher[];
@@ -19,6 +20,10 @@ export default function Login({ teachers, students, coordinators, onLogin, onBac
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  // School ka naam + logo (Developer Portal → School Identity se set hote hain;
+  // set na hon to default "Demo School" + /logo.png).
+  const { schoolName, logoSrc } = useSchoolIdentity();
 
   /**
    * AUTH: profiles row → UserSession.
@@ -130,8 +135,8 @@ export default function Login({ teachers, students, coordinators, onLogin, onBac
         {/* Minimalist Header */}
         <div className="text-center space-y-4">
           <img
-            src="/logo.png"
-            alt="DEMO ACADEMY"
+            src={logoSrc}
+            alt={schoolName}
             className="mx-auto h-20 w-auto object-contain mb-2"
             referrerPolicy="no-referrer"
           />
@@ -140,7 +145,7 @@ export default function Login({ teachers, students, coordinators, onLogin, onBac
               Portal <span className="font-extrabold not-">Login</span>
             </h2>
             <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.4em] text-center">
-              Demo School
+              {schoolName}
             </p>
           </div>
         </div>
@@ -211,7 +216,7 @@ export default function Login({ teachers, students, coordinators, onLogin, onBac
 
         <div className="pt-8 border-t border-slate-50 dark:border-slate-900 text-center">
             <p className="text-[10px] font-bold text-slate-300 dark:text-slate-700 uppercase tracking-widest">
-                Demo School Digital Management Infrastructure
+                {schoolName} Digital Management Infrastructure
             </p>
         </div>
       </div>

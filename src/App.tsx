@@ -25,6 +25,7 @@ import DeveloperPortal from './components/DeveloperPortal';
 
 import { safeStorage } from './lib/safeStorage';
 import { initLang } from './lib/i18n';
+import { DEFAULT_SCHOOL_NAME, DEFAULT_LOGO_SRC, syncSchoolIdentity, getSchoolName } from './lib/schoolIdentity';
 
 
 function safeParse<T>(key: string, fallback: T): T {
@@ -138,12 +139,14 @@ export default function App() {
   const [appSettings, setAppSettings] = useState<AppSettings>(() => 
     safeParse('acadamis_app_settings', {
       absentTemplate: "Greetings, Respected Parent! We noticed that your child {student_name} (Roll: {roll_number}) has been marked ABSENT on date {date}. Kindly clarify the reason or contact the school office. Principal.",
-      feeTemplate: "Dear parent, your child {name}'s fee for {month} is {amount} which is due on {date}. Demo Academy.",
-      resultTemplate: "Greetings, Respected Parent! Result of {student_name} (Roll: {roll_number}, {class_name}) for {exam_name}:\n{subjects}\nTotal: {total_obtained}/{total_max} ({percentage}%). Status: {status}.\n- Demo Academy.",
+      feeTemplate: "Dear parent, your child {name}'s fee for {month} is {amount} which is due on {date}. - {school_name}.",
+      resultTemplate: "Greetings, Respected Parent! Result of {student_name} (Roll: {roll_number}, {class_name}) for {exam_name}:\n{subjects}\nTotal: {total_obtained}/{total_max} ({percentage}%). Status: {status}.\n- {school_name}.",
       whatsAppAutoFee: true,
       whatsAppAutoAbsence: true,
       whatsAppAutoResult: false,
       autoWhatsAppRedirect: true,
+      schoolName: DEFAULT_SCHOOL_NAME,
+      logoSrc: DEFAULT_LOGO_SRC,
       extraPeriods: {},
       deletedPeriods: {},
       periodColors: {},
@@ -213,7 +216,7 @@ export default function App() {
       });
     } else {
       toast.info(
-        "To install DEMO ACADEMY, click the install icon (desktop) in your browser's address bar or select 'Add to Home Screen' from the browser menu (e.g., Safari iOS Share menu).",
+        `To install ${getSchoolName(appSettings).toUpperCase()}, click the install icon (desktop) in your browser's address bar or select 'Add to Home Screen' from the browser menu (e.g., Safari iOS Share menu).`,
         { duration: 6000 }
       );
     }
@@ -856,6 +859,12 @@ export default function App() {
     sync();
   }, [appSettings]);
 
+  // School identity (naam + logo) → global store (har component) + browser tab title
+  useEffect(() => {
+    syncSchoolIdentity(appSettings);
+    document.title = getSchoolName(appSettings);
+  }, [appSettings]);
+
   // Auto-sync students to feeStudents collection
   useEffect(() => {
     if (!isSyncComplete.current) return;
@@ -1042,7 +1051,7 @@ export default function App() {
                 </div>
               </div>
               <div className="bg-slate-50 p-4 text-center border-t border-slate-100">
-                <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Demo School Management System</p>
+                <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">{getSchoolName(appSettings)} Management System</p>
               </div>
             </motion.div>
           </div>

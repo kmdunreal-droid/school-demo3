@@ -7,6 +7,7 @@ import {
   Menu, X, Star, Quote, TrendingUp, CheckSquare, CreditCard, MessageSquare, Fingerprint
 } from 'lucide-react';
 import { Teacher, Student, Class } from '../types';
+import { useSchoolIdentity } from '../lib/schoolIdentity';
 import schoolHero from '../assets/images/school_hero_illustration_1781185991035.png';
 
 interface LandingPageProps {
@@ -17,6 +18,9 @@ interface LandingPageProps {
 }
 
 export default function LandingPage({ teachers, students, classes, onEnterPortal }: LandingPageProps) {
+  // School naam + logo (Developer Portal → School Identity se set hote hain)
+  const { schoolName, logoSrc } = useSchoolIdentity();
+
   // Mobile nav state
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -63,17 +67,17 @@ export default function LandingPage({ teachers, students, classes, onEnterPortal
           className="flex items-center gap-3"
         >
           <img 
-            src="/logo.png" 
-            alt="Demo School" 
+            src={logoSrc} 
+            alt={schoolName} 
             className="h-9 sm:h-10 w-auto object-contain hover:scale-105 transition-transform"
             referrerPolicy="no-referrer"
           />
           <div className="flex flex-col">
             <span className="font-black text-slate-950 text-lg sm:text-xl tracking-tighter uppercase leading-none">
-              Demo
+              {schoolName.split(' ')[0]}
             </span>
             <span className="text-[10px] tracking-[0.4em] font-black text-amber-600 uppercase">
-              School
+              {schoolName.split(' ').slice(1).join(' ') || 'Academy'}
             </span>
           </div>
         </motion.div>
@@ -173,7 +177,7 @@ export default function LandingPage({ teachers, students, classes, onEnterPortal
                 </h1>
                 
                 <p className="text-slate-500 text-base sm:text-lg md:text-xl max-w-xl leading-relaxed font-medium mx-auto">
-                  Demo School integrates rigorous academic standards with advanced digital systems, fostering an environment where curiosity meets modern capability.
+                  {schoolName} integrates rigorous academic standards with advanced digital systems, fostering an environment where curiosity meets modern capability.
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 md:gap-5 pt-4 sm:pt-6 max-w-md sm:max-w-none mx-auto">
@@ -209,7 +213,7 @@ export default function LandingPage({ teachers, students, classes, onEnterPortal
                   <div className="absolute inset-0 flex items-center justify-center">
                     <img 
                       src={schoolHero} 
-                      alt="Demo School Features" 
+                      alt={`${schoolName} Features`} 
                       className="w-full h-full object-cover"
                       referrerPolicy="no-referrer"
                     />
@@ -369,7 +373,7 @@ export default function LandingPage({ teachers, students, classes, onEnterPortal
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center relative z-10 w-full">
                   <div className="space-y-4 sm:space-y-6">
-                    <h4 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tighter">Demo Academy Prep</h4>
+                    <h4 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tighter">{schoolName} Prep</h4>
                     <p className="text-amber-50 text-base sm:text-lg leading-relaxed max-w-md">
                       Specialized evening coaching designed for conceptual mastery and top-tier board exam results.
                     </p>
@@ -396,7 +400,7 @@ export default function LandingPage({ teachers, students, classes, onEnterPortal
                 Pedagogical Excellence.
               </h3>
               <p className="text-slate-500 font-medium mt-6 text-sm max-w-2xl mx-auto leading-relaxed">
-                Three pillars that power every classroom at Demo School — from verified expertise to technology-driven learning experiences.
+                Three pillars that power every classroom at {schoolName} — from verified expertise to technology-driven learning experiences.
               </p>
             </div>
 
@@ -501,7 +505,7 @@ export default function LandingPage({ teachers, students, classes, onEnterPortal
                 {[
                   { icon: Phone, label: 'Principal Office', val: '+92 (051) demo-school' },
                   { icon: Mail, label: 'Inquiry Support', val: 'queries@demo-school.edu' },
-                  { icon: MapPin, label: 'Campus Address', val: 'Demo School Building, Academy Blvd, PK' }
+                  { icon: MapPin, label: 'Campus Address', val: `${schoolName} Building, Academy Blvd, PK` }
                 ].map(info => (
                   <div key={info.label} className="flex items-center justify-center gap-5">
                     <div className="w-10 h-10 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center text-slate-900 shadow-sm shrink-0">
@@ -622,8 +626,8 @@ export default function LandingPage({ teachers, students, classes, onEnterPortal
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-16 mb-16 md:mb-20">
             <div className="space-y-6">
               <div className="flex items-center gap-3">
-                <img src="/logo.png" alt="Demo School Logo" className="h-12 w-auto object-contain rounded-lg bg-white p-1.5 shadow-lg" referrerPolicy="no-referrer" />
-                <span className="font-black text-xl tracking-tighter uppercase">Demo School</span>
+                <img src={logoSrc} alt={`${schoolName} Logo`} className="h-12 w-auto object-contain rounded-lg bg-white p-1.5 shadow-lg" referrerPolicy="no-referrer" />
+                <span className="font-black text-xl tracking-tighter uppercase">{schoolName}</span>
               </div>
               <p className="text-slate-500 text-xs leading-relaxed font-bold uppercase tracking-wider">
                 Developing Scholars, Creating Legacies since 2012. We are committed to nurturing the next generation of global citizens.

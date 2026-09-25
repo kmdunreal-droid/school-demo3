@@ -8,6 +8,7 @@ import { Printer, FileSpreadsheet } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Student, Class, Attendance, FeeRecord, UserSession } from '../types';
 import { downloadCsv } from '../lib/csvExport';
+import { useSchoolIdentity } from '../lib/schoolIdentity';
 
 interface CertificateTabProps {
   userSession: UserSession;
@@ -29,6 +30,10 @@ export default function CertificateTab({ students, classes, attendance, fees }: 
   const [studentId, setStudentId] = useState('');
   const [type, setType] = useState<CertType>('tc');
   const [remarks, setRemarks] = useState('');
+  // School naam + logo (Developer Portal → School Identity)
+  const { schoolName, logoSrc } = useSchoolIdentity();
+  // HTML string mein daalne se pehle escape (naam mein & < > ho sakta hai)
+  const safeSchoolName = schoolName.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
   const cls = (s: Student) => classes.find(c => String(c.id) === String(s.classId));
   const student = students.find(s => String(s.id) === studentId);
@@ -51,7 +56,7 @@ export default function CertificateTab({ students, classes, attendance, fees }: 
       ? `This is to certify that <b>${student.name}</b>, son/daughter of <b>${student.guardianName || '______'}</b>, was a bona fide student of this institution studying in <b>Class ${classText}</b> (Roll No. ${student.rollNumber}). During his/her stay at this school, his/her conduct and character were <b>good/exemplary</b>. All dues have been cleared and the school leaving record is complete.<br/><br/>His/her general attendance was <b>${studentStats.attPct}%</b>. We wish him/her success in future academic pursuits.`
       : type === 'character'
         ? `This is to certify that <b>${student.name}</b> (Roll No. ${student.rollNumber}, Class ${classText}) is a student of this institution. During the period of his/her study here, his/her conduct and character have been <b>excellent/satisfactory</b>. He/She bears a good moral character.${remarks ? `<br/><br/>Remarks: ${remarks}` : ''}`
-        : `This is to certify that <b>${student.name}</b>, son/daughter of <b>${student.guardianName || '______'}</b>, is a bonafide student of <b>Demo School &amp; Academy</b>, currently studying in <b>Class ${classText}</b> (Roll No. ${student.rollNumber}). This certificate is issued on his/her request for official purposes.`;
+        : `This is to certify that <b>${student.name}</b>, son/daughter of <b>${student.guardianName || '______'}</b>, is a bonafide student of <b>${safeSchoolName}</b>, currently studying in <b>Class ${classText}</b> (Roll No. ${student.rollNumber}). This certificate is issued on his/her request for official purposes.`;
 
     const html = `<!doctype html><html><head><meta charset="utf-8"><title>${label} — ${student.name}</title>
 <style>
@@ -71,8 +76,8 @@ export default function CertificateTab({ students, classes, attendance, fees }: 
 </style></head><body>
 <div class="cert">
   <div class="head">
-    <img src="/logo.png" alt="logo" style="height:70px" onerror="this.style.display='none'" />
-    <div class="school">Demo School &amp; Academy</div>
+    <img src="${logoSrc}" alt="logo" style="height:70px" onerror="this.style.display='none'" />
+    <div class="school">${safeSchoolName}</div>
     <div class="sub">Saddar Campus · Karachi</div>
   </div>
   <h1>${label}</h1>
@@ -80,7 +85,7 @@ export default function CertificateTab({ students, classes, attendance, fees }: 
   <div class="body">${body}</div>
   <div class="footer">
     <div>Date: <b>${today}</b></div>
-    <div class="sig">Principal<br/>Demo School &amp; Academy</div>
+    <div class="sig">Principal<br/>${safeSchoolName}</div>
   </div>
 </div>
 <script>window.onload=function(){setTimeout(function(){window.print();},400);};</script>

@@ -33,6 +33,7 @@ import { initMotionPreference } from '../lib/motionPrefs';
 import { useLang, t, i18nCls, L } from '../lib/i18n';
 import LanguageToggle from './LanguageToggle';
 import LanguageCard from './LanguageCard';
+import { useSchoolIdentity, applySchoolBrand } from '../lib/schoolIdentity';
 
 interface TeacherDashboardProps {
   userSession: UserSession;
@@ -101,6 +102,9 @@ export default function TeacherDashboard({
   onInstallApp
 }: TeacherDashboardProps) {
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
+
+  // School naam + logo (Developer Portal → School Identity se set hote hain)
+  const { schoolName, logoSrc } = useSchoolIdentity();
 
   // Browser Back Button Support for Tabs
   useEffect(() => {
@@ -305,7 +309,7 @@ export default function TeacherDashboard({
     toast.success(`Collection of ${collected} for ${student.name} recorded!`);
 
     // SATH HI: Trigger parents message notification popup preview
-    const rawMsg = `Saddar Campus Fee Deposit Receipt:\nAssalam-o-Alaikum! Fee payment of ${collected} has been received for student ${student.name} (${newFeeMonth} - ${newFeeType}). Your account balance has been updated. Thank you.\n- Demo School Digital Registrar Office.`;
+    const rawMsg = applySchoolBrand(`Saddar Campus Fee Deposit Receipt:\nAssalam-o-Alaikum! Fee payment of ${collected} has been received for student ${student.name} (${newFeeMonth} - ${newFeeType}). Your account balance has been updated. Thank you.\n- ${schoolName} Digital Registrar Office.`, schoolName);
 
     setFeeNotificationPopup({
       studentName: student.name,
@@ -658,7 +662,7 @@ export default function TeacherDashboard({
     </div>
     <table>${rows}</table>
     <table><tr class="tot"><td>Net Payable</td><td style="text-align:right">${formatPKR(s.netPay)}</td></tr></table>
-    <div class="foot"><span>Demo School — Digital Registrar</span><span>Generated: ${new Date().toLocaleString()}</span></div>
+    <div class="foot"><span>${schoolName} — Digital Registrar</span><span>Generated: ${new Date().toLocaleString()}</span></div>
   </div>
   <script>window.onload=function(){setTimeout(function(){window.print();},300);};<\/script>
   </body></html>`;
@@ -1323,9 +1327,9 @@ export default function TeacherDashboard({
       {/* Mobile Top Bar */}
       <div id="mobile-teacher-top-bar" className="md:hidden sticky top-0 flex items-center justify-between px-4 py-3 bg-white/90 backdrop-blur-lg border-b border-slate-200 shadow-sm z-20">
         <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="Demo School Logo" className="h-10 w-auto object-contain" referrerPolicy="no-referrer" />
+          <img src={logoSrc} alt={`${schoolName} Logo`} className="h-10 w-auto object-contain" referrerPolicy="no-referrer" />
           <div>
-            <h1 className="font-black text-gray-900 tracking-tight uppercase text-lg leading-none">Demo School</h1>
+            <h1 className="font-black text-gray-900 tracking-tight uppercase text-lg leading-none">{schoolName}</h1>
             <p className={`text-[10px] font-bold text-teal-600 uppercase tracking-[0.2em] mt-0.5 ${cls}`}>{t('portal.teacher')}</p>
           </div>
         </div>
@@ -1382,14 +1386,14 @@ export default function TeacherDashboard({
         <div className="p-4 border-b border-slate-100 flex flex-col items-center gap-2">
           <div className="flex items-center justify-between w-full">
             <div className="mb-1">
-              <img src="/logo.png" alt="Demo School Logo" className="h-14 w-auto object-contain" referrerPolicy="no-referrer" />
+              <img src={logoSrc} alt={`${schoolName} Logo`} className="h-14 w-auto object-contain" referrerPolicy="no-referrer" />
             </div>
             <button onClick={() => setSidebarOpen(false)} aria-label="Close menu" className="md:hidden flex items-center justify-center px-2 h-9 rounded-lg text-slate-300 hover:text-slate-600 hover:bg-slate-50 transition-colors">
               <X size={18} />
             </button>
           </div>
           <div className="text-center w-full">
-            <h1 className="text-slate-900 font-black text-sm tracking-widest uppercase leading-none">Demo School</h1>
+            <h1 className="text-slate-900 font-black text-sm tracking-widest uppercase leading-none">{schoolName}</h1>
             <p className={`text-teal-600 font-black text-[10px] tracking-[0.3em] uppercase mt-1 ${cls}`}>{t('portal.teacher')}</p>
           </div>
         </div>
@@ -1509,9 +1513,9 @@ export default function TeacherDashboard({
         <div className="flex items-center justify-between border-b border-slate-200 pb-4 mb-6 z-30 relative font-sans">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-3">
-              <img src="/logo.png" alt="Demo School Logo" className="h-14 w-auto object-contain sm:block hidden" referrerPolicy="no-referrer" />
+              <img src={logoSrc} alt={`${schoolName} Logo`} className="h-14 w-auto object-contain sm:block hidden" referrerPolicy="no-referrer" />
               <div className="sm:block hidden leading-none select-none">
-                <h2 className="text-3xl font-black text-slate-900 tracking-tight">Demo School</h2>
+                <h2 className="text-3xl font-black text-slate-900 tracking-tight">{schoolName}</h2>
                 <p className={`text-teal-600 font-black text-[10px] tracking-[0.3em] uppercase mt-1 ${cls}`}>{t('portal.teacher')}</p>
               </div>
             </div>
@@ -3927,7 +3931,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
         <tbody>${rows}</tbody>
         <tfoot><tr><td colspan="2">Total Percentage</td><td class="c">${pct}%</td></tr></tfoot>
       </table>
-      <div class="foot"><span>Demo School — Result Card</span><span>Date: ${new Date().toLocaleDateString()}</span></div>
+      <div class="foot"><span>${schoolName} — Result Card</span><span>Date: ${new Date().toLocaleDateString()}</span></div>
     </div>
     <script>window.onload=function(){setTimeout(function(){window.print();},300);};</script>
   </body></html>`;

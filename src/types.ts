@@ -179,6 +179,8 @@ export interface AppSettings {
   subscription?: SubscriptionInfo | null;
   /** Custom School / Academy Name (replaces hardcoded NSB/Demo). */
   schoolName?: string;
+  /** Custom school logo (data-URL). Blank → default `/logo.png`. */
+  logoSrc?: string;
   /** Individual portal access control switches (set by Developer). */
   teacherPortalDisabled?: boolean;
   teacherPortalMessage?: string;

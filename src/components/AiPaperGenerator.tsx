@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { aiGeneratePaper, isAiEnabled, type GeneratedPaper, type GeneratedQuestion, type PaperSource } from '../lib/gemini';
 import type { Quiz, QuizQuestion, UserSession, Class } from '../types';
 import { usePortalCollection, newId, PORTAL_TABLES } from '../lib/portalStore';
+import { useSchoolIdentity } from '../lib/schoolIdentity';
 
 interface AiPaperGeneratorProps {
   userSession: UserSession;
@@ -27,6 +28,8 @@ interface SourceFile {
 export default function AiPaperGenerator({ userSession, classes }: AiPaperGeneratorProps) {
   const aiOn = isAiEnabled();
   const { upsert } = usePortalCollection<Quiz>('acadamis_quizzes', PORTAL_TABLES.quizzes);
+  // School naam + logo (Developer Portal → School Identity) — paper header ke liye
+  const { schoolName, logoSrc } = useSchoolIdentity();
 
   const [sourceText, setSourceText] = useState('');
   const [files, setFiles] = useState<SourceFile[]>([]);
@@ -228,8 +231,8 @@ export default function AiPaperGenerator({ userSession, classes }: AiPaperGenera
   @media print { body { padding: 0; } }
 </style></head><body>
 <div class="head">
-  <img src="/logo.png" alt="logo" onerror="this.style.display='none'" />
-  <div class="school">Demo School &amp; Academy</div>
+  <img src="${logoSrc}" alt="logo" onerror="this.style.display='none'" />
+  <div class="school">${esc(schoolName)}</div>
   <div class="meta">
     <div><b>Class:</b> ${esc(paper.className)} &nbsp;|&nbsp; <b>Subject:</b> ${esc(paper.subject)}</div>
     <div><b>Time:</b> ${paper.durationMin} min &nbsp;|&nbsp; <b>Marks:</b> ${paper.totalMarks}</div>
