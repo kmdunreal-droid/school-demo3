@@ -46,7 +46,8 @@ import {
   getAllDues,
   getAdvanceSummary,
   MONTHS,
-  Month
+  Month,
+  DEFAULT_FEE_CATEGORY
 } from '../lib/feeEngine';
 import { defaultPayConfig, summarizeTeacherMonth, buildPayslip, monthLabel, formatPKR } from '../lib/payEngine';
 import { DEFAULT_SCHOOL_LOCATION, haversineMeters, formatDistance } from '../lib/geoUtils';
@@ -655,7 +656,7 @@ export default function PrincipalDashboard({
   const [monthHistoryFilter, setMonthHistoryFilter] = useState<{ studentId: string; month: string; year: number } | null>(null);
   // Fee ledger year — year change karo to months dobara Jan se start hote hain
   const [feeLedgerYear, setFeeLedgerYear] = useState<number>(new Date().getFullYear());
-  const [quickCollectFeeType, setQuickCollectFeeType] = useState('School NSB Fee');
+  const [quickCollectFeeType, setQuickCollectFeeType] = useState(DEFAULT_FEE_CATEGORY);
   const [quickCollectNotes, setQuickCollectNotes] = useState('');
   // Month card ke "Collect" se kholne pe — TARGET month mode: amount usi month mein jaye (auto-spread skip)
   const [quickCollectTargetMonth, setQuickCollectTargetMonth] = useState<string | null>(null);
@@ -2208,7 +2209,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
   const [tEmail, setTEmail] = useState('');
   const [tSubject, setTSubject] = useState('');
   const [tPhone, setTPhone] = useState('');
-  const [tPassword, setTPassword] = useState('nsb123');
+  const [tPassword, setTPassword] = useState('');
   const [tUsername, setTUsername] = useState('');
 
   // Student
@@ -2220,7 +2221,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
   const [sStudentPhone, setSStudentPhone] = useState('');
   const [sBaseFee, setSBaseFee] = useState('0');
   const [sEnrollmentMonth, setSEnrollmentMonth] = useState('January');
-  const [sPassword, setSPassword] = useState('nsb123');
+  const [sPassword, setSPassword] = useState('');
   const [sUsername, setSUsername] = useState('');
   const [sIsAcademy, setSIsAcademy] = useState(false);
   const [sAcademySubjects, setSAcademySubjects] = useState('');
@@ -2454,7 +2455,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
     setTEmail('');
     setTSubject('');
     setTPhone('');
-    setTPassword('nsb123');
+    setTPassword('');
     setTUsername('');
 
     setSName('');
@@ -2475,7 +2476,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
     setSStudentPhone('');
     setSBaseFee('0');
     setSEnrollmentMonth('January');
-    setSPassword('nsb123');
+    setSPassword('');
     setSUsername('');
     setSIsAcademy(false);
     setSAcademySubjects('');
@@ -2545,7 +2546,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
         setTEmail(match.email);
         setTSubject(match.subject);
         setTPhone(match.phone);
-        setTPassword(match.password || 'nsb123');
+        setTPassword(match.password || '');
         setTUsername(match.username || '');
       }
     } else if (type === 'coordinator') {
@@ -2555,7 +2556,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
         setTEmail(match.email || '');
         setTSubject('Academic Coordinator');
         setTPhone(match.phone || '');
-        setTPassword(match.password || 'nsb123');
+        setTPassword(match.password || '');
         setTUsername(match.username || '');
       }
     } else if (type === 'student') {
@@ -2569,7 +2570,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
         setSStudentPhone(match.studentPhone || '');
         setSBaseFee(match.baseFee?.toString() || '0');
         setSEnrollmentMonth(match.enrollmentMonth || 'January');
-        setSPassword(match.password || 'nsb123');
+        setSPassword(match.password || '');
         setSUsername(match.username || '');
         setSIsAcademy(match.category === 'Academy');
         setSAcademySubjects(match.academySubjects?.join(', ') || '');
@@ -3557,7 +3558,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                           </div>
                           <div className="min-w-0">
                             <p className="text-sm font-black uppercase tracking-widest">⚡ Collect Fee + Receipt</p>
-                            <p className="text-[10px] font-bold text-amber-100 uppercase tracking-widest truncate">Pick a student — instantly collect School NSB Fee / Dues</p>
+                            <p className="text-[10px] font-bold text-amber-100 uppercase tracking-widest truncate">Pick a student — instantly collect {DEFAULT_FEE_CATEGORY} / Dues</p>
                           </div>
                         </div>
                         <span className="px-4 py-2 bg-white text-amber-700 text-[10px] font-black uppercase tracking-widest rounded-xl shrink-0 group-hover:scale-105 transition-transform">Open <ArrowRight size={12} className="inline ml-1" /></span>
@@ -3736,7 +3737,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                                 </div>
                                 <div className="p-3 bg-white border border-slate-200 shadow-xs">
                                   <span className="text-xs font-black text-slate-400 uppercase block mb-1">Access Password</span>
-                                  <span className="font-mono text-xs font-bold text-amber-600 bg-amber-50 px-1">{t.password || 'nsb123'}</span>
+                                  <span className="font-mono text-xs font-bold text-amber-600 bg-amber-50 px-1">{t.password || 'Not set'}</span>
                                 </div>
                                 <div className="p-3 bg-white border border-slate-200 col-span-2 shadow-xs">
                                   <span className="text-xs font-black text-slate-400 uppercase block mb-1">Contact Details</span>
@@ -4049,7 +4050,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                                 </div>
                                 <div className="p-3 bg-white border border-slate-200 shadow-xs">
                                   <span className="text-xs font-black text-slate-400 uppercase block mb-1">Access Password</span>
-                                  <span className="font-mono text-xs font-bold text-amber-600 bg-amber-50 px-1">{c.password || 'nsb123'}</span>
+                                  <span className="font-mono text-xs font-bold text-amber-600 bg-amber-50 px-1">{c.password || 'Not set'}</span>
                                 </div>
                                 <div className="p-3 bg-white border border-slate-200 col-span-2 shadow-xs">
                                   <span className="text-xs font-black text-slate-400 uppercase block mb-1">Contact Details</span>
@@ -8167,7 +8168,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                         required
                         value={tPassword}
                         onChange={(e) => setTPassword(e.target.value)}
-                        placeholder="nsb123"
+                        placeholder="Set a password (min 6 characters)"
                         className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-teal-500"
                       />
                     </div>
@@ -8233,7 +8234,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                         required
                         value={tPassword}
                         onChange={(e) => setTPassword(e.target.value)}
-                        placeholder="nsb123"
+                        placeholder="Set a password (min 6 characters)"
                         className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-teal-500"
                       />
                     </div>
@@ -8355,7 +8356,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                               required
                               value={sPassword}
                               onChange={(e) => setSPassword(e.target.value)}
-                              placeholder="nsb123"
+                              placeholder="Set a password (min 6 characters)"
                               className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-teal-500 outline-none transition-all"
                             />
                           </div>
@@ -9812,7 +9813,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                         </div>
                         <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3">
                           <span className="text-[10px] font-black uppercase text-slate-400 block mb-1">Password</span>
-                          <span className="text-sm font-black text-slate-900">{st.password || 'nsb123'}</span>
+                          <span className="text-sm font-black text-slate-900">{st.password || 'Not set'}</span>
                         </div>
                       </div>
 
@@ -10770,7 +10771,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                             <p className={`text-[10px] font-black uppercase tracking-wider ${dCount > 0 ? 'text-amber-600' : 'text-amber-600'}`}>{dCount > 0 ? `${dCount} dues pending` : 'No pending dues ✓'}</p>
                           </div>
                           <button
-                            onClick={() => { setQuickCollectStudentId(''); setCollectDuesList({}); setQcSearch(''); setQuickCollectFeeType('School NSB Fee'); }}
+                            onClick={() => { setQuickCollectStudentId(''); setCollectDuesList({}); setQcSearch(''); setQuickCollectFeeType(DEFAULT_FEE_CATEGORY); }}
                             className="px-2.5 py-1.5 bg-white border border-slate-200 text-slate-500 text-[10px] font-black uppercase rounded-lg hover:text-rose-600 hover:border-rose-300 shrink-0 cursor-pointer"
                           >
                             Change
@@ -10798,7 +10799,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                               return (
                                 <button
                                   key={s.id}
-                                  onClick={() => { setQuickCollectStudentId(s.id); if (s.baseFee) setQuickCollectAmount(String(s.baseFee)); setQuickCollectFeeType('School NSB Fee'); setQcSearch(''); }}
+                                  onClick={() => { setQuickCollectStudentId(s.id); if (s.baseFee) setQuickCollectAmount(String(s.baseFee)); setQuickCollectFeeType(DEFAULT_FEE_CATEGORY); setQcSearch(''); }}
                                   className="w-full px-3 py-2.5 flex items-center justify-between gap-2 hover:bg-amber-50 transition-colors cursor-pointer text-left"
                                 >
                                   <span className="text-xs font-black text-slate-800 truncate">{s.name} <span className="text-[10px] font-bold text-slate-400">· Roll #{s.rollNumber || 'N/A'}</span></span>
@@ -10828,7 +10829,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                   return (
                     <div className="grid grid-cols-2 gap-2">
                       <div className={`p-3 rounded-xl border text-center ${feePending > 0 ? 'bg-rose-50 border-rose-200' : 'bg-amber-50 border-amber-100'}`}>
-                        <span className="block text-[9px] font-black uppercase tracking-widest text-slate-400">School NSB Fee Pending</span>
+                        <span className="block text-[9px] font-black uppercase tracking-widest text-slate-400">{DEFAULT_FEE_CATEGORY} Pending</span>
                         <span className={`block text-sm font-black ${feePending > 0 ? 'text-rose-600' : 'text-amber-600'}`}>{feePending > 0 ? `PKR ${feePending.toLocaleString()}` : 'Clear ✓'}</span>
                       </div>
                       <div className={`p-3 rounded-xl border text-center ${duesPending > 0 ? 'bg-amber-50 border-amber-200' : 'bg-amber-50 border-amber-100'}`}>
@@ -10908,10 +10909,10 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                     );
                   })()}
 
-                      {/* Monthly School NSB Fee — REQUIRED (always visible) */}
+                      {/* Monthly tuition fee — REQUIRED (always visible) */}
                       <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-teal-50 border border-teal-100">
                         <span className="text-[10px] font-black text-teal-700 uppercase tracking-widest flex items-center gap-1.5">
-                          <CreditCard size={12} /> Monthly School NSB Fee — Required
+                          <CreditCard size={12} /> Monthly {DEFAULT_FEE_CATEGORY} — Required
                         </span>
                         <span className="text-[9px] font-black text-teal-400 uppercase tracking-widest">Auto-Spread ON</span>
                       </div>
@@ -11007,15 +11008,15 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                 })()}
 
                 <div>
-                  {/* Fee Category — fixed School NSB Fee */}
+                  {/* Fee Category — fixed tuition fee */}
                   <label className="text-xs font-black uppercase tracking-widest text-slate-500 block mb-1">
                     Fee Category
                   </label>
                   <div className="w-full p-3 bg-amber-50 border border-amber-200 rounded-xl text-sm font-black text-amber-700 uppercase tracking-wide flex items-center gap-2">
-                    <CheckCircle2 size={14} className="shrink-0" /> School NSB Fee
+                    <CheckCircle2 size={14} className="shrink-0" /> {DEFAULT_FEE_CATEGORY}
                   </div>
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1">
-                    School NSB Fee — auto-spread: oldest pending months are cleared first
+                    {DEFAULT_FEE_CATEGORY} — auto-spread: oldest pending months are cleared first
                   </p>
                 </div>
 
@@ -11062,7 +11063,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
                       </p>
                       {mainAmt > 0 && (
                         <div className="flex justify-between text-[11px] font-bold text-slate-600">
-                          <span>School NSB Fee · {quickCollectMonth}</span><span className="font-black text-slate-900">PKR {mainAmt.toLocaleString()}</span>
+                          <span>{DEFAULT_FEE_CATEGORY} · {quickCollectMonth}</span><span className="font-black text-slate-900">PKR {mainAmt.toLocaleString()}</span>
                         </div>
                       )}
                       {duesSel.map(([id]) => {

@@ -19,6 +19,7 @@ import { Teacher, Student, Class, TimetableEntry, Attendance, Mark, ExamType, Us
 import { subscribeRecords, loadCollectionFromSupabase, sbQueueWrite, sbQueueDelete, flushSupabase } from '../lib/supabaseSync';
 import { DEFAULT_SCHOOL_LOCATION, getCurrentPosition, haversineMeters, isWithinSchoolRadius, formatDistance } from '../lib/geoUtils';
 import { defaultPayConfig, summarizeTeacherMonth, buildPayslip, monthKeyOf, monthLabel, formatPKR } from '../lib/payEngine';
+import { DEFAULT_FEE_CATEGORY } from '../lib/feeEngine';
 import { INITIAL_TEACHER_PAY_CONFIGS, INITIAL_SCHOOL_LOCATION } from '../initialData';
 import { listChanged } from '../lib/dataUtils';
 import { HoldActionWrapper } from './HoldActionWrapper';
@@ -203,7 +204,7 @@ export default function TeacherDashboard({
   const [showAddFeeModal, setShowAddFeeModal] = useState(false);
   const [newFeeStudentId, setNewFeeStudentId] = useState('');
   const [newFeeAmount, setNewFeeAmount] = useState('');
-  const [newFeeType, setNewFeeType] = useState('School NSB Fee');
+  const [newFeeType, setNewFeeType] = useState(DEFAULT_FEE_CATEGORY);
   const [newFeeMonth, setNewFeeMonth] = useState('June 2026');
   const [amountCollected, setAmountCollected] = useState('');
 

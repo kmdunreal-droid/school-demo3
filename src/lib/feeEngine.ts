@@ -44,11 +44,21 @@ export const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', '
 export type Month = typeof MONTHS[number];
 
 /**
+ * Default tuition fee category (UI label + saved `feeType`).
+ * Sirf ek jagah define kiya gaya hai — components isi ko use karein,
+ * taake "School NSB Fee" jaise purane/hard-coded labels dobara na aa jayein.
+ * Legacy rows ka feeType 'School NSB Fee' / 'Monthly Fee' ho sakta hai —
+ * matching tolerant hai (dekhein ADV_TUITION_FEE_TYPES), is liye purana
+ * data bhi tuition fee hi gina jata hai.
+ */
+export const DEFAULT_FEE_CATEGORY = 'School Fee';
+
+/**
  * Core Fee Engine Functions
  */
 
 // 1. addPayment - Partial payment support with auto-fill for future months
-export const addPayment = (students: StudentFeeData[], studentId: string | number, targetMonth: string, year: number, amount: number, feeType: string = 'School Fee'): StudentFeeData[] => {
+export const addPayment = (students: StudentFeeData[], studentId: string | number, targetMonth: string, year: number, amount: number, feeType: string = DEFAULT_FEE_CATEGORY): StudentFeeData[] => {
   const date = new Date().toISOString().split('T')[0];
   const updatedStudents = students.map(s => {
     if (String(s.id) === String(studentId)) {

@@ -177,6 +177,8 @@ export interface AppSettings {
   notifications?: AdminNotification[];
   /** Monthly subscription record. */
   subscription?: SubscriptionInfo | null;
+  /** Custom School / Academy Name (replaces hardcoded NSB/Demo). */
+  schoolName?: string;
   /** Individual portal access control switches (set by Developer). */
   teacherPortalDisabled?: boolean;
   teacherPortalMessage?: string;

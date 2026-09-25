@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import { X, Search, CheckCircle2, CreditCard, Receipt, AlertCircle, ChevronLeft, ChevronDown, Wallet, ArrowRight, CalendarDays, BadgeCheck, Banknote, Eye, EyeOff, TrendingUp } from 'lucide-react';
 import { StudentFeeData, Student } from '../types';
-import { MONTHS, getDueRemaining, getDuePaid, getAdvanceSummary } from '../lib/feeEngine';
+import { MONTHS, getDueRemaining, getDuePaid, getAdvanceSummary, DEFAULT_FEE_CATEGORY } from '../lib/feeEngine';
 
 // ===== Month parsing helpers (mirror of PrincipalDashboard's parseMonthKey) =====
 export const MONTH_ALIAS: Record<string, number> = {
@@ -486,7 +486,7 @@ export function FeePaymentCenter({ open, onClose, feeStudents, students, initial
                         {recentPayments.map(p => (
                           <div key={p.id} className="flex items-center justify-between px-3 py-2 rounded-lg bg-slate-50 border border-slate-100">
                             <div className="min-w-0">
-                              <span className="text-[10px] font-black text-slate-700 uppercase tracking-wide">{p.feeType || 'School NSB Fee'}</span>
+                              <span className="text-[10px] font-black text-slate-700 uppercase tracking-wide">{p.feeType || DEFAULT_FEE_CATEGORY}</span>
                               <span className="text-[9px] font-bold text-slate-400 uppercase block">{p.month} {Number(p.year) || year} - {p.date}</span>
                             </div>
                             <span className="text-xs font-black text-amber-600 shrink-0">PKR {Number(p.amount || 0).toLocaleString()}</span>
