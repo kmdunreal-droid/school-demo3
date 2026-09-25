@@ -28,6 +28,14 @@ A comprehensive school management PWA built with React 19, TypeScript, Vite, Sup
 - `npm run keepalive:watch` → har 6 ghante auto-ping
 - Windows Task Scheduler setup `scripts/supabase-keepalive.cjs` header mein documented hai
 
+### ID + Password Auth (Supabase Auth) — 2026 redesign
+- Login ab **ID + Password** se hota hai (email nahi): ID internally `<id>@app.school` fake-email par map hoti hai
+- Role **sirf** `public.profiles` table se aata hai (RLS: apni row) — purana "koi bhi authenticated = principal" hole band
+- Hardcoded credentials (`km/6016`, `ali/111222`) hata diye gaye; logout par `supabase.auth.signOut()`
+- Naye teacher/student/coordinator add karne par auth user Edge Function `create-auth-user` banata hai (service key server-side)
+- Password cloud par jaata hi nahi (`src/lib/supabaseSync.ts` mein strip); bulk setup `scripts/provision-users.cjs`
+- Poori tafseel + troubleshooting: **`AUTH_SETUP.md`**
+
 ### Theme (purana — 2026 redesign se badal gaya, upar "Design System & Onboarding" dekhein)
 - Pehle: Teal `#0d9488` + Amber. Ab: **Midnight Indigo** (`--color-brand-600: #4f46e5`) + **Amber Gold** accent
 - PWA `theme_color: #4f46e5` (index.html + vite.config.ts manifest dono)

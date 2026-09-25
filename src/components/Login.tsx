@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { GraduationCap, Mail, Lock, Eye, EyeOff, Shield, User, Users, AlertCircle } from 'lucide-react';
 import { Role, UserSession, Teacher, Student, Coordinator } from '../types';
-import { supabase } from '../supabase';
+import { supabase, isDemoMode } from '../supabase';
+import { toAuthEmail, sanitizeLoginKey } from '../lib/authId';
 import { toast } from 'sonner';
 
 interface LoginProps {
@@ -17,129 +18,120 @@ export default function Login({ teachers, students, coordinators, onLogin, onBac
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  /**
+   * AUTH: profiles row → UserSession.
+   * ROLE ka source of truth ab SIRF `profiles` table hai (Supabase Auth + RLS).
+   * Pehle koi bhi authenticated email auto-'principal' ban jata tha — privilege
+   * escalation hole. Ab profile row na mile to login REJECT hota hai.
+   */
+  const buildSessionFromProfile = async (uid: string, loginInput: string, authEmail?: string): Promise<UserSession | null> => {
+    try {
+      const { data: prof, error: profErr } = await supabase
+        .from('profiles')
+        .select('login_key, role, ref_id, display_name')
+        .eq('id', uid)
+        .maybeSingle();
+      if (profErr || !prof?.role) return null;
+
+      const role = prof.role as Role;
+      const refId = prof.ref_id ? String(prof.ref_id) : undefined;
+      const record: any =
+        role === 'teacher' ? teachers.find(t => t.id === refId) :
+        role === 'student' ? students.find(s => s.id === refId) :
+        role === 'coordinator' ? coordinators.find(c => c.id === refId) : null;
+
+      return {
+        role,
+        email: record?.email || authEmail || '',
+        username: prof.login_key || sanitizeLoginKey(loginInput),
+        id: refId,
+        name: prof.display_name || record?.name || prof.login_key || loginInput,
+      };
+    } catch (e) {
+      console.warn('[Auth] profile lookup failed:', e);
+      return null;
+    }
+  };
+
+  /**
+   * LOCAL FALLBACK — demo mode ya offline device: record ke password se match
+   * (cloud auth band/na-configured ho to bhi staff login kar sake). Principal/
+   * developer ka koi local record nahi hota — wo sirf cloud auth se aate hain.
+   */
+  const matchLocalRecord = (input: string): UserSession | null => {
+    const key = sanitizeLoginKey(input);
+    const pick = (list: any[], role: Role) => {
+      const rec = list.find(r =>
+        sanitizeLoginKey(r.username) === key ||
+        sanitizeLoginKey(r.id) === key ||
+        (input.includes('@') && String(r.email || '').toLowerCase() === input.toLowerCase())
+      );
+      return rec && rec.password && rec.password === password ? { role, rec } : null;
+    };
+    const found = pick(coordinators, 'coordinator') || pick(teachers, 'teacher') || pick(students, 'student');
+    if (!found) return null;
+    const { role, rec } = found;
+    return { role, email: rec.email || '', username: rec.username || rec.id, id: rec.id, name: rec.name };
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    const checkInput = email.trim().toLowerCase();
-
-    if (!email.trim() || !password.trim()) {
+    const input = email.trim();
+    if (!input || !password.trim()) {
       setError('Please fill in all fields.');
       return;
     }
 
-    // 1. Check Developer (Superuser)
-    if (checkInput === 'km' && password === '6016') {
-      onLogin({
-        role: 'developer',
-        email: 'developer@nsb1.com',
-        username: 'KM',
-        name: 'System Developer',
-      });
-      toast.success("Developer Access Granted.");
-      return;
-    }
-
-    // 2. Check Principal (Master Credentials)
-    if (checkInput === 'ali' && password === '111222') {
-      onLogin({
-        role: 'principal',
-        email: 'ali@nsb1.com',
-        username: 'ali',
-        name: 'Ali (Principal)',
-      });
-      toast.success("Principal Ali authenticated.");
-      return;
-    }
-
-    // 3. Check Coordinators
-    const foundCoordinator = coordinators.find(c => 
-      c.name?.toLowerCase() === checkInput || 
-      c.username?.toLowerCase() === checkInput ||
-      c.id?.toLowerCase() === checkInput
-    );
-    if (foundCoordinator && password === foundCoordinator.password) {
-      onLogin({
-        role: 'coordinator',
-        email: foundCoordinator.email || '',
-        username: foundCoordinator.username || '',
-        id: foundCoordinator.id,
-        name: foundCoordinator.name,
-      });
-      toast.success(`Welcome Coordinator ${foundCoordinator.name}!`);
-      return;
-    }
-
-    // 4. Check Faculty (Teachers)
-    const foundTeacher = teachers.find(t => 
-      t.name?.toLowerCase() === checkInput || 
-      t.username?.toLowerCase() === checkInput ||
-      t.id?.toLowerCase() === checkInput
-    );
-    if (foundTeacher && password === foundTeacher.password) {
-      onLogin({
-        role: 'teacher',
-        email: foundTeacher.email || '',
-        username: foundTeacher.username || '',
-        id: foundTeacher.id,
-        name: foundTeacher.name,
-      });
-      toast.success(`Welcome Faculty ${foundTeacher.name}!`);
-      return;
-    }
-
-    // 5. Check Students
-    const foundStudent = students.find(s => 
-      s.email?.toLowerCase() === checkInput || 
-      s.username?.toLowerCase() === checkInput ||
-      s.id?.toLowerCase() === checkInput
-    );
-    if (foundStudent && password === foundStudent.password) {
-      onLogin({
-        role: 'student',
-        email: foundStudent.email || '',
-        username: foundStudent.username || '',
-        id: foundStudent.id,
-        name: foundStudent.name,
-      });
-      toast.success(`Welcome Student ${foundStudent.name}!`);
-      return;
-    }
-
-    // 6. Fallback — Cloud Register (Supabase Auth) for generic Principal/Secure Admin
+    setBusy(true);
     try {
-      const { data: cred, error: authErr } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
-      if (authErr) throw authErr;
-      const user = cred.user;
-      if (user && user.email) {
-        onLogin({
-          role: 'principal',
-          email: user.email,
-          username: user.email.split('@')[0],
-          name: 'Principal Office',
-        });
-        toast.success("Authenticated via Cloud Register.");
+      // 1) AUTH FIRST — ID + Password (Supabase Auth). Login ID ka auth email banta hai:
+      //    'teacher1' → 'teacher1@app.school' (fake-email pattern; user ko email nahi dikhta)
+      if (!isDemoMode()) {
+        const authEmail = toAuthEmail(input) || (input.includes('@') ? input.toLowerCase() : null);
+        if (authEmail) {
+          const { data, error: authErr } = await supabase.auth.signInWithPassword({ email: authEmail, password });
+          if (!authErr && data.user) {
+            const session = await buildSessionFromProfile(data.user.id, input, authEmail);
+            if (session) {
+              onLogin(session);
+              toast.success(`Welcome ${session.name}!`);
+              return;
+            }
+            setError('Aap ka account kisi staff/student profile se linked nahi hai. Principal se rabta karein.');
+            return;
+          }
+        }
+      }
+
+      // 2) LOCAL FALLBACK — device par maujood record ka password match
+      const localSession = matchLocalRecord(input);
+      if (localSession) {
+        onLogin(localSession);
+        toast.success(`Welcome ${localSession.name}!`);
         return;
       }
-    } catch (err: any) {
-      // If everything fails
+
       setError('Invalid ID or Password. Portal access denied.');
+    } catch (err: any) {
+      setError(err?.message || 'Login failed. Please try again.');
+    } finally {
+      setBusy(false);
     }
   };
 
   return (
     <div id="login-container" className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-slate-950 px-6 font-sans border-t-8 border-slate-900 dark:border-teal-600 text-slate-900 dark:text-slate-100 transition-colors duration-200">
       <div className="w-full max-w-sm space-y-12">
-        
+
         {/* Minimalist Header */}
         <div className="text-center space-y-4">
-          <img 
-            src="/logo.png" 
-            alt="DEMO ACADEMY" 
+          <img
+            src="/logo.png"
+            alt="DEMO ACADEMY"
             className="mx-auto h-20 w-auto object-contain mb-2"
             referrerPolicy="no-referrer"
           />
@@ -169,7 +161,7 @@ export default function Login({ teachers, students, coordinators, onLogin, onBac
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="ID, Username or Email"
+                placeholder="Login ID (e.g. teacher1)"
                 className="w-full bg-transparent border-b border-slate-200 dark:border-slate-800 py-4 text-[11px] font-bold tracking-[0.2em] focus:outline-none focus:border-teal-600 dark:focus:border-teal-500 text-slate-900 dark:text-white transition-all placeholder:text-slate-300 dark:placeholder:text-slate-650"
               />
             </div>
@@ -198,14 +190,15 @@ export default function Login({ teachers, students, coordinators, onLogin, onBac
             <button
               id="login-submit-btn"
               type="submit"
-              className="w-full py-4 bg-slate-950 dark:bg-teal-600 hover:bg-slate-800 dark:hover:bg-teal-500 text-white font-bold text-[10px] uppercase tracking-[0.4em] transition-all cursor-pointer shadow-2xl"
+              disabled={busy}
+              className="w-full py-4 bg-slate-950 dark:bg-teal-600 hover:bg-slate-800 dark:hover:bg-teal-500 text-white font-bold text-[10px] uppercase tracking-[0.4em] transition-all cursor-pointer shadow-2xl disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Sign In to Portal
+              {busy ? 'Signing In...' : 'Sign In to Portal'}
             </button>
 
             <div className="text-center">
               {onBackToLanding && (
-                <button 
+                <button
                   onClick={onBackToLanding}
                   className="text-[11px] font-bold text-slate-400 hover:text-slate-950 uppercase tracking-[0.2em] border-b border-slate-100 transition-all cursor-pointer"
                 >

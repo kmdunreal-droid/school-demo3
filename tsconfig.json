@@ -1,4 +1,11 @@
 {
+  // NOTE: supabase/functions Deno runtime ka code hai (Deno.* globals) — app ke
+  // tsc program se exclude hai; deploy Supabase CLI karta hai.
+  "exclude": [
+    "node_modules",
+    "dist",
+    "supabase/functions"
+  ],
   "compilerOptions": {
     "target": "ES2022",
     "experimentalDecorators": true,

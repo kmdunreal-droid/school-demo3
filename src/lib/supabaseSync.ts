@@ -94,6 +94,22 @@ function dedupeOps(ops: PendingOp[]): PendingOp[] {
   return Array.from(byKey.values());
 }
 
+/**
+ * AUTH RULE — password cloud par NAHI jaata.
+ * ID+Password authentication ab Supabase Auth (auth.users + profiles) se hota
+ * hai; app record mein password sirf device-local rehta hai (offline fallback).
+ * Isliye in tables ke payload se `password` strip kar diya jaata hai (purane
+ * rows se bhi pehli write par hat jata hai).
+ */
+const PASSWORD_TABLES = ['teachers', 'students', 'coordinators'];
+
+function stripPassword(table: string, data: any): any {
+  if (!PASSWORD_TABLES.includes(table) || !data || typeof data !== 'object') return data;
+  if (!('password' in data)) return data;
+  const { password: _password, ...rest } = data as Record<string, any>;
+  return rest;
+}
+
 /** Ek flush pass: queue splice karke upserts → deletes bhejta hai. */
 async function doFlush(): Promise<boolean> {
   const ops = pendingOps.splice(0);
@@ -105,7 +121,8 @@ async function doFlush(): Promise<boolean> {
     for (const op of unique) {
       if (op.op === 'set') {
         if (!byTable[op.col]) byTable[op.col] = [];
-        byTable[op.col].push({ id: String(op.id), data: op.data === undefined ? null : op.data });
+        const payload = op.data === undefined ? null : stripPassword(op.col, op.data);
+        byTable[op.col].push({ id: String(op.id), data: payload });
       } else {
         if (!delsByTable[op.col]) delsByTable[op.col] = [];
         delsByTable[op.col].push(String(op.id));

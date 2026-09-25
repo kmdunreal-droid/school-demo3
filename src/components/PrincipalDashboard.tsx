@@ -1,5 +1,7 @@
 import { testSupabaseConnection, isDemoMode } from '../supabase';
 import { subscribeRecords, loadCollectionFromSupabase, sbQueueWrite, sbQueueDelete, flushSupabase } from '../lib/supabaseSync';
+import { provisionAuthUser } from '../lib/authAdmin';
+import { sanitizeLoginKey } from '../lib/authId';
 import { listChanged } from '../lib/dataUtils';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -2693,6 +2695,43 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
     return errors.length === 0;
   };
 
+  /**
+   * AUTH PROVISIONING — record save hote waqt uska Supabase Auth login bhi
+   * bana/update karo (Login ID + Password). Actual user creation Edge Function
+   * `create-auth-user` karti hai (service key server-side; browser me nahi).
+   *
+   * Fail hone par bhi app data save rehta hai — sirf warning toast aata hai,
+   * taake offline/demo mode aur purane data ka flow na toote.
+   */
+  const syncAuthAccount = async (args: {
+    loginId: string;
+    password: string;
+    role: 'teacher' | 'student' | 'coordinator';
+    refId: string;
+    displayName: string;
+  }) => {
+    if (isDemoMode()) return; // demo = cloud off, sab local
+    const key = sanitizeLoginKey(args.loginId);
+    if (!key) return;
+    if (!args.password) {
+      toast.warning('Password khali hai — is record ka cloud login update nahi hua.');
+      return;
+    }
+    if (args.password.length < 6) {
+      toast.warning('Login password kam se kam 6 characters ka rakhein (ID: ' + key + ').');
+      return;
+    }
+    const res = await provisionAuthUser({
+      loginId: key,
+      password: args.password,
+      role: args.role,
+      refId: args.refId,
+      displayName: args.displayName,
+    });
+    if (res.ok) toast.success('Login ban gaya: ' + key);
+    else toast.warning('Cloud login issue (' + key + '): ' + res.error);
+  };
+
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -2711,6 +2750,8 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
         };
         setTeachers([...teachers, newTeacher]);
         toast.success("Teacher profile added successfully!");
+        // Login ID + Password bhi bana do (Supabase Auth provisioning)
+        void syncAuthAccount({ loginId: newTeacher.username, password: tPassword, role: 'teacher', refId: id, displayName: newTeacher.name });
       } else {
         setTeachers(teachers.map(t => t.id === currentId ? {
           ...t,
@@ -2722,6 +2763,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
           username: tName.trim(),
         } : t));
         toast.success("Teacher profile updated successfully!");
+        void syncAuthAccount({ loginId: tName, password: tPassword, role: 'teacher', refId: String(currentId), displayName: tName });
       }
     } 
     
@@ -2738,6 +2780,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
         };
         setCoordinators([...coordinators, newCoordinator]);
         toast.success("Coordinator profile added successfully!");
+        void syncAuthAccount({ loginId: newCoordinator.username, password: tPassword, role: 'coordinator', refId: newCoordinator.id, displayName: newCoordinator.name });
       } else {
         setCoordinators(coordinators.map(c => c.id === currentId ? {
           ...c,
@@ -2748,6 +2791,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
           username: tName.trim(),
         } : c));
         toast.success("Coordinator profile updated successfully!");
+        void syncAuthAccount({ loginId: tName, password: tPassword, role: 'coordinator', refId: String(currentId), displayName: tName });
       }
     } 
     
@@ -2772,6 +2816,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
         };
         setStudents([...students, newStudent]);
         toast.success("Student profile added successfully!");
+        void syncAuthAccount({ loginId: newStudent.username, password: sPassword, role: 'student', refId: id, displayName: newStudent.name });
       } else {
         setStudents(students.map(s => s.id === currentId ? {
           ...s,
@@ -2790,6 +2835,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
           photo: sPhoto,
         } : s));
         toast.success("Student profile updated successfully!");
+        void syncAuthAccount({ loginId: sUsername || sName, password: sPassword, role: 'student', refId: String(currentId), displayName: sName });
       }
     }     
     else if (modalType === 'class') {

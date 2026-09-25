@@ -4,6 +4,7 @@ import { Toaster, toast } from 'sonner';
 import { Download, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { sbQueueWrite, sbQueueDelete, flushSupabase, loadAllFromSupabase, subscribeRecords, getSupabaseLastError } from './lib/supabaseSync';
+import { supabase } from './supabase';
 import { Teacher, Student, Coordinator, Class, TimetableEntry, Attendance, Mark, UserSession, FeeRecord, AppSettings, StudentFeeData, Assignment, Notice, SchoolEvent, Quiz, QuizAttempt, PeriodAttendance } from './types';
 import { 
   INITIAL_TEACHERS, 
@@ -977,6 +978,9 @@ export default function App() {
   };
 
   const handleLogout = () => {
+    // Cloud session bhi khatam karo — warna Supabase auth token device par cached
+    // reh jata hai aur next login bina password ke "session" mil jati hai.
+    try { supabase.auth.signOut().catch(() => {}); } catch { /* noop */ }
     setUserSession(null);
   };
 
