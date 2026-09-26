@@ -31,7 +31,6 @@ import { buildSmartTasks } from '../lib/smartActions';
 import { getFavorites, toggleFavorite } from '../lib/favorites';
 import { initMotionPreference } from '../lib/motionPrefs';
 import { useLang, t, i18nCls, L } from '../lib/i18n';
-import LanguageToggle from './LanguageToggle';
 import LanguageCard from './LanguageCard';
 import { useSchoolIdentity, applySchoolBrand } from '../lib/schoolIdentity';
 
@@ -1468,11 +1467,7 @@ export default function TeacherDashboard({
             </div>
           ))}
 
-          {/* Language Toggle in Teacher Sidebar */}
-          <div className={`mt-3 flex items-center justify-between px-1 ${cls}`}>
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t('sidebar.language')}</span>
-            <LanguageToggle />
-          </div>
+          {/* HIDDEN (user request): Language toggle — Settings → Language card se badlein */}
 
             {/* Install Button in Teacher Sidebar */}
             <button

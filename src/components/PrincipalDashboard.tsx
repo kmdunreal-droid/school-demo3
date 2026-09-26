@@ -58,7 +58,6 @@ import SmartTaskPanel from './SmartTaskPanel';
 import CommandPalette from './CommandPalette';
 import { getNavItems, groupNavItems, NAV_GROUP_LABELS, navLabel, navHint, groupLabel, type NavGroupId } from '../lib/navConfig';
 import { useLang, t, i18nCls, L } from '../lib/i18n';
-import LanguageToggle from './LanguageToggle';
 import LanguageCard from './LanguageCard';
 import { buildSmartTasks } from '../lib/smartActions';
 import { getFavorites, toggleFavorite } from '../lib/favorites';
@@ -509,23 +508,8 @@ export default function PrincipalDashboard({
   };
 
   // ===== Developer → Principal notifications (AdminNotification) =====
-  const devNotifications = React.useMemo(() => appSettings.notifications ?? [], [appSettings.notifications]);
-  const unreadDevCount = devNotifications.filter(n => !n.read).length;
-  const [showDevNotif, setShowDevNotif] = useState(false);
-
-  const markDevNotifRead = (id: string) => {
-    setAppSettings(prev => ({
-      ...prev,
-      notifications: (prev.notifications ?? []).map(n => n.id === id ? { ...n, read: true } : n),
-    }));
-  };
-
-  const markAllDevNotifRead = () => {
-    setAppSettings(prev => ({
-      ...prev,
-      notifications: (prev.notifications ?? []).map(n => ({ ...n, read: true })),
-    }));
-  };
+  // HIDDEN (user request): sidebar "Notifications" bell hataya — notifications ab
+  // header bell (recent office alerts) + Alert Center (Tools) se milte hain.
 
   // ===== Subscription expiry days =====
   const subDaysLeft = React.useMemo(() => {
@@ -3278,11 +3262,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
             </div>
           ))}
 
-          {/* Language Toggle in Sidebar */}
-          <div className="mt-3 flex items-center justify-between px-1">
-            <span className={`text-[10px] font-black uppercase tracking-widest text-slate-400 ${cls}`}>{t('sidebar.language')}</span>
-            <LanguageToggle />
-          </div>
+          {/* HIDDEN (user request): Language toggle — Settings → Language card se badlein */}
 
             {/* Install Button in Sidebar */}
             <button
@@ -3293,56 +3273,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
               <span className={cls}>{t('sidebar.install')}</span>
             </button>
 
-            {/* Developer Notifications Bell */}
-            <div className="relative mt-2">
-              <button
-                onClick={() => setShowDevNotif(v => !v)}
-                className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-bold uppercase tracking-[0.2em] transition-all text-left group rounded-xl bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-100 shadow-sm shadow-indigo-500/20 hover:shadow-md hover:shadow-indigo-500/30"
-              >
-                <span className="relative">
-                  <Bell size={14} className="text-indigo-600" />
-                  {unreadDevCount > 0 && (
-                    <span className="absolute -top-2 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-rose-500 text-white text-[9px] font-black flex items-center justify-center">
-                      {unreadDevCount}
-                    </span>
-                  )}
-                </span>
-                <span className={cls}>Notifications{unreadDevCount > 0 ? ` (${unreadDevCount})` : ''}</span>
-              </button>
-
-              {showDevNotif && (
-                <div className="absolute left-0 bottom-full mb-2 w-80 max-h-96 overflow-y-auto bg-white rounded-xl border border-slate-200 shadow-2xl z-50">
-                  <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Developer Alerts</span>
-                    {unreadDevCount > 0 && (
-                      <button onClick={markAllDevNotifRead} className="text-[10px] font-bold text-indigo-600 hover:underline">
-                        Mark all read
-                      </button>
-                    )}
-                  </div>
-                  {devNotifications.length === 0 ? (
-                    <div className="px-4 py-6 text-center text-xs text-slate-400 font-bold">No notifications yet.</div>
-                  ) : (
-                    devNotifications.map(n => (
-                      <button
-                        key={n.id}
-                        onClick={() => markDevNotifRead(n.id)}
-                        className={`w-full text-left px-4 py-3 border-b border-slate-50 hover:bg-slate-50 transition-all ${n.read ? 'opacity-60' : ''}`}
-                      >
-                        <div className="flex items-start gap-2">
-                          {!n.read && <span className="w-2 h-2 rounded-full bg-indigo-500 mt-1.5 shrink-0" />}
-                          <div className="min-w-0">
-                            <p className="text-xs font-black text-slate-700 truncate">{n.title}</p>
-                            <p className="text-[11px] text-slate-500 line-clamp-2">{n.message}</p>
-                            <p className="text-[9px] text-slate-400 font-bold mt-0.5">{new Date(n.createdAt).toLocaleString()}</p>
-                          </div>
-                        </div>
-                      </button>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
+            {/* HIDDEN (user request): Developer Notifications bell — header bell / Alert Center se dekhein */}
 
             {/* Exit System Button in Sidebar */}
             <button

@@ -16,7 +16,6 @@ import AttendanceSwipeOverlay from './AttendanceSwipeOverlay';
 // ── Naya design system + utilities (Batch 3–5) ──
 import SmartTaskPanel from './SmartTaskPanel';
 import CommandPalette from './CommandPalette';
-import LanguageToggle from './LanguageToggle';
 import NoticeBoard from './NoticeBoard';
 import EventsCalendar from './EventsCalendar';
 import { getNavItems, groupNavItems, navLabel, navHint, groupLabel } from '../lib/navConfig';
@@ -652,11 +651,7 @@ export default function StudentDashboard({
             </div>
           ))}
 
-          {/* Language Toggle in Student Sidebar */}
-          <div className="mt-3 flex items-center justify-between px-1">
-            <span className={`text-[10px] font-black uppercase tracking-widest text-slate-400 ${cls}`}>{t('sidebar.language')}</span>
-            <LanguageToggle />
-          </div>
+          {/* HIDDEN (user request): Language toggle — Settings → Language card se badlein */}
 
           {/* Install Button in Student Sidebar */}
           <button
