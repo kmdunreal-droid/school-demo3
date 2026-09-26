@@ -6,7 +6,7 @@ import { listChanged } from '../lib/dataUtils';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
-import { BarChart2, CheckCircle2, ChevronDown, ChevronUp, CreditCard, Database, Download, Edit2, LogOut, Mail, Menu, MessageSquare, Moon, Percent, Phone, Plus, PlusCircle, RefreshCw, Save, Search, Shield, ShieldAlert, Sparkles, Sun, Trash2, Eye, EyeOff, TrendingUp, User, Users, X, ArrowUpRight, Award, Bell, BookOpen, Calendar, CalendarDays, AlertCircle, DownloadCloud, UploadCloud, Upload, ArrowLeft, ArrowRight, Fingerprint, Send, Zap, FileText, Printer, Filter, Receipt, Clock, AlertTriangle, School, DollarSign, HardDrive, Wifi, Banknote, Wallet, MapPin, Navigation, Coins, CalendarClock, LocateFixed, Megaphone, LayoutGrid, Settings, Pin } from 'lucide-react';
+import { BarChart2, CheckCircle2, ChevronDown, ChevronUp, CreditCard, Database, Download, Edit2, LogOut, Mail, Menu, MessageSquare, Moon, Percent, Phone, Plus, PlusCircle, RefreshCw, Save, Search, Shield, ShieldAlert, Sparkles, Sun, Trash2, Eye, EyeOff, TrendingUp, User, Users, X, ArrowUpRight, Award, Bell, BookOpen, Calendar, CalendarDays, AlertCircle, DownloadCloud, UploadCloud, Upload, ArrowLeft, ArrowRight, Fingerprint, Send, Zap, FileText, Printer, Filter, Receipt, Clock, AlertTriangle, School, DollarSign, HardDrive, Wifi, Banknote, Wallet, MapPin, Navigation, Coins, CalendarClock, LocateFixed, Megaphone, LayoutGrid, Pin } from 'lucide-react';
 import AnalyticsTab from './AnalyticsTab';
 import NoticeBoard from './NoticeBoard';
 import EventsCalendar from './EventsCalendar';
@@ -130,7 +130,7 @@ const parseMonthKey = (raw: unknown, fallbackYear: number): { idx: number; year:
 // ===== FEATURES HUB =====
 // Purane alag-alag tabs jo ab ek hi "Features Hub" tab ke sub-tabs hain.
 // In ids ka istemal legacy localStorage/history migration ke liye rehta hai.
-const FEATURES_HUB_TABS = ['notices', 'calendar', 'certificates', 'ai_paper', 'alerts', 'settings'] as const;
+const FEATURES_HUB_TABS = ['notices', 'calendar', 'certificates', 'ai_paper', 'alerts'] as const;
 type FeaturesSubTab = (typeof FEATURES_HUB_TABS)[number];
 const isFeaturesHubTab = (t: unknown): t is FeaturesSubTab =>
   (FEATURES_HUB_TABS as readonly unknown[]).includes(t);
@@ -140,7 +140,6 @@ const FEATURES_HUB_META: Record<FeaturesSubTab, { label: string; icon: any }> = 
   certificates: { label: 'Certificates', icon: Award },
   ai_paper: { label: 'AI Paper', icon: Sparkles },
   alerts: { label: 'Alert Center', icon: AlertCircle },
-  settings: { label: 'Cloud Config', icon: Settings },
 };
 
 interface PrincipalDashboardProps {
@@ -7317,7 +7316,7 @@ const [extraFees, setExtraFees] = useState<Record<string, string>>({
         )}
         {/* end teacher_pay panel */}
         {/* ========== SETTINGS & CONFIGURATION PORTAL ========== */}
-        {activeTab === 'features_hub' && featuresSubTab === 'settings' && (
+        {activeTab === 'settings' && (
           <div id="panel-principal-settings" className="space-y-8 animate-fade-in font-sans bg-slate-50 dark:bg-slate-900/40 p-4 sm:p-6 -mx-4 sm:-mx-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-inner">
 
             {/* ===== Settings Hero Banner ===== */}

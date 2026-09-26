@@ -148,7 +148,15 @@ export const PRINCIPAL_NAV: NavItem[] = [
     label: 'Tools',
     icon: LayoutGrid,
     group: 'administration',
-    hint: 'Notices, calendar, certificates, AI paper, alerts and settings',
+    hint: 'Notices, calendar, certificates, AI paper and alerts',
+  },
+
+  {
+    id: 'settings',
+    label: 'Setting',
+    icon: Settings,
+    group: 'school',
+    hint: 'App settings — language, theme, cloud sync',
   },
 ];
 
@@ -377,7 +385,7 @@ export function getTabGroupLabel(items: NavItem[], tabId: string): string | null
 export const TAB_LABELS: Record<string, string> = {
   // Principal hub sub-tabs
   alerts: 'Alert Center',
-  settings: 'App Settings',
+  settings: 'Setting',
   notices: 'Notices',
   calendar: 'Calendar',
   certificates: 'Certificates',
@@ -454,7 +462,8 @@ const PRINCIPAL_UR: Record<string, UrEntry> = {
   monthly_report: { label: 'ماہانہ رپورٹس', hint: 'مہینے کی رپورٹ — اسکرین پر یا پرنٹ/PDF' },
   teacher_pay: { label: 'عملہ تنخواہیں', hint: 'تنخواہ کا حساب، پے سلپ اور "ادا شدہ" نشان' },
   management_hub: { label: 'افراد و ترتیب', hint: 'طلبہ، اساتذہ اور کلاسوں کا انتظام' },
-  features_hub: { label: 'ٹولز', hint: 'اعلانات، کیلنڈر، اسناد، AI پرچہ، الرٹس اور ترتیبات' },
+  features_hub: { label: 'ٹولز', hint: 'اعلانات، کیلنڈر، اسناد، AI پرچہ اور الرٹس' },
+  settings: { label: 'ترتیبات', hint: 'زبان، تھیم اور کلاؤڈ سنک کی ترتیبات' },
 };
 
 const TEACHER_UR: Record<string, UrEntry> = {
