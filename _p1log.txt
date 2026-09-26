@@ -1,0 +1,137 @@
+=== _ur_p1_login.cjs ===
+APPLIED: 0
+MISSES:
+  src/components/Login.tsx:219 ΓÇö find kisi line par nahi mila
+  src/components/Login.tsx:210 ΓÇö pehle se badla hua
+  src/components/Login.tsx:201 ΓÇö find kisi line par nahi mila
+  src/components/Login.tsx:181 ΓÇö find kisi line par nahi mila
+  src/components/Login.tsx:169 ΓÇö find kisi line par nahi mila
+  src/components/Login.tsx:145 ΓÇö find kisi line par nahi mila
+  src/components/Login.tsx:125 ΓÇö find kisi line par nahi mila
+  src/components/Login.tsx:123 ΓÇö find kisi line par nahi mila
+  src/components/Login.tsx:119 ΓÇö find kisi line par nahi mila
+  src/components/Login.tsx:109 ΓÇö find kisi line par nahi mila
+  src/components/Login.tsx:106 ΓÇö find kisi line par nahi mila
+  src/components/Login.tsx:90 ΓÇö find kisi line par nahi mila
+=== _ur_p1_app.cjs ===
+APPLIED: 1
+MISSES:
+  src/App.tsx:1185 ΓÇö pehle se badla hua
+  src/App.tsx:1182 ΓÇö pehle se badla hua
+  src/App.tsx:1180 ΓÇö find kisi line par nahi mila
+  src/App.tsx:1147 ΓÇö pehle se badla hua
+  src/App.tsx:1144 ΓÇö pehle se badla hua
+  src/App.tsx:1142 ΓÇö find kisi line par nahi mila
+  src/App.tsx:1104 ΓÇö pehle se badla hua
+  src/App.tsx:1101 ΓÇö pehle se badla hua
+  src/App.tsx:1099 ΓÇö find kisi line par nahi mila
+  src/App.tsx:1089 ΓÇö find kisi line par nahi mila
+  src/App.tsx:1088 ΓÇö find kisi line par nahi mila
+  src/App.tsx:1054 ΓÇö find kisi line par nahi mila
+  src/App.tsx:1049 ΓÇö pehle se badla hua
+  src/App.tsx:1043 ΓÇö pehle se badla hua
+  src/App.tsx:1034 ΓÇö pehle se badla hua
+  src/App.tsx:1032 ΓÇö find kisi line par nahi mila
+  src/App.tsx:1010 ΓÇö pehle se badla hua
+  src/App.tsx:1004 ΓÇö find kisi line par nahi mila
+  src/App.tsx:219 ΓÇö pehle se badla hua
+=== _ur_p1_land1a.cjs ===
+APPLIED: 2
+MISSES:
+  src/components/LandingPage.tsx:264 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:250 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:230 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:229 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:228 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:227 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:226 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:225 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:200 ΓÇö pehle se badla hua
+  src/components/LandingPage.tsx:190 ΓÇö pehle se badla hua
+  src/components/LandingPage.tsx:180 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:176 ΓÇö pehle se badla hua
+  src/components/LandingPage.tsx:175 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:174 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:170 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:144 ΓÇö pehle se badla hua
+  src/components/LandingPage.tsx:114 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:107 ΓÇö pehle se badla hua
+  src/components/LandingPage.tsx:38 ΓÇö find kisi line par nahi mila
+=== _ur_p1_land1b.cjs ===
+APPLIED: 0
+MISSES:
+  src/components/LandingPage.tsx:382 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:378 ΓÇö pehle se badla hua
+  src/components/LandingPage.tsx:376 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:361 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:359 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:355 ΓÇö pehle se badla hua
+  src/components/LandingPage.tsx:353 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:332 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:328 ΓÇö pehle se badla hua
+  src/components/LandingPage.tsx:326 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:311 ΓÇö pehle se badla hua
+  src/components/LandingPage.tsx:309 ΓÇö pehle se badla hua
+  src/components/LandingPage.tsx:308 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:306 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:280 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:279 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:278 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:277 ΓÇö find kisi line par nahi mila
+=== _ur_p1_land2a.cjs ===
+APPLIED: 0
+MISSES:
+  src/components/LandingPage.tsx:508 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:507 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:506 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:501 ΓÇö pehle se badla hua
+  src/components/LandingPage.tsx:499 ΓÇö pehle se badla hua
+  src/components/LandingPage.tsx:498 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:495 ΓÇö pehle se badla hua
+  src/components/LandingPage.tsx:477 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:476 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:475 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:434 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:429 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:428 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:425 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:420 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:419 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:416 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:411 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:410 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:403 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:400 ΓÇö pehle se badla hua
+  src/components/LandingPage.tsx:398 ΓÇö find kisi line par nahi mila
+=== _ur_p1_land2b.cjs ===
+APPLIED: 0
+MISSES:
+  src/components/LandingPage.tsx:674 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:673 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:670 ΓÇö pehle se badla hua
+  src/components/LandingPage.tsx:657 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:652 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:651 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:650 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:648 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:643 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:642 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:641 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:640 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:638 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:633 ΓÇö pehle se badla hua
+  src/components/LandingPage.tsx:612 ΓÇö pehle se badla hua
+  src/components/LandingPage.tsx:599 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:596 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:591 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:590 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:589 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:588 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:587 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:581 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:568 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:557 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:549 ΓÇö pehle se badla hua
+  src/components/LandingPage.tsx:547 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:534 ΓÇö find kisi line par nahi mila
+  src/components/LandingPage.tsx:533 ΓÇö find kisi line par nahi mila

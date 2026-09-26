@@ -1,3 +1,4 @@
+import { L } from '../lib/i18n';
 import React, { useState } from 'react';
 import { useLongPress } from '../lib/longPress';
 import { Edit2, Trash2, FileText } from 'lucide-react';
@@ -45,7 +46,7 @@ export const HoldActionWrapper: React.FC<HoldActionWrapperProps> = ({
               }}
               className="flex items-center gap-1.5 px-3 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-md cursor-pointer"
             >
-              <FileText size={14} /> Detail
+              <FileText size={14} /> {L('Detail', 'تفصیل')}
             </button>
           )}
           {onEdit && (
@@ -58,7 +59,7 @@ export const HoldActionWrapper: React.FC<HoldActionWrapperProps> = ({
               }}
               className="flex items-center gap-1.5 px-3 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-md cursor-pointer"
             >
-              <Edit2 size={14} /> Edit
+              <Edit2 size={14} /> {L('Edit', 'ترمیم')}
             </button>
           )}
           {onDelete && (
@@ -71,7 +72,7 @@ export const HoldActionWrapper: React.FC<HoldActionWrapperProps> = ({
               }}
               className="flex items-center gap-1.5 px-3 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-md cursor-pointer"
             >
-              <Trash2 size={14} /> Delete
+              <Trash2 size={14} /> {L('Delete', 'حذف')}
             </button>
           )}
           <button

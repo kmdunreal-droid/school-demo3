@@ -1,0 +1,26 @@
+/* Phase 1 batch — LandingPage.tsx part 1a (alert, nav, hero, chips) */
+module.exports = {
+  'src/components/LandingPage.tsx': [
+    { line: 38, find: "alert('Please fill in Student Name and Contact Phone number.');", replace: "alert(L('Please fill in Student Name and Contact Phone number.', 'براہِ کرم طلب علم کا نام اور رابطہ نمبر درج کریں۔'));" },
+    { line: 94, find: '{item}', replace: "{t('landing.' + item.toLowerCase())}" },
+    { line: 107, find: 'Portal Login', replace: "{L('Portal Login', 'پورٹل لاگ اِن')}" },
+    { line: 114, find: 'aria-label="Toggle menu"', replace: "aria-label={L('Toggle menu', 'مینو')}" },
+    { line: 137, find: '{item}', replace: "{t('landing.' + item.toLowerCase())}" },
+    { line: 144, find: 'Portal Login', replace: "{L('Portal Login', 'پورٹل لاگ اِن')}" },
+    { line: 170, find: 'Excellence Redefined</span>', replace: "{L('Excellence Redefined', 'ممتازیت کی نئی تعریف')}</span>" },
+    { line: 174, find: 'Shaping<br/>', replace: "{L('Shaping', 'سرداروں کا')}<br/>" },
+    { line: 175, find: '<span className="text-amber-600">The Future</span><br/>', replace: "<span className=\"text-amber-600\">{L('The Future', 'مستقبل')}</span><br/>" },
+    { line: 176, find: 'of Leaders.', replace: "{L('of Leaders.', 'گھڑنا۔')}" },
+    { line: 180, find: '{schoolName} integrates rigorous academic standards with advanced digital systems, fostering an environment where curiosity meets modern capability.', replace: "{schoolName} {L('integrates rigorous academic standards with advanced digital systems, fostering an environment where curiosity meets modern capability.', 'سختینہ تعلیمی معیارات کو جدید ڈیجیٹل سسٹمز کے ساتھ جوڑ کر ایسا ماحول پیدا کرتا ہے جہاں متجسسی جدید صلاحیتوں سے ملتی ہے۔')}" },
+    { line: 190, find: 'Enter Portal', replace: "{L('Enter Portal', 'پورٹل میں جائیں')}" },
+    { line: 200, find: 'View Programs', replace: "{L('View Programs', 'پروگرام دیکھیں')}" },
+    { line: 225, find: "label: 'Digital Attendance'", replace: "label: L('Digital Attendance', 'ڈیجیٹل حاضری')" },
+    { line: 226, find: "label: 'Smart Timetable'", replace: "label: L('Smart Timetable', 'سمارٹ ٹائم ٹیبل')" },
+    { line: 227, find: "label: 'Fee Ledger'", replace: "label: L('Fee Ledger', 'فیس ریکارڈ')" },
+    { line: 228, find: "label: 'WhatsApp Alerts'", replace: "label: L('WhatsApp Alerts', 'WhatsApp اطلاعات')" },
+    { line: 229, find: "label: 'Live Results'", replace: "label: L('Live Results', 'لائیو نتائج')" },
+    { line: 230, find: "label: 'ID Cards'", replace: "label: L('ID Cards', 'شناختی کارڈ')" },
+    { line: 250, find: 'Board Pass Rate</div>', replace: "{L('Board Pass Rate', 'بورڈ پاس ریٹ')}</div>" },
+    { line: 264, find: 'Specialized Labs</div>', replace: "{L('Specialized Labs', 'مخصوص لیبارٹریز')}</div>" },
+  ],
+};

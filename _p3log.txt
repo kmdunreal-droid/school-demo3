@@ -1,0 +1,4 @@
+APPLIED: 4
+MISSES: none
+files found: 23 App.tsx, AiPaperGenerator.tsx, AiSettingsSection.tsx, AnalyticsTab.tsx, AttendanceSettingsSection.tsx
+TOTAL: 1051

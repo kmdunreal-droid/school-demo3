@@ -1,0 +1,27 @@
+/* Phase 1 batch — LandingPage.tsx part 2a (mentors wall + directory metrics + admissions head) */
+module.exports = {
+  'src/components/LandingPage.tsx': [
+    { line: 398, find: '>Our Commitment</h2>', replace: ">{L('Our Commitment', 'ہمارا عزم')}</h2>" },
+    { line: 400, find: 'Pedagogical Excellence.', replace: "{L('Pedagogical Excellence.', 'تدارس کی مہارت۔')}" },
+    { line: 403, find: 'Three pillars that power every classroom at {schoolName} — from verified expertise to technology-driven learning experiences.', replace: "{L(`Three pillars that power every classroom at ${schoolName} — from verified expertise to technology-driven learning experiences.`, `تین بنیادی ستون جو ${schoolName} کے ہر کلاس کو آباد کرتے ہیں — تصدیق شدہ مہارت سے ٹیکنالوجی پر مبنی تعلیم تک۔`)}" },
+    { line: 410, find: "title: 'Certified Academics'", replace: "title: L('Certified Academics', 'تصدیق شدہ تعلیم')" },
+    { line: 411, find: "desc: 'Faculty members hold advanced credentials and undergo rigorous pedagogical training cycles for mastery in every subject.',", replace: "desc: L('Faculty members hold advanced credentials and undergo rigorous pedagogical training cycles for mastery in every subject.', 'اساتذہ اعلیٰ اہلیت رکھتے ہیں اور ہر مضمون میں مہارت کے لیے سختینہ تدارسی تربیتی دورے کرتے ہیں.')," },
+    { line: 416, find: "features: ['100% Qualified Staff', 'Continuous PD Cycles', 'Subject Specialists']", replace: "features: [L('100% Qualified Staff', '100% اہل عملہ'), L('Continuous PD Cycles', 'مسلسل تعلیمی ترقی دورے'), L('Subject Specialists', 'مضمون ماہرین')]" },
+    { line: 419, find: "title: 'Mentorship Focus'", replace: "title: L('Mentorship Focus', 'رہنمائی پر توجہ')" },
+    { line: 420, find: "desc: 'Each student is assigned a personal academic mentor to track holistic development — academically and personally.',", replace: "desc: L('Each student is assigned a personal academic mentor to track holistic development — academically and personally.', 'ہر طالب علم کو جامع ترقی کے لیے ذاتی تعلیمی منصوبہ بند سپرد کی جاتی ہے — تعلیمی اور ذاتی دونوں طور پر.')," },
+    { line: 425, find: "features: ['1:1 Mentorship', 'Progress Reviews', 'Parent Counselor Links']", replace: "features: [L('1:1 Mentorship', 'واحد رہنمائی'), L('Progress Reviews', 'پیش رفت جائزے'), L('Parent Counselor Links', 'والدین کاؤنسلر رابطے')]" },
+    { line: 428, find: "title: 'Tech-First Learning'", replace: "title: L('Tech-First Learning', 'ٹیکنالوجی پر مبنی تعلیم')" },
+    { line: 429, find: "desc: 'Integrating smart classroom technology for an interactive, data-driven experience that prepares students for a digital future.',", replace: "desc: L('Integrating smart classroom technology for an interactive, data-driven experience that prepares students for a digital future.', 'تعاملی اور ڈیٹا پر مبنی تجربے کے لیے سمارٹ کلاس روم ٹیکنالوجی — جو طلبہ کو ڈیجیٹل مستقبل کے لیے تیار کرتی ہے.')," },
+    { line: 434, find: "features: ['Smart Classrooms', 'Digital Attendance', 'Live Result Portal']", replace: "features: [L('Smart Classrooms', 'سمارٹ کلاس روم'), L('Digital Attendance', 'ڈیجیٹل حاضری'), L('Live Result Portal', 'لائیو نتائج پورٹل')]" },
+    { line: 475, find: "label: 'Faculty Members'", replace: "label: L('Faculty Members', 'اساتذہ')" },
+    { line: 476, find: "label: 'Students Enrolled'", replace: "label: L('Students Enrolled', 'ثبت شدہ طلبہ')" },
+    { line: 477, find: "label: 'Active Classrooms'", replace: "label: L('Active Classrooms', 'فعال کلاس روم')" },
+    { line: 495, find: 'Session 2026-27 Open', replace: "{L('Session 2026-27 Open', 'سیشن 2026-27 کھلا')}" },
+    { line: 498, find: 'Secure Your Path<br/>', replace: "{L('Secure Your Path', 'اپنا راستہ محفوظ کریں')}<br/>" },
+    { line: 499, find: 'to Academic Success.', replace: "{L('to Academic Success.', 'تعلیمی کامیابی کے لیے۔')}" },
+    { line: 501, find: 'Submit an inquiry today to receive our comprehensive digital prospectus and fee structure blueprints.', replace: "{L('Submit an inquiry today to receive our comprehensive digital prospectus and fee structure blueprints.', 'آج ایک استفسار جمع کریں — ہمارا مکمل ڈیجیٹل پراسپیکٹس اور فیس ڈھانچہ حاصل کرنے کے لیے۔')}" },
+    { line: 506, find: "label: 'Principal Office'", replace: "label: L('Principal Office', 'پرنسپل آفس')" },
+    { line: 507, find: "label: 'Inquiry Support'", replace: "label: L('Inquiry Support', 'استفسار سپورٹ')" },
+    { line: 508, find: "label: 'Campus Address'", replace: "label: L('Campus Address', 'کیمپس پتہ')" },
+  ],
+};

@@ -40,6 +40,19 @@ html.lang-ur .nav-group.i18n-ur {
 
 /* Urdu mode: sirf text Urdu hota hai — numbers/dates/LTR layout waise hi. */
 
+/* Urdu mode: har text element Urdu font (Naskh) — is se bina .i18n-ur class ke
+   bhi L()/t() strings sahi font mein render hoti hain (glyph fallback se pehle).
+   Existing .i18n-ur / .i18n-ur-display rules isi se oopar hain (zyada specificity),
+   is liye headings par Nastaliq/line-height waise ka waisa rehta hai. */
+html.lang-ur body,
+html.lang-ur body *:not(code):not(pre):not(kbd):not(samp) {
+  font-family: var(--font-urdu);
+}
+html.lang-ur body,
+html.lang-ur body * {
+  letter-spacing: normal !important;
+}
+
 /* ═══════════════ 2) VIBRANT BUTTONS ═══════════════ */
 
 @layer components {

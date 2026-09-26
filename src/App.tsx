@@ -216,7 +216,7 @@ export default function App() {
       });
     } else {
       toast.info(
-        `To install ${getSchoolName(appSettings).toUpperCase()}, click the install icon (desktop) in your browser's address bar or select 'Add to Home Screen' from the browser menu (e.g., Safari iOS Share menu).`,
+        L(`To install ${getSchoolName(appSettings).toUpperCase()}, click the install icon (desktop) in your browser's address bar or select 'Add to Home Screen' from the browser menu (e.g., Safari iOS Share menu).`, `ہوم اسکرین پر شامل کرنے کے لیے، اپنے براؤزر کے ایڈریس بار میں انسٹال آئیکن (ڈیسکٹاپ) پر کلک کریں یا براؤزر مینو (جیسے Safari iOS شیئر مینو) سے 'Add to Home Screen' منتخب کریں۔`),
         { duration: 6000 }
       );
     }
@@ -1001,13 +1001,13 @@ export default function App() {
       {/* Cloud sync health banner */}
       {syncError && (
         <div className="fixed top-2 left-1/2 -translate-x-1/2 z-[10000] bg-amber-500 text-white text-[10px] font-black uppercase tracking-wider px-4 py-2 rounded-full shadow-lg print:hidden max-w-[90vw] truncate flex items-center gap-2">
-          Cloud sync issue: {syncError} — data saved locally
+          {L('Cloud sync issue:', 'کلاؤڈ سنک مسئلہ:')} {syncError} {L('— data saved locally', '— ڈیٹا مقامی طور پر محفوظ ہے')}
           {syncPaused && (
             <button
               onClick={() => { syncPausedUntil.current = 0; setSyncPaused(false); flushBatch(); }}
               className="px-2 py-0.5 bg-white text-amber-700 rounded-full text-[9px] font-black uppercase hover:bg-amber-100 transition-colors cursor-pointer shrink-0"
             >
-              Retry Now
+              {L('Retry Now', 'ابھی کوشش کریں')}
             </button>
           )}
         </div>
@@ -1029,9 +1029,9 @@ export default function App() {
                 </div>
                 
                 <div className="space-y-2">
-                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight ">Install Portal</h3>
+                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight ">{L('Install Portal', 'پورٹل انسٹال کریں')}</h3>
                   <p className="text-xs font-bold text-slate-500 leading-relaxed uppercase tracking-wide">
-                    Add to your home screen for quick access and a better mobile experience.
+                    {L('Add to your home screen for quick access and a better mobile experience.', 'فوری رسائی اور بہتر موبائل تجربے کے لیے اسے اپنی ہوم اسکرین پر شامل کریں۔')}
                   </p>
                 </div>
 
@@ -1040,18 +1040,18 @@ export default function App() {
                     onClick={handleInstallClick}
                     className="w-full py-4 bg-teal-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-teal-700 transition-all shadow-lg active:scale-95"
                   >
-                    Install Now
+                    {L('Install Now', 'ابھی انسٹال کریں')}
                   </button>
                   <button 
                     onClick={() => setShowInstallModal(false)}
                     className="w-full py-4 bg-white border border-slate-200 text-slate-400 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all active:scale-95"
                   >
-                    Maybe Later
+                    {L('Maybe Later', 'شاید بعد میں')}
                   </button>
                 </div>
               </div>
               <div className="bg-slate-50 p-4 text-center border-t border-slate-100">
-                <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">{getSchoolName(appSettings)} Management System</p>
+                <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">{getSchoolName(appSettings)} {L('Management System', 'مینجمنٹ سسٹم')}</p>
               </div>
             </motion.div>
           </div>
@@ -1085,10 +1085,10 @@ export default function App() {
       ) : appSettings.maintenanceMode ? (
         <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center p-6 text-center">
           <p className="text-4xl mb-3">🛠️</p>
-          <h1 className="text-xl font-black uppercase tracking-widest">App Maintenance Mein Hai</h1>
-          <p className="text-sm text-slate-400 font-bold mt-2">Thodi der mein wapas aa jayega. Developer se rabta karein.</p>
+          <h1 className="text-xl font-black uppercase tracking-widest">{L('App Under Maintenance', 'ایپ کی دیکھ بھال جاری ہے')}</h1>
+          <p className="text-sm text-slate-400 font-bold mt-2">{L('It will be back shortly. Contact the developer.', 'کچھ دیر میں واپس آئے گی۔ ڈویلپر سے رابطہ کریں۔')}</p>
           <button onClick={handleLogout} className="mt-6 px-5 py-2 rounded-lg bg-teal-600 text-white text-xs font-black uppercase tracking-widest hover:bg-teal-700 transition-all">
-            Logout
+            {L('Logout', 'لاگ آؤٹ')}
           </button>
         </div>
       ) : (userSession.role === 'principal' || userSession.role === 'coordinator') && appSettings.principalPortalDisabled ? (
@@ -1096,12 +1096,12 @@ export default function App() {
           <div className="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-3xl mb-4">
             🔒
           </div>
-          <h1 className="text-xl font-black uppercase tracking-widest text-rose-400">Principal Portal Suspended</h1>
+          <h1 className="text-xl font-black uppercase tracking-widest text-rose-400">{L('Principal Portal Suspended', 'پرنسپل پورٹل معطل ہے')}</h1>
           <p className="text-sm text-slate-300 font-bold mt-3 max-w-md leading-relaxed">
-            {appSettings.principalPortalMessage || 'Principal portal access is temporarily disabled by developer admin.'}
+            {appSettings.principalPortalMessage || L('Principal portal access is temporarily disabled by developer admin.', 'پرنسپل پورٹل کی رسائی عارضی طور پر ڈویلپر ایڈمن نے بند کر رکھی ہے۔')}
           </p>
           <button onClick={handleLogout} className="mt-6 px-6 py-2.5 rounded-xl bg-rose-600 text-white text-xs font-black uppercase tracking-widest hover:bg-rose-700 transition-all shadow-lg shadow-rose-900/30">
-            Back to Login
+            {L('Back to Login', 'لاگ اِن پر واپس')}
           </button>
         </div>
       ) : (userSession.role === 'principal' || userSession.role === 'coordinator') ? (
@@ -1139,12 +1139,12 @@ export default function App() {
           <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-3xl mb-4">
             👨‍🏫
           </div>
-          <h1 className="text-xl font-black uppercase tracking-widest text-amber-400">Teacher Portal Suspended</h1>
+          <h1 className="text-xl font-black uppercase tracking-widest text-amber-400">{L('Teacher Portal Suspended', 'استاد پورٹل معطل ہے')}</h1>
           <p className="text-sm text-slate-300 font-bold mt-3 max-w-md leading-relaxed">
-            {appSettings.teacherPortalMessage || 'Teacher portal is temporarily suspended by administration.'}
+            {appSettings.teacherPortalMessage || L('Teacher portal is temporarily suspended by administration.', 'استاد پورٹل عارضی طور پر انتظامیہ نے معطل کر رکھا ہے۔')}
           </p>
           <button onClick={handleLogout} className="mt-6 px-6 py-2.5 rounded-xl bg-amber-600 text-white text-xs font-black uppercase tracking-widest hover:bg-amber-700 transition-all shadow-lg shadow-amber-900/30">
-            Back to Login
+            {L('Back to Login', 'لاگ اِن پر واپس')}
           </button>
         </div>
       ) : userSession.role === 'teacher' ? (
@@ -1177,12 +1177,12 @@ export default function App() {
           <div className="w-16 h-16 rounded-2xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-3xl mb-4">
             🎓
           </div>
-          <h1 className="text-xl font-black uppercase tracking-widest text-sky-400">Student Portal Suspended</h1>
+          <h1 className="text-xl font-black uppercase tracking-widest text-sky-400">{L('Student Portal Suspended', 'طلبہ پورٹل معطل ہے')}</h1>
           <p className="text-sm text-slate-300 font-bold mt-3 max-w-md leading-relaxed">
-            {appSettings.studentPortalMessage || 'Student portal is temporarily closed for maintenance.'}
+            {appSettings.studentPortalMessage || L('Student portal is temporarily closed for maintenance.', 'طلبہ پورٹل دیکھ بھال کے لیے عارضی طور پر بند ہے۔')}
           </p>
           <button onClick={handleLogout} className="mt-6 px-6 py-2.5 rounded-xl bg-sky-600 text-white text-xs font-black uppercase tracking-widest hover:bg-sky-700 transition-all shadow-lg shadow-sky-900/30">
-            Back to Login
+            {L('Back to Login', 'لاگ اِن پر واپس')}
           </button>
         </div>
       ) : userSession.role === 'student' ? (

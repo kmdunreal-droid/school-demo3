@@ -1,0 +1,7 @@
+[
+  {
+    "file": "src/components/TeacherDashboard.tsx",
+    "line": 3188,
+    "text": "                              if (!window.confirm(L(`Delete ALL marks for \\\"${se.exam} · ${se.subject}\\\"?`, `\\\"${se.exam} · ${se.subject}\\\" کے تمام نمبر حذف کریں؟`))) return;"
+  }
+]

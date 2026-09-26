@@ -156,7 +156,7 @@ export default function TeacherDashboard({
         if (classesData && listChanged(classesRef.current, classesData)) {
           classesRef.current = classesData;
           setClasses(classesData);
-          toast.info('Class assignments updated from Principal portal');
+          toast.info(L('Class assignments updated from Principal portal', 'پرنسپل پورٹل سے کلاس اسائنمنٹس اپ ڈیٹ ہو گئیں'));
           changed = true;
         }
         if (teachersData && listChanged(teachersRef.current, teachersData)) {
@@ -172,7 +172,7 @@ export default function TeacherDashboard({
         if (timetableData && listChanged(timetableRef.current, timetableData)) {
           timetableRef.current = timetableData;
           setTimetable(timetableData);
-          toast.info('Timetable updated from Principal portal');
+          toast.info(L('Timetable updated from Principal portal', 'پرنسپل پورٹل سے ٹائم ٹیبل اپ ڈیٹ ہو گیا'));
           changed = true;
         }
         if (attendanceData && listChanged(attendanceRef.current, attendanceData)) {
@@ -252,7 +252,7 @@ export default function TeacherDashboard({
 
   const handleAddCashFee = () => {
     if (!newFeeStudentId || !newFeeAmount) {
-      alert('Please select a student and enter amount.');
+      alert(L('Please select a student and enter amount.', 'براہِ کرم طالب علم منتخب کریں اور رقم لکھیں۔'));
       return;
     }
     const student = students.find(s => s.id === newFeeStudentId);
@@ -306,7 +306,7 @@ export default function TeacherDashboard({
       setFees([newFee, ...updatedFees]);
     }
 
-    toast.success(`Collection of ${collected} for ${student.name} recorded!`);
+    toast.success(L(`Collection of ${collected} for ${student.name} recorded!`, `کلیکشن ${collected} برائے ${student.name} درج ہو گئی!`));
 
     // SATH HI: Trigger parents message notification popup preview
     const rawMsg = applySchoolBrand(`Saddar Campus Fee Deposit Receipt:\nAssalam-o-Alaikum! Fee payment of ${collected} has been received for student ${student.name} (${newFeeMonth} - ${newFeeType}). Your account balance has been updated. Thank you.\n- ${schoolName} Digital Registrar Office.`, schoolName);
@@ -450,13 +450,13 @@ export default function TeacherDashboard({
       lng: pos.longitude,
       distanceMeters: Math.round(dist || 0),
       locationVerified: true,
-      note: useDemoPosition ? 'Demo GPS (school location)' : 'Live GPS',
+      note: useDemoPosition ? L('Demo GPS (school location)', 'ڈیمو جی پی ایس (اسکول لوکیشن)') : L('Live GPS', 'لائیو جی پی ایس'),
     };
     setMyTeacherAttendance([rec, ...myTeacherAttendance.filter(a => a.id !== rec.id)]);
     addNotification({
       type: 'attendance_complete',
-      title: `Check-in: ${userSession.name}`,
-      message: `${userSession.name} ne ${now.toLocaleTimeString()} par check-in kiya (${isLate ? 'LATE' : 'On Time'}, ${useDemoPosition ? 'Demo GPS' : formatDistance(Math.round(dist || 0))} school se).`,
+      title: L(`Check-in: ${userSession.name}`, `حاضری: ${userSession.name}`),
+      message: L(`${userSession.name} checked in at ${now.toLocaleTimeString()} (${isLate ? 'LATE' : 'On Time'}, ${useDemoPosition ? 'Demo GPS' : formatDistance(Math.round(dist || 0))} from school).`, `${userSession.name} نے ${now.toLocaleTimeString()} پر حاضری لگائی (${isLate ? 'تاخیر' : 'بروقت'}, ${useDemoPosition ? 'ڈیمو جی پی ایس' : formatDistance(Math.round(dist || 0))} اسکول سے)۔`),
       teacherId: teacherId,
       classId: '',
       role: 'all'
@@ -623,13 +623,13 @@ export default function TeacherDashboard({
     if (!t) return;
     const s = myPayslip;
     const rows =
-      `<tr><td class="lbl">Base Salary</td><td class="amt">${formatPKR(s.baseSalary)}</td></tr>
-      <tr><td class="lbl">Present Days (${s.presentDays}) × Daily Bonus</td><td class="amt">+ ${formatPKR(s.presentBonus)}</td></tr>
-      <tr><td class="lbl">Allowances</td><td class="amt">+ ${formatPKR(s.allowances)}</td></tr>
-      <tr><td class="lbl">Late Deduction (${s.lateDays} day)</td><td class="amt">- ${formatPKR(s.lateDeduction)}</td></tr>
-      <tr><td class="lbl">Absent Deduction (${s.absentDays} day)</td><td class="amt">- ${formatPKR(s.absentDeduction)}</td></tr>
-      ${s.fixedDeductions > 0 ? `<tr><td class="lbl">Fixed Deductions</td><td class="amt">- ${formatPKR(s.fixedDeductions)}</td></tr>` : ''}`;
-    const html = `<!doctype html><html><head><meta charset="utf-8"><title>Payslip - ${t.name}</title>
+      `<tr><td class="lbl">${L('Base Salary', 'بنیادی تنخواہ')}</td><td class="amt">${formatPKR(s.baseSalary)}</td></tr>
+      <tr><td class="lbl">${L('Present Days', 'حاضری کے دن')} (${s.presentDays}) × ${L('Daily Bonus', 'روزانہ بونس')}</td><td class="amt">+ ${formatPKR(s.presentBonus)}</td></tr>
+      <tr><td class="lbl">${L('Allowances', 'الاؤنس')}</td><td class="amt">+ ${formatPKR(s.allowances)}</td></tr>
+      <tr><td class="lbl">${L('Late Deduction', 'تاخیر کٹوتی')} (${s.lateDays} ${L('day', 'دن')})</td><td class="amt">- ${formatPKR(s.lateDeduction)}</td></tr>
+      <tr><td class="lbl">${L('Absent Deduction', 'غیر حاضری کٹوتی')} (${s.absentDays} ${L('day', 'دن')})</td><td class="amt">- ${formatPKR(s.absentDeduction)}</td></tr>
+      ${s.fixedDeductions > 0 ? `<tr><td class="lbl">${L('Fixed Deductions', 'مقررہ کٹوتیاں')}</td><td class="amt">- ${formatPKR(s.fixedDeductions)}</td></tr>` : ''}`;
+    const html = `<!doctype html><html><head><meta charset="utf-8"><title>${L('Payslip', 'تنخواہ پرچی')} - ${t.name}</title>
   <style>
     * { box-sizing: border-box; }
     body { font-family: 'Inter', Arial, sans-serif; color:#0f172a; margin:0; padding:32px; }
@@ -649,25 +649,25 @@ export default function TeacherDashboard({
   </style></head><body>
   <div class="slip">
     <div class="head">
-      <div><h1>${t.name}</h1><div style="font-size:12px;opacity:.9;text-transform:uppercase;letter-spacing:.1em;">${t.subject} · Payslip</div></div>
-      <div class="pct"><div class="lbl">Net Payable</div><div class="big">${formatPKR(s.netPay)}</div><div style="font-size:11px;opacity:.85;">${monthLabel(s.year, s.month)}</div></div>
+      <div><h1>${t.name}</h1><div style="font-size:12px;opacity:.9;text-transform:uppercase;letter-spacing:.1em;">${t.subject} · ${L('Payslip', 'تنخواہ پرچی')}</div></div>
+      <div class="pct"><div class="lbl">${L('Net Payable', 'قابل ادائیگی')}</div><div class="big">${formatPKR(s.netPay)}</div><div style="font-size:11px;opacity:.85;">${monthLabel(s.year, s.month)}</div></div>
     </div>
     <div class="meta">
-      <div><b>Period</b>${monthLabel(s.year, s.month)}</div>
-      <div><b>Present</b>${s.presentDays}</div>
-      <div><b>Late</b>${s.lateDays}</div>
-      <div><b>Absent</b>${s.absentDays}</div>
-      <div><b>Leave</b>${s.leaveDays}</div>
-      <div><b>Status</b>${s.paid ? 'PAID' : 'PENDING'}</div>
+      <div><b>${L('Period', 'مدت')}</b>${monthLabel(s.year, s.month)}</div>
+      <div><b>${L('Present', 'حاضر')}</b>${s.presentDays}</div>
+      <div><b>${L('Late', 'تاخیر')}</b>${s.lateDays}</div>
+      <div><b>${L('Absent', 'غیر حاضر')}</b>${s.absentDays}</div>
+      <div><b>${L('Leave', 'رخصت')}</b>${s.leaveDays}</div>
+      <div><b>${L('Status', 'صورتحال')}</b>${s.paid ? L('PAID', 'ادا شدہ') : L('PENDING', 'باقی')}</div>
     </div>
     <table>${rows}</table>
-    <table><tr class="tot"><td>Net Payable</td><td style="text-align:right">${formatPKR(s.netPay)}</td></tr></table>
-    <div class="foot"><span>${schoolName} — Digital Registrar</span><span>Generated: ${new Date().toLocaleString()}</span></div>
+    <table><tr class="tot"><td>${L('Net Payable', 'قابل ادائیگی')}</td><td style="text-align:right">${formatPKR(s.netPay)}</td></tr></table>
+    <div class="foot"><span>${schoolName} — ${L('Digital Registrar', 'ڈیجیٹل رجسٹرار')}</span><span>Generated: ${new Date().toLocaleString()}</span></div>
   </div>
   <script>window.onload=function(){setTimeout(function(){window.print();},300);};<\/script>
   </body></html>`;
     const w = window.open('', '_blank');
-    if (!w) { toast.error('Pop-up blocked. Allow pop-ups to print payslip.'); return; }
+    if (!w) { toast.error(L('Pop-up blocked. Allow pop-ups to print payslip.', 'پاپ اپ بلاک ہو گیا۔ تنخواہ پرچی پرنٹ کرنے کے لیے پاپ اپ کی اجازت دیں۔')); return; }
     w.document.open();
     w.document.write(html);
     w.document.close();
@@ -897,7 +897,7 @@ export default function TeacherDashboard({
     // Collect all lectures for this teacher regardless of day, sorted chronologically
     const allTeacherLectures = timetable.filter(tt => tt.teacherId === teacherId);
     if (allTeacherLectures.length === 0) {
-      toast.error("No lectures scheduled for you in the timetable yet. Ask the Principal to add one!");
+      toast.error(L('No lectures scheduled for you in the timetable yet. Ask the Principal to add one!', 'ابھی آپ کے ٹائم ٹیبل میں کوئی لیکچر نہیں۔ پرنسپل سے کہیں کہ ایک شامل کریں!'));
       return;
     }
 
@@ -908,16 +908,16 @@ export default function TeacherDashboard({
     const classStr = classObj ? `${classObj.className}-${classObj.section}` : 'General';
 
     // Show simulation toast
-    toast.info(`🔔 Simulated Bell: ${lecture.period} started!`, {
-      description: `Class: ${classStr} | Subject: ${lecture.subject}. Notification has been dispatched to both your portal and your students!`,
+    toast.info(L(`🔔 Simulated Bell: ${lecture.period} started!`, `🔔 مصنوعی بیل: ${lecture.period} شروع ہو گئی!`), {
+      description: L(`Class: ${classStr} | Subject: ${lecture.subject}. Notification has been dispatched to both your portal and your students!`, `کلاس: ${classStr} | مضمون: ${lecture.subject}۔ اطلاع آپ کے پورٹل اور طلبہ دونوں کو بھیج دی گئی ہے!`),
       duration: 6000
     });
 
     // Add persistent notification so both teacher and student get it
     addNotification({
       type: 'period_bell',
-      title: `${lecture.period} Started (${lecture.subject}) â°`,
-      message: `🔔 Simulated School Bell is ringing! Today's lecture "${lecture.subject}" for Class ${classStr} with instructor ${userSession.name} has begun.`,
+      title: L(`${lecture.period} Started (${lecture.subject}) ⏰`, `${lecture.period} شروع (${lecture.subject}) ⏰`),
+      message: L(`🔔 Simulated School Bell is ringing! Today's lecture "${lecture.subject}" for Class ${classStr} with instructor ${userSession.name} has begun.`, `🔔 اسکول کی مصنوعی بیل بج رہی ہے! آج کا لیکچر "${lecture.subject}" کلاس ${classStr} کے لیے استاد ${userSession.name} کے ساتھ شروع ہو گیا ہے۔`),
       teacherId: teacherId,
       classId: lecture.classId,
       role: 'all'
@@ -928,13 +928,13 @@ export default function TeacherDashboard({
     const updated = notifications.map(n => ({ ...n, isUnread: false }));
     saveNotifications(updated);
     setNotifications(updated);
-    toast.success("All notifications marked as read.");
+    toast.success(L('All notifications marked as read.', 'تمام اطلاعات پڑھی ہوئی نشان زد ہو گئیں۔'));
   };
 
   const handleClearNotifications = () => {
     saveNotifications([]);
     setNotifications([]);
-    toast.success("Notification history cleared.");
+    toast.success(L('Notification history cleared.', 'اطلاعات کی تاریخ صاف ہو گئی۔'));
   };
 
   // All relevant classes to track for attendance today (Assigned Class + classes taught today)
@@ -1039,25 +1039,25 @@ export default function TeacherDashboard({
 
     addNotification({
       type: 'attendance_complete',
-      title: `Attendance Completed: ${classNameStr}`,
-      message: `${userSession.name} has completed attendance for Class ${classNameStr} on ${attendanceDate}. Present: ${presentCount} | Absent: ${absentCount} | Total: ${newLogs.length}.`,
+      title: L(`Attendance Completed: ${classNameStr}`, `حاضری مکمل: ${classNameStr}`),
+      message: L(`${userSession.name} has completed attendance for Class ${classNameStr} on ${attendanceDate}. Present: ${presentCount} | Absent: ${absentCount} | Total: ${newLogs.length}.`, `${userSession.name} نے کلاس ${classNameStr} کی حاضری ${attendanceDate} کو مکمل کی۔ حاضر: ${presentCount} | غیر حاضر: ${absentCount} | کل: ${newLogs.length}۔`),
       teacherId: teacherId,
       classId: activeClassId,
       role: 'all'
     });
 
-    toast.success('Attendance logs successfully updated and cached!');
-    toast.info(`Principal & Coordinator notified for ${classNameStr}.`);
+    toast.success(L('Attendance logs successfully updated and cached!', 'حاضری کے لاگ کامیابی سے اپ ڈیٹ اور محفوظ ہو گئے!'));
+    toast.info(L(`Principal & Coordinator notified for ${classNameStr}.`, `پرنسپل و کارڈینیٹر کو ${classNameStr} کے بارے میں اطلاع دے دی گئی۔`));
   };
 
   // DIARY / ASSIGNMENT ENGINE
   const handleCreateAssignment = () => {
     if (!diaryClassId) {
-      toast.error("Please select a class first.");
+      toast.error(L('Please select a class first.', 'پہلے کلاس منتخب کریں۔'));
       return;
     }
     if (!diaryTitle.trim()) {
-      toast.error("Please enter an assignment title.");
+      toast.error(L('Please enter an assignment title.', 'ہوم ورک کا عنوان لکھیں۔'));
       return;
     }
     const cls = classesMap.get(diaryClassId);
@@ -1079,8 +1079,8 @@ export default function TeacherDashboard({
 
     addNotification({
       type: 'attendance_complete',
-      title: `New Assignment: ${newAssignment.title}`,
-      message: `${userSession.name} posted a new ${newAssignment.subject} assignment for Class ${classNameStr}. Due: ${newAssignment.dueDate}. Check the Student Diary!`,
+      title: L(`New Assignment: ${newAssignment.title}`, `نیا ہوم ورک: ${newAssignment.title}`),
+      message: L(`${userSession.name} posted a new ${newAssignment.subject} assignment for Class ${classNameStr}. Due: ${newAssignment.dueDate}. Check the Student Diary!`, `${userSession.name} نے کلاس ${classNameStr} کے لیے ${newAssignment.subject} کا نیا ہوم ورک لگایا۔ آخری تاریخ: ${newAssignment.dueDate}۔ طلبہ ڈائری دیکھیں!`),
       teacherId: teacherId,
       classId: diaryClassId,
       role: 'student'
@@ -1089,12 +1089,12 @@ export default function TeacherDashboard({
     setDiaryTitle('');
     setDiaryDescription('');
     setDiarySubject('');
-    toast.success(`Assignment posted to ${classNameStr} students!`);
+    toast.success(L(`Assignment posted to ${classNameStr} students!`, `کلاس ${classNameStr} کے طلبہ کو ہوم ورک لگا دیا گیا!`));
   };
 
   const handleDeleteAssignment = (id: string) => {
     setAssignments(prev => prev.filter(a => a.id !== id));
-    toast.success("Assignment removed from Diary.");
+    toast.success(L('Assignment removed from Diary.', 'ہوم ورک ڈائری سے ہٹا دیا گیا۔'));
   };
 
   const myAssignments = React.useMemo(
@@ -1140,7 +1140,7 @@ export default function TeacherDashboard({
   const handleSaveMarks = () => {
     const classStudents = students.filter(s => s.classId === selectedMarkClassId);
     if (!selectedSubject.trim()) {
-      alert('Subject name is required to log scores.');
+      alert(L('Subject name is required to log scores.', 'نمبر درج کرنے کے لیے مضمون کا نام ضروری ہے۔'));
       return;
     }
 
@@ -1183,13 +1183,13 @@ export default function TeacherDashboard({
     });
     setMarks([...cleanMarks, ...newRecords]);
     syncMarksToFirestore(removed, newRecords);
-    toast.success('Exam marks mapped and committed to storage.');
+    toast.success(L('Exam marks mapped and committed to storage.', 'امتحان کے نمبر محفوظ کر دیے گئے۔'));
   };
 
   const handleAddMarkFromProfile = () => {
     if (!selectedStudentProfile) return;
     if (!profileMarkSubject.trim() || !profileMarkExam.trim() || !profileMarkObtained.trim()) {
-      toast.error("Please fill all marks fields correctly");
+      toast.error(L('Please fill all marks fields correctly', 'براہِ کرم تمام نمبر درست طور پر بھریں'));
       return;
     }
 
@@ -1197,7 +1197,7 @@ export default function TeacherDashboard({
     const maxMarksNum = parseFloat(profileMarkMax) || 100;
 
     if (isNaN(marksObtainedNum)) {
-      toast.error("Marks obtained must be a number");
+      toast.error(L('Marks obtained must be a number', 'حاصل کردہ نمبر عدد میں ہونے چاہئیں'));
       return;
     }
 
@@ -1219,17 +1219,17 @@ export default function TeacherDashboard({
     syncMarksToFirestore(removed, [newMark]);
     setProfileMarkExam('');
     setProfileMarkObtained('');
-    toast.success(`Mark added for ${selectedStudentProfile.name}`);
+    toast.success(L(`Mark added for ${selectedStudentProfile.name}`, `${selectedStudentProfile.name} کے نمبر درج ہو گئے`));
   };
 
   const handleSaveReport = () => {
     const student = students.find(s => s.id === reportStudentId);
     if (!student) {
-      toast.error("Please select a student first.");
+      toast.error(L('Please select a student first.', 'پہلے طالب علم منتخب کریں۔'));
       return;
     }
     if (reportSubjectsList.length === 0) {
-      toast.error("No subjects added to this report. Add at least one subject above.");
+      toast.error(L('No subjects added to this report. Add at least one subject above.', 'اس رپورٹ میں کوئی مضمون شامل نہیں۔ اوپر سے کم از کم ایک مضمون شامل کریں۔'));
       return;
     }
     const examName = reportExamName.trim() || 'General';
@@ -1249,7 +1249,7 @@ export default function TeacherDashboard({
     });
     setMarks([...cleanMarks, ...newRecords]);
     syncMarksToFirestore(removedForReport, newRecords);
-    toast.success(`Report saved for ${student.name} — visible in Principal Report.`);
+    toast.success(L(`Report saved for ${student.name} — visible in Principal Report.`, `${student.name} کی رپورٹ محفوظ ہو گئی — پرنسپل رپورٹ میں نظر آئے گی۔`));
   };
 
   // Auto-sync marks to Supabase (cloud) so data survives refresh / other devices
@@ -1260,7 +1260,7 @@ export default function TeacherDashboard({
       await flushSupabase();
     } catch (err) {
       console.error('Marks cloud sync failed', err);
-      toast.error('Saved on this device; cloud sync failed');
+      toast.error(L('Saved on this device; cloud sync failed', 'اس ڈیوائس پر محفوظ ہو گیا؛ کلاؤڈ سنک ناکام رہا'));
     }
   };
 
@@ -1388,7 +1388,7 @@ export default function TeacherDashboard({
             <div className="mb-1">
               <img src={logoSrc} alt={`${schoolName} Logo`} className="h-14 w-auto object-contain" referrerPolicy="no-referrer" />
             </div>
-            <button onClick={() => setSidebarOpen(false)} aria-label="Close menu" className="md:hidden flex items-center justify-center px-2 h-9 rounded-lg text-slate-300 hover:text-slate-600 hover:bg-slate-50 transition-colors">
+            <button onClick={() => setSidebarOpen(false)} aria-label={L('Close menu', 'مینو بند کریں')} className="md:hidden flex items-center justify-center px-2 h-9 rounded-lg text-slate-300 hover:text-slate-600 hover:bg-slate-50 transition-colors">
               <X size={18} />
             </button>
           </div>
@@ -1541,7 +1541,7 @@ export default function TeacherDashboard({
               if (!currentPeriodObj) return (
                 <div className="flex items-center gap-2 px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-bold uppercase tracking-wider">
                   <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                  No Active Lecture Right Now
+                  {L('No Active Lecture Right Now', 'ابھی کوئی لیکچر جاری نہیں')}
                 </div>
               );
 
@@ -1551,7 +1551,7 @@ export default function TeacherDashboard({
               return (
                 <div className="flex items-center gap-2 px-3 py-1 bg-red-50 border border-red-100 text-red-700 rounded-full text-xs font-extrabold uppercase tracking-widest animate-pulse">
                   <span className="w-1.5 h-1.5 rounded-full bg-red-650 animate-ping"></span>
-                  LIVE: {currentPeriodObj.period} ({currentPeriodObj.subject} — Class {classLabel})
+                  {L('LIVE', 'جاری')}: {currentPeriodObj.period} ({currentPeriodObj.subject} — {L('Class', 'کلاس')} {classLabel})
                 </div>
               );
             })()}
@@ -1562,10 +1562,10 @@ export default function TeacherDashboard({
             <button
               onClick={handleSimulateNextPeriod}
               className="px-3.5 py-2 bg-gradient-to-r from-teal-600 to-teal-600 text-white text-xs font-black uppercase tracking-widest rounded-full shadow-md shadow-teal-200 hover:from-teal-700 hover:to-teal-700 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
-              title="Test class bells and push notifications"
+              title={L('Test class bells and push notifications', 'کلاس بیل اور پش اطلاعات آزمائیں')}
             >
               <Bell size={13} />
-              Bell
+              {L('Bell', 'بیل')}
             </button>
 
             {/* Quick Dark Mode Toggler */}
@@ -1573,7 +1573,7 @@ export default function TeacherDashboard({
               type="button"
               onClick={handleToggleTheme}
               className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-full transition-all flex items-center justify-center text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-900"
-              title="Toggle Dark/Light Mode"
+              title={L('Toggle Dark/Light Mode', 'ڈارک / لائٹ موڈ بدلیں')}
             >
               <span key={String(darkTheme)} className="animate-theme-pop inline-flex">
                 {darkTheme ? <Sun size={15} className="text-amber-500" /> : <Moon size={15} />}
@@ -1586,7 +1586,7 @@ export default function TeacherDashboard({
               <button 
                 onClick={() => setShowNotifDropdown(!showNotifDropdown)}
                 className={`p-2 hover:bg-slate-100 border border-slate-200 rounded-xl transition-all flex items-center justify-center relative uppercase font-black text-xs ${showNotifDropdown ? 'bg-slate-100' : 'bg-white'}`}
-                title="Notifications"
+                title={L('Notifications', 'اطلاعات')}
               >
                 <Bell size={16} className="text-slate-600" />
                 {notifications.filter(n => n.isUnread).length > 0 && (
@@ -1607,22 +1607,22 @@ export default function TeacherDashboard({
                       className="absolute right-0 mt-2 w-80 bg-white border border-slate-200 rounded-xl shadow-xl z-50 py-3 flex flex-col font-sans"
                     >
                       <div className="px-4 pb-2 border-b border-slate-150 flex items-center justify-between">
-                        <span className="text-xs font-extrabold text-slate-400 uppercase tracking-widest">School Bells / Alerts</span>
+                        <span className="text-xs font-extrabold text-slate-400 uppercase tracking-widest">{L('School Bells / Alerts', 'اسکول بیل / اطلاعات')}</span>
                         <div className="flex items-center gap-2">
                           {notifications.length > 0 && (
-                            <button onClick={handleMarkAllRead} className="text-xs hover:underline text-teal-600 font-bold uppercase">Mark Read</button>
+                            <button onClick={handleMarkAllRead} className="text-xs hover:underline text-teal-600 font-bold uppercase">{L('Mark Read', 'پڑھ لیں')}</button>
                           )}
                           {notifications.length > 0 && (
                             <span className="text-slate-200">|</span>
                           )}
-                          <button onClick={handleClearNotifications} className="text-xs hover:underline text-rose-600 font-bold uppercase">Clear</button>
+                          <button onClick={handleClearNotifications} className="text-xs hover:underline text-rose-600 font-bold uppercase">{L('Clear', 'صاف کریں')}</button>
                         </div>
                       </div>
 
                       <div className="max-h-64 overflow-y-auto divide-y divide-slate-100">
                         {notifications.length === 0 ? (
                           <div className="py-8 text-center text-slate-400 text-xs ">
-                            No notifications received yet
+                            {L('No notifications received yet', 'ابھی کوئی اطلاع نہیں آئی')}
                           </div>
                         ) : (
                           notifications.map(notif => (
@@ -1750,15 +1750,15 @@ export default function TeacherDashboard({
                   <div className="flex justify-between items-center">
                     <h3 className="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-1.5">
                       <CalendarDays size={14} className="text-teal-600" />
-                      Class Lectures scheduled today ({todayClasses.length})
+                      {L('Class Lectures scheduled today', 'آج کے طے شدہ کلاس لیکچرز')} ({todayClasses.length})
                     </h3>
-                    <span className="text-xs text-teal-500 font-bold uppercase tracking-wider">Timetabled Lectures</span>
+                    <span className="text-xs text-teal-500 font-bold uppercase tracking-wider">{L('Timetabled Lectures', 'ٹائم ٹیبل کے لیکچرز')}</span>
                   </div>
 
                   {todayClasses.length === 0 ? (
                     <div className="bg-slate-50 border border-slate-100 p-6 text-center text-slate-500 rounded-xl text-xs">
-                      ☕ No formal lectures assigned to your ID under <strong>{currentDayName}</strong>. 
-                      <p className="mt-1.5 text-xs text-slate-400">Great opportunity to review grading portfolios or coordinate with fellow faculty members!</p>
+                      ☕ {L('No formal lectures assigned to your ID under', 'آپ کی آئی ڈی کے لیے کوئی باقاعدہ لیکچر نہیں')} <strong>{currentDayName}</strong>. 
+                      <p className="mt-1.5 text-xs text-slate-400">{L('Great opportunity to review grading portfolios or coordinate with fellow faculty members!', 'یہ بہترین موقع ہے کہ گریڈنگ پورٹ فولیو دیکھیں یا ساتھی اساتذہ سے رابطہ کریں!')}</p>
                     </div>
                   ) : (
                     <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1">
@@ -1778,12 +1778,12 @@ export default function TeacherDashboard({
                                 </h4>
                                 {isMentor && (
                                   <span className="text-xs bg-amber-50 text-amber-700 border border-amber-100 px-1.5 py-0.5 font-bold">
-                                    Primary Mentor
+                                    {L('Primary Mentor', 'پرائمری منٹور')}
                                   </span>
                                 )}
                               </div>
                               <p className="text-xs text-slate-600 font-bold">
-                                Subject: <span className="text-teal-900">{lecture.subject}</span>
+                                {L('Subject', 'مضمون')}: <span className="text-teal-900">{lecture.subject}</span>
                               </p>
                             </div>
 
@@ -1805,24 +1805,24 @@ export default function TeacherDashboard({
                     <div className="flex justify-between items-center">
                       <h3 className="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-1.5">
                         <ListTodo size={14} className="text-amber-600" />
-                        Today's Attendance Checklist ({attendanceStatusList.length})
+                        {L("Today's Attendance Checklist", 'آج کی حاضری چیک لسٹ')} ({attendanceStatusList.length})
                       </h3>
                       <div className="flex items-center gap-3">
                         <div className="flex items-center gap-1.5">
                           <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-                          <span className="text-xs font-black uppercase text-slate-500">Total P: {attendanceStatusList.reduce((acc, curr) => acc + curr.presentCount, 0)}</span>
+                          <span className="text-xs font-black uppercase text-slate-500">{L('Total P', 'کل حاضر')}: {attendanceStatusList.reduce((acc, curr) => acc + curr.presentCount, 0)}</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           <span className="w-2 h-2 rounded-full bg-rose-500"></span>
-                          <span className="text-xs font-black uppercase text-slate-500">Total A: {attendanceStatusList.reduce((acc, curr) => acc + curr.absentCount, 0)}</span>
+                          <span className="text-xs font-black uppercase text-slate-500">{L('Total A', 'کل غیر حاضر')}: {attendanceStatusList.reduce((acc, curr) => acc + curr.absentCount, 0)}</span>
                         </div>
-                        <span className="text-xs text-amber-600 font-bold uppercase tracking-wider">Verification Task</span>
+                        <span className="text-xs text-amber-600 font-bold uppercase tracking-wider">{L('Verification Task', 'تصدیقی کام')}</span>
                       </div>
                     </div>
 
                     {attendanceStatusList.length === 0 ? (
                       <div className="bg-slate-50 border border-slate-100 p-6 text-center text-slate-500 rounded-xl text-xs">
-                        No assigned classroom cohorts requiring registers today.
+                        {L('No assigned classroom cohorts requiring registers today.', 'آج کوئی تفویض شدہ کلاس رجسٹر درکار نہیں۔')}
                       </div>
                     ) : (
                       <div className="space-y-2">
@@ -1838,22 +1838,22 @@ export default function TeacherDashboard({
                             <div className="space-y-0.5">
                               <div className="flex items-center gap-2">
                                 <h4 className="text-xs font-black uppercase text-slate-800">
-                                  Class {item.className}
+                                  {L('Class', 'کلاس')} {item.className}
                                 </h4>
                                 {item.isMentorClass && (
                                   <span className="text-xs uppercase tracking-wider font-extrabold bg-teal-50 text-teal-600 px-1.5 border border-teal-100">
-                                    My Cohort
+                                    {L('My Cohort', 'میرا گروپ')}
                                   </span>
                                 )}
                               </div>
                               <p className="text-xs text-slate-500">
-                                Total Pupils: <span className="font-bold text-slate-700">{item.studentCount}</span>
+                                {L('Total Pupils', 'کل طلبہ')}: <span className="font-bold text-slate-700">{item.studentCount}</span>
                                 {item.marked && (
                                   <>
                                     <span className="mx-1">|</span>
-                                    <span className="text-amber-600 font-bold">P: {item.presentCount}</span>
+                                    <span className="text-amber-600 font-bold">{L('P', 'ح')}: {item.presentCount}</span>
                                     <span className="mx-1">|</span>
-                                    <span className="text-rose-600 font-bold">A: {item.absentCount}</span>
+                                    <span className="text-rose-600 font-bold">{L('A', 'غ')}: {item.absentCount}</span>
                                   </>
                                 )}
                               </p>
@@ -1862,11 +1862,11 @@ export default function TeacherDashboard({
                             <div className="flex items-center gap-2">
                               {item.marked ? (
                                 <span className="text-xs font-mono font-extrabold text-amber-700 bg-amber-100/80 px-2 py-1 uppercase rounded-xl flex items-center gap-1">
-                                  ✓ Logged
+                                  ✓ {L('Logged', 'درج')}
                                 </span>
                               ) : (
                                 <span className="text-xs font-mono font-extrabold text-rose-600 bg-rose-100/80 px-2 py-1 uppercase rounded-xl">
-                                  âš ï¸ Pending
+                                  {L('Pending', 'باقی')}
                                 </span>
                               )}
 
@@ -1883,7 +1883,7 @@ export default function TeacherDashboard({
                                     : 'bg-amber-600 hover:bg-amber-500 text-white font-extrabold shadow-sm'
                                 }`}
                               >
-                                {item.marked ? 'Re-edit' : 'Take Attendance'}
+                                {item.marked ? L('Re-edit', 'دوبارہ ترمیم') : L('Take Attendance', 'حاضری لگائیں')}
                               </button>
                             </div>
                           </div>
@@ -1894,7 +1894,7 @@ export default function TeacherDashboard({
 
                   {pendingCount > 0 && (
                     <div className="bg-amber-50 border border-amber-100 p-3 text-xs text-amber-950 font-mono font-medium leading-relaxed">
-                      âš ï¸ Remainder: Principal office sync expects all student attendance records to be updated and signed by 2:00 PM today.
+                      âš ï¸ {L('Remainder: Principal office sync expects all student attendance records to be updated and signed by 2:00 PM today.', 'یاد دہانی: پرنسپل آفس کے مطابق تمام طلبہ کی حاضری آج 2:00 بجے تک اپ ڈیٹ اور تصدیق شدہ ہونی چاہیے۔')}
                     </div>
                   )}
                 </div>
@@ -1909,15 +1909,15 @@ export default function TeacherDashboard({
                     <Calendar size={20} />
                   </div>
                   <div>
-                    <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider font-display">My Timetable</h2>
-                    <p className="text-xs text-slate-500 mt-0.5 uppercase font-bold tracking-widest">Select a day to view its schedule</p>
+                    <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider font-display">{L('My Timetable', 'میرا ٹائم ٹیبل')}</h2>
+                    <p className="text-xs text-slate-500 mt-0.5 uppercase font-bold tracking-widest">{L('Select a day to view its schedule', 'شیڈول دیکھنے کے لیے دن منتخب کریں')}</p>
                   </div>
                 </div>
               </div>
 
               {/* Day Selector Chips */}
               <div className="flex flex-wrap items-center gap-2 mb-6">
-                <span className="text-xs font-black text-slate-400 uppercase tracking-widest mr-1">Day:</span>
+                <span className="text-xs font-black text-slate-400 uppercase tracking-widest mr-1">{L('Day', 'دن')}:</span>
                 {['all', ...DAYS].map(day => (
                   <button
                     key={day}
@@ -1930,7 +1930,7 @@ export default function TeacherDashboard({
                         : 'bg-white text-slate-500 border-slate-200 hover:border-slate-400'
                     }`}
                   >
-                    {day === 'all' ? 'All Days' : day}
+                    {day === 'all' ? L('All Days', 'تمام دن') : day}
                   </button>
                 ))}
               </div>
@@ -1972,7 +1972,7 @@ export default function TeacherDashboard({
                 })}
                 {(timetableDayFilter === 'all' ? timetable : timetable.filter(tt => tt.day === timetableDayFilter)).filter(tt => tt.teacherId === teacherId).length === 0 && (
                   <div className="py-12 text-center">
-                    <p className="text-xs font-bold text-slate-400 uppercase ">No sessions assigned in global timetable yet.</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase ">{L('No sessions assigned in global timetable yet.', 'عالمی ٹائم ٹیبل میں ابھی کوئی سیشن تفویض نہیں ہوا۔')}</p>
                   </div>
                 )}
               </div>
@@ -1989,8 +1989,8 @@ export default function TeacherDashboard({
                 <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 text-white flex items-center justify-center mb-4 shadow-lg shadow-amber-100 group-hover:scale-110 transition-transform">
                   <CheckSquare size={20} />
                 </div>
-                <h3 className="text-base font-bold text-slate-900 uppercase tracking-wide font-display">Mark Attendance</h3>
-                <p className="text-xs text-slate-500 mt-1">Log present or absent indices for pupils on a selected calendar day.</p>
+                <h3 className="text-base font-bold text-slate-900 uppercase tracking-wide font-display">{L('Mark Attendance', 'حاضری لگائیں')}</h3>
+                <p className="text-xs text-slate-500 mt-1">{L('Log present or absent indices for pupils on a selected calendar day.', 'منتخب تاریخ پر طلبہ کی حاضری یا غیر حاضری درج کریں۔')}</p>
               </div>
 
               <div 
@@ -2003,8 +2003,8 @@ export default function TeacherDashboard({
                 <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 text-white flex items-center justify-center mb-4 shadow-lg shadow-teal-100 group-hover:scale-110 transition-transform">
                   <Award size={20} />
                 </div>
-                <h3 className="text-base font-bold text-slate-900 uppercase tracking-wide font-display">Configure Scores</h3>
-                <p className="text-xs text-slate-500 mt-1">Commend academic marks for Unit Tests, Mid-Year cycle, and Final exams.</p>
+                <h3 className="text-base font-bold text-slate-900 uppercase tracking-wide font-display">{L('Configure Scores', 'نمبر ترتیب دیں')}</h3>
+                <p className="text-xs text-slate-500 mt-1">{L('Commend academic marks for Unit Tests, Mid-Year cycle, and Final exams.', 'یونٹ ٹیسٹ، ششماہی اور سالانہ امتحانات کے تعلیمی نمبر درج کریں۔')}</p>
               </div>
 
             </div>
@@ -2031,15 +2031,15 @@ export default function TeacherDashboard({
                         <Menu size={20} className="text-slate-900" />
                       </div>
                       <div>
-                        <h2 className="text-lg font-black uppercase tracking-tight text-slate-900">Update Credentials</h2>
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Portal Access Security</p>
+                        <h2 className="text-lg font-black uppercase tracking-tight text-slate-900">{L('Update Credentials', 'لاگ اِن تفصیلات اپ ڈیٹ کریں')}</h2>
+                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{L('Portal Access Security', 'پورٹل رسائی سیکیورٹی')}</p>
                       </div>
                     </div>
 
 
                     <div className="space-y-6">
                       <div className="space-y-1.5">
-                        <label className="text-xs font-black uppercase tracking-widest text-slate-400 block">Current ID</label>
+                        <label className="text-xs font-black uppercase tracking-widest text-slate-400 block">{L('Current ID', 'موجودہ آئی ڈی')}</label>
                         <input 
                           type="text" 
                           disabled 
@@ -2048,7 +2048,7 @@ export default function TeacherDashboard({
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-xs font-black uppercase tracking-widest text-slate-400 block">New Password</label>
+                        <label className="text-xs font-black uppercase tracking-widest text-slate-400 block">{L('New Password', 'نیا پاس ورڈ')}</label>
                         <input 
                           type="password"
                           value={newPassword}
@@ -2056,13 +2056,13 @@ export default function TeacherDashboard({
                           placeholder="••••••••"
                           className="w-full bg-white border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:border-slate-900" 
                         />
-                        <p className="text-xs text-slate-400 ">Minimum 8 characters recommended for robust security.</p>
+                        <p className="text-xs text-slate-400 ">{L('Minimum 8 characters recommended for robust security.', 'مضبوط سیکیورٹی کے لیے کم از کم 8 حروف تجویز کیے جاتے ہیں۔')}</p>
                       </div>
 
                       <button
                         onClick={() => {
                           if (newPassword.length < 4) {
-                            toast.error('Password must be at least 4 characters long.');
+                            toast.error(L('Password must be at least 4 characters long.', 'پاس ورڈ کم از کم 4 حروف کا ہونا چاہیے۔'));
                             return;
                           }
                           
@@ -2071,12 +2071,12 @@ export default function TeacherDashboard({
                             t.id === userSession.id ? { ...t, password: newPassword } : t
                           ));
                           
-                          toast.success('Password updated successfully! Next login requires new credentials.');
+                          toast.success(L('Password updated successfully! Next login requires new credentials.', 'پاس ورڈ کامیابی سے اپ ڈیٹ ہو گیا! اگلی بار نئی تفصیلات سے لاگ اِن کریں۔'));
                           setShowPasswordModal(false);
                         }}
                         className="w-full bg-teal-600 text-white font-black uppercase tracking-widest py-3 rounded-xl hover:bg-teal-700 transition-all text-xs"
                       >
-                        Commit Changes
+                        {L('Commit Changes', 'تبدیلیاں محفوظ کریں')}
                       </button>
                     </div>
                   </motion.div>
@@ -2089,7 +2089,7 @@ export default function TeacherDashboard({
               <div className="flex items-center gap-3">
                 <Info size={18} className="text-amber-600 shrink-0" />
                 <p className="text-xs text-slate-500 font-sans">
-                  You are editing simulated data. This app uses <strong>Indexed Storage (localStorage)</strong>. You can safely simulate different dates, record marks, and re-login as a student to see the changes update in real time.
+                  {L('You are editing simulated data. This app uses', 'آپ نقلی ڈیٹا میں ترمیم کر رہے ہیں۔ یہ ایپ استعمال کرتی ہے')} <strong>{L('Indexed Storage (localStorage)', 'انڈیکسڈ اسٹوریج (لوکل اسٹوریج)')}</strong>{L('. You can safely simulate different dates, record marks, and re-login as a student to see the changes update in real time.', '۔ آپ مختلف تاریخیں آزما سکتے ہیں، نمبر درج کر سکتے ہیں اور طالب علم کے طور پر دوبارہ لاگ اِن کر کے تبدیلیاں فوراً دیکھ سکتے ہیں۔')}
                 </p>
               </div>
             </div>
@@ -2100,45 +2100,45 @@ export default function TeacherDashboard({
                 <div className="flex items-center gap-2.5 text-white">
                   <ClipboardList size={18} />
                   <div>
-                    <h3 className="text-sm font-black uppercase tracking-widest leading-none">Quick Diary</h3>
-                    <p className="text-[10px] font-bold text-amber-100 mt-1 uppercase tracking-wider">Post an assignment to your class students</p>
+                    <h3 className="text-sm font-black uppercase tracking-widest leading-none">{L('Quick Diary', 'فوری ڈائری')}</h3>
+                    <p className="text-[10px] font-bold text-amber-100 mt-1 uppercase tracking-wider">{L('Post an assignment to your class students', 'اپنی کلاس کے طلبہ کو ہوم ورک دیں')}</p>
                   </div>
                 </div>
                 <button
                   onClick={() => { handleTabChange('diary'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   className="text-[10px] font-black uppercase tracking-widest bg-white/15 hover:bg-white/25 text-white px-3 py-1.5 rounded-lg transition-all cursor-pointer"
                 >
-                  Full Diary
+                  {L('Full Diary', 'مکمل ڈائری')}
                 </button>
               </div>
 
               <div className="p-5 space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="space-y-1">
-                    <label className="block text-[9px] font-black text-slate-400 uppercase tracking-widest">Class</label>
+                    <label className="block text-[9px] font-black text-slate-400 uppercase tracking-widest">{L('Class', 'کلاس')}</label>
                     <select
                       value={diaryClassId}
                       onChange={(e) => setDiaryClassId(e.target.value)}
                       className="w-full bg-slate-50 border border-slate-200 focus:border-amber-500 focus:bg-white p-2.5 text-xs font-bold outline-none transition-all rounded-lg cursor-pointer"
                     >
-                      {myClasses.length === 0 && <option value="">No assigned classes</option>}
+                      {myClasses.length === 0 && <option value="">{L('No assigned classes', 'کوئی تفویض شدہ کلاس نہیں')}</option>}
                       {myClasses.map(c => (
                         <option key={c.id} value={c.id}>{c.className}-{c.section}</option>
                       ))}
                     </select>
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-[9px] font-black text-slate-400 uppercase tracking-widest">Subject</label>
+                    <label className="block text-[9px] font-black text-slate-400 uppercase tracking-widest">{L('Subject', 'مضمون')}</label>
                     <input
                       type="text"
-                      placeholder={teacherSubject || 'e.g. Mathematics'}
+                      placeholder={teacherSubject || L('e.g. Mathematics', 'مثلاً ریاضی')}
                       value={diarySubject}
                       onChange={(e) => setDiarySubject(e.target.value)}
                       className="w-full bg-slate-50 border border-slate-200 focus:border-amber-500 focus:bg-white p-2.5 text-xs font-bold outline-none transition-all rounded-lg"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="block text-[9px] font-black text-slate-400 uppercase tracking-widest">Due Date</label>
+                    <label className="block text-[9px] font-black text-slate-400 uppercase tracking-widest">{L('Due Date', 'آخری تاریخ')}</label>
                     <input
                       type="date"
                       value={diaryDueDate}
@@ -2149,10 +2149,10 @@ export default function TeacherDashboard({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-[9px] font-black text-slate-400 uppercase tracking-widest">Assignment Title *</label>
+                  <label className="block text-[9px] font-black text-slate-400 uppercase tracking-widest">{L('Assignment Title *', 'ہوم ورک کا عنوان *')}</label>
                   <input
                     type="text"
-                    placeholder="e.g. Chapter 5 Exercise Questions"
+                    placeholder={L('e.g. Chapter 5 Exercise Questions', 'مثلاً باب 5 کے مشقی سوالات')}
                     value={diaryTitle}
                     onChange={(e) => setDiaryTitle(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200 focus:border-amber-500 focus:bg-white p-2.5 text-xs font-bold outline-none transition-all rounded-lg"
@@ -2160,10 +2160,10 @@ export default function TeacherDashboard({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-[9px] font-black text-slate-400 uppercase tracking-widest">Instructions / Details</label>
+                  <label className="block text-[9px] font-black text-slate-400 uppercase tracking-widest">{L('Instructions / Details', 'ہدایات / تفصیل')}</label>
                   <textarea
                     rows={2}
-                    placeholder="Write the assignment details, page numbers, or submission instructions..."
+                    placeholder={L('Write the assignment details, page numbers, or submission instructions...', 'ہوم ورک کی تفصیل، صفحہ نمبر یا جمع کرانے کی ہدایات لکھیں...')}
                     value={diaryDescription}
                     onChange={(e) => setDiaryDescription(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200 focus:border-amber-500 focus:bg-white p-2.5 text-xs font-bold outline-none transition-all rounded-lg resize-none"
@@ -2192,12 +2192,12 @@ export default function TeacherDashboard({
           <div id="panel-teacher-students" className="space-y-6 animate-fade-in bg-teal-50/50 p-4 sm:p-6 -mx-4 sm:-mx-6 rounded-2xl border border-teal-100 shadow-inner">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">My Students Roster</h1>
+                <h1 className="text-2xl font-bold text-gray-900">{L('My Students Roster', 'میرے طلبہ کی فہرست')}</h1>
               </div>
               
               {/* Select Classroom */}
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-gray-500">Classroom:</span>
+                <span className="text-xs font-semibold text-gray-500">{L('Classroom', 'کلاس روم')}:</span>
                 <select
                   id="teacher-students-class-select"
                   value={activeClassId}
@@ -2215,10 +2215,10 @@ export default function TeacherDashboard({
             <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-xs">
               <div className="p-4 bg-gray-50/50 border-b border-gray-100 flex items-center justify-between">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">
-                  Students in {viewClass ? `${viewClass.className} - ${viewClass.section}` : 'N/A'}
+                  {L('Students in', 'طلبہ — کلاس')} {viewClass ? `${viewClass.className} - ${viewClass.section}` : 'N/A'}
                 </h3>
                 <span className="text-xs bg-slate-200 text-slate-800 font-bold px-2 py-0.5 rounded">
-                  {viewClassStudents.length} Assigned Pupils
+                  {viewClassStudents.length} {L('Assigned Pupils', 'تفویض شدہ طلبہ')}
                 </span>
               </div>
               
@@ -2226,10 +2226,10 @@ export default function TeacherDashboard({
                 <table className="w-full text-left">
                   <thead>
                     <tr className="border-b border-gray-100 text-xs font-bold text-gray-400 uppercase tracking-widest bg-gray-50/20">
-                      <th className="px-6 py-3 w-20">Roll #</th>
-                      <th className="px-6 py-3">Student Name</th>
-                      <th className="px-6 py-3">Contact parent Phone</th>
-                      <th className="px-6 py-3 text-right">Actions</th>
+                      <th className="px-6 py-3 w-20">{L('Roll #', 'رول نمبر')}</th>
+                      <th className="px-6 py-3">{L('Student Name', 'طالب علم کا نام')}</th>
+                      <th className="px-6 py-3">{L('Contact parent Phone', 'والدین کا فون')}</th>
+                      <th className="px-6 py-3 text-right">{L('Actions', 'کارروائیاں')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 text-sm">
@@ -2257,7 +2257,7 @@ export default function TeacherDashboard({
                               }}
                               className="px-4 py-1.5 bg-teal-50 text-teal-600 hover:bg-teal-600 hover:text-white border border-teal-100 rounded-lg text-xs font-black uppercase tracking-widest transition-all shadow-sm"
                             >
-                              Profile
+                              {L('Profile', 'پروفائل')}
                             </button>
                           </td>
                         </tr>
@@ -2265,7 +2265,7 @@ export default function TeacherDashboard({
                     ) : (
                       <tr>
                         <td colSpan={4} className="px-6 py-12 text-center text-gray-400 text-sm ">
-                          No student profiles enrolled inside this class register.
+                          {L('No student profiles enrolled inside this class register.', 'اس کلاس رجسٹر میں کوئی طالب علم درج نہیں۔')}
                         </td>
                       </tr>
                     )}
@@ -2281,13 +2281,13 @@ export default function TeacherDashboard({
           <div id="panel-teacher-attendance" className="space-y-6 animate-fade-in bg-rose-50/50 p-4 sm:p-6 -mx-4 sm:-mx-6 rounded-2xl border border-rose-100 shadow-inner">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Mark Daily Attendance</h1>
+                <h1 className="text-2xl font-bold text-gray-900">{L('Mark Daily Attendance', 'روزانہ حاضری لگائیں')}</h1>
               </div>
 
               {/* Class & Date Controls */}
               <div className="flex flex-wrap items-center gap-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-gray-500">Class:</span>
+                  <span className="text-xs font-semibold text-gray-500">{L('Class', 'کلاس')}:</span>
                   <select
                     id="attendance-class-select"
                     value={activeClassId}
@@ -2301,7 +2301,7 @@ export default function TeacherDashboard({
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-gray-500">Log Date:</span>
+                  <span className="text-xs font-semibold text-gray-500">{L('Log Date', 'تاریخ')}:</span>
                   <input
                     id="attendance-date-input"
                     type="date"
@@ -2324,9 +2324,9 @@ export default function TeacherDashboard({
                   }}
                   className="appearance-none pl-3 pr-8 py-2 bg-white border border-slate-200 rounded-xl text-xs font-black uppercase tracking-widest text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500/20 cursor-pointer shadow-sm"
                 >
-                  <option value="grid">🎴 Student Cards Grid</option>
-                  <option value="list">📋 Spreadsheet List</option>
-                  <option value="swipe">✨ Swipe Card Mode</option>
+                  <option value="grid">{L('🎴 Student Cards Grid', '🎴 طلبہ کارڈ گرڈ')}</option>
+                  <option value="list">{L('📋 Spreadsheet List', '📋 شیٹ لسٹ')}</option>
+                  <option value="swipe">{L('✨ Swipe Card Mode', '✨ سوائپ کارڈ موڈ')}</option>
                 </select>
                 <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </div>
@@ -2342,18 +2342,18 @@ export default function TeacherDashboard({
                 {viewClassStudents.length > 0 && (
                   <div className="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">Batch Mark:</span>
+                      <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">{L('Batch Mark', 'اجتماعی حاضری')}:</span>
                       <button
                         type="button"
                         onClick={() => {
                           const updated: { [id: string]: 'present' | 'absent' | 'late' | 'leave' } = { ...scratchAttendance };
                           viewClassStudents.forEach(s => { updated[s.id] = 'present'; });
                           setScratchAttendance(updated);
-                          toast.success("Marked all students as Present");
+                          toast.success(L('Marked all students as Present', 'تمام طلبہ کو حاضر لگا دیا گیا'));
                         }}
                         className="px-2.5 py-1 bg-amber-50 text-amber-700 hover:bg-amber-600 hover:text-white rounded-lg text-xs font-black uppercase tracking-wider transition-all border border-amber-200"
                       >
-                        ✅ All Present
+                        ✅ {L('All Present', 'سب حاضر')}
                       </button>
                       <button
                         type="button"
@@ -2361,7 +2361,7 @@ export default function TeacherDashboard({
                           const updated: { [id: string]: 'present' | 'absent' | 'late' | 'leave' } = { ...scratchAttendance };
                           viewClassStudents.forEach(s => { updated[s.id] = 'absent'; });
                           setScratchAttendance(updated);
-                          toast.success("Marked all students as Absent");
+                          toast.success(L('Marked all students as Absent', 'تمام طلبہ کو غیر حاضر لگا دیا گیا'));
                         }}
                         className="px-2.5 py-1 bg-rose-50 text-rose-700 hover:bg-rose-600 hover:text-white rounded-lg text-xs font-black uppercase tracking-wider transition-all border border-rose-200"
                       >
@@ -2375,7 +2375,7 @@ export default function TeacherDashboard({
                       className="flex items-center gap-2 py-2 px-5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold tracking-wide shadow-md transition-all cursor-pointer ml-auto"
                     >
                       <Save size={14} />
-                      Save & Commit Attendance
+                      {L('Save & Commit Attendance', 'حاضری محفوظ کریں')}
                     </button>
                   </div>
                 )}
@@ -2443,7 +2443,7 @@ export default function TeacherDashboard({
                                   ? 'bg-amber-50 text-amber-600 border-amber-200' 
                                   : 'bg-amber-50 text-amber-600 border-amber-200'
                               }`}>
-                                {isPaid ? 'Fee Paid' : 'Fee Pending'}
+                                {isPaid ? L('Fee Paid', 'فیس ادا شدہ') : L('Fee Pending', 'فیس باقی')}
                               </span>
                             </div>
                           </div>
@@ -2464,7 +2464,7 @@ export default function TeacherDashboard({
                                     : 'bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-900'
                                 }`}
                               >
-                                {st === 'present' ? 'P' : st === 'absent' ? 'A' : st === 'late' ? 'L' : 'LV'}
+                                {st === 'present' ? L('P', 'ح') : st === 'absent' ? L('A', 'غ') : st === 'late' ? L('L', 'ت') : L('LV', 'ر')}
                               </button>
                             ))}
                           </div>
@@ -2474,7 +2474,7 @@ export default function TeacherDashboard({
                   </div>
                 ) : (
                   <div className="p-12 text-center bg-white border border-slate-200 rounded-2xl text-slate-400  font-medium">
-                    No students enrolled in this class group.
+                    {L('No students enrolled in this class group.', 'اس کلاس گروپ میں کوئی طالب علم نہیں۔')}
                   </div>
                 )}
 
@@ -2486,7 +2486,7 @@ export default function TeacherDashboard({
                       className="flex items-center gap-2 py-2.5 px-6 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold tracking-wide shadow-md transition-all cursor-pointer"
                     >
                       <Save size={14} />
-                      Commit and Save Attendance Logs
+                      {L('Commit and Save Attendance Logs', 'حاضری کے لاگ محفوظ کریں')}
                     </button>
                   </div>
                 )}
@@ -2498,9 +2498,9 @@ export default function TeacherDashboard({
                   <table className="w-full text-left">
                     <thead>
                       <tr className="border-b border-gray-100 text-xs font-bold text-gray-500 uppercase tracking-widest bg-gray-50">
-                        <th className="px-6 py-4 w-28">Roll #</th>
-                        <th className="px-6 py-4">Student Profile</th>
-                        <th className="px-6 py-4 text-center">Status Toggle</th>
+                        <th className="px-6 py-4 w-28">{L('Roll #', 'رول نمبر')}</th>
+                        <th className="px-6 py-4">{L('Student Profile', 'طالب علم پروفائل')}</th>
+                        <th className="px-6 py-4 text-center">{L('Status Toggle', 'حاضری تبدیل کریں')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-150 text-sm">
@@ -2538,7 +2538,7 @@ export default function TeacherDashboard({
                                                 : 'bg-amber-50 text-amber-600 border-amber-100 animate-pulse'
                                             }`}
                                           >
-                                            {isPaid ? 'Fee Paid' : 'Fee Pending'}
+                                            {isPaid ? L('Fee Paid', 'فیس ادا شدہ') : L('Fee Pending', 'فیس باقی')}
                                           </button>
                                         );
                                       })()}
@@ -2560,7 +2560,7 @@ export default function TeacherDashboard({
                                           : 'text-gray-400 hover:text-gray-900 hover:bg-white'
                                       }`}
                                     >
-                                      {st === 'present' ? 'P' : st === 'absent' ? 'A' : st === 'late' ? 'L' : 'LV'}
+                                      {st === 'present' ? L('P', 'ح') : st === 'absent' ? L('A', 'غ') : st === 'late' ? L('L', 'ت') : L('LV', 'ر')}
                                     </button>
                                   ))}
                                 </div>
@@ -2571,7 +2571,7 @@ export default function TeacherDashboard({
                       ) : (
                         <tr>
                           <td colSpan={3} className="px-6 py-12 text-center text-gray-400 text-sm  font-medium">
-                            No student profiles enrolled inside the class scope.
+                            {L('No student profiles enrolled inside the class scope.', 'اس کلاس کے دائرے میں کوئی طالب علم درج نہیں۔')}
                           </td>
                         </tr>
                       )}
@@ -2587,7 +2587,7 @@ export default function TeacherDashboard({
                       className="flex items-center gap-2 py-2 px-5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold tracking-wide shadow-sm transition-all cursor-pointer"
                     >
                       <Save size={14} />
-                      Commit and Save Attendance Logs
+                      {L('Commit and Save Attendance Logs', 'حاضری کے لاگ محفوظ کریں')}
                     </button>
                   </div>
                 )}
@@ -2630,12 +2630,12 @@ export default function TeacherDashboard({
                                     // Swipe right -> Present
                                     setScratchAttendance(prev => ({ ...prev, [currentStudent.id]: 'present' }));
                                     setActiveSwipeIndex(idx => idx + 1);
-                                    toast.success(`Marked ${currentStudent.name} as Present`);
+                                    toast.success(L(`Marked ${currentStudent.name} as Present`, `${currentStudent.name} کو حاضر لگا دیا گیا`));
                                   } else if (info.offset.x < -100) {
                                     // Swipe left -> Absent
                                     setScratchAttendance(prev => ({ ...prev, [currentStudent.id]: 'absent' }));
                                     setActiveSwipeIndex(idx => idx + 1);
-                                    toast.error(`Marked ${currentStudent.name} as Absent`);
+                                    toast.error(L(`Marked ${currentStudent.name} as Absent`, `${currentStudent.name} کو غیر حاضر لگا دیا گیا`));
                                   }
                                 }}
                                 whileTap={{ scale: 1.02 }}
@@ -2653,10 +2653,10 @@ export default function TeacherDashboard({
                                 <div>
                                   <div className="flex justify-between items-center">
                                     <span className="font-mono text-xs font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">
-                                      Roll #{currentStudent.rollNumber}
+                                      {L('Roll #', 'رول نمبر')} {currentStudent.rollNumber}
                                     </span>
                                     <span className="text-xs text-teal-600 font-bold uppercase tracking-wider bg-teal-50 px-2 py-0.5 rounded-md">
-                                      👈 Swipe Left (A) | Swipe Right (P) 👉
+                                      👈 {L('Swipe Left (A) | Swipe Right (P)', 'بائیں سوائپ (غ) | دائیں سوائپ (ح)')} 👉
                                     </span>
                                   </div>
 
@@ -2682,7 +2682,7 @@ export default function TeacherDashboard({
                                   <div className="text-rose-600 font-black flex items-center gap-1 bg-rose-50 px-2 py-1 rounded-lg border border-rose-100">
                                     👈 ABSENT
                                   </div>
-                                  <span className="text-slate-400 text-xs uppercase font-semibold">Or tap buttons</span>
+                                  <span className="text-slate-400 text-xs uppercase font-semibold">{L('Or tap buttons', 'یا بٹن دبائیں')}</span>
                                   <div className="text-amber-600 font-black flex items-center gap-1 bg-amber-50 px-2 py-1 rounded-lg border border-amber-100">
                                     PRESENT 👉
                                   </div>
@@ -2708,7 +2708,7 @@ export default function TeacherDashboard({
                                   'bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-600 hover:text-white'
                                 }`}
                               >
-                                {st === 'present' ? 'âœ… Present' : st === 'absent' ? 'âŒ Absent' : st === 'late' ? 'â° Late' : 'ðŸ“„ Leave'}
+                                  {st === 'present' ? `✅ ${L('Present', 'حاضر')}` : st === 'absent' ? `❌ ${L('Absent', 'غیر حاضر')}` : st === 'late' ? `⏰ ${L('Late', 'تاخیر')}` : `📄 ${L('Leave', 'رخصت')}`}
                               </button>
                             ))}
                           </div>
@@ -2721,7 +2721,7 @@ export default function TeacherDashboard({
                             disabled={activeSwipeIndex === 0}
                             className="w-full py-2.5 bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200 text-xs font-bold uppercase tracking-wider disabled:opacity-40 rounded-xl cursor-pointer"
                           >
-                            âª Rewind Previous Student
+                            âª {L('Rewind Previous Student', 'پچھلے طالب علم پر جائیں')}
                           </button>
                         </div>
                       );
@@ -2733,20 +2733,20 @@ export default function TeacherDashboard({
                         ✓
                       </div>
                       <div>
-                        <h3 className="text-xl font-black text-slate-900 tracking-tight">All Student Cards Swiped!</h3>
-                        <p className="text-xs text-slate-500 mt-1">You have reviewed all student attendance records for this date.</p>
+                        <h3 className="text-xl font-black text-slate-900 tracking-tight">{L('All Student Cards Swiped!', 'تمام طلبہ کارڈ مکمل ہو گئے!')}</h3>
+                        <p className="text-xs text-slate-500 mt-1">{L('You have reviewed all student attendance records for this date.', 'آپ اس تاریخ کے تمام طلبہ کے حاضری ریکارڈ دیکھ چکے ہیں۔')}</p>
                       </div>
 
                       {/* Summary statistics */}
                       <div className="grid grid-cols-2 gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100 text-center">
                         <div>
-                          <p className="text-xs font-bold text-amber-600 uppercase tracking-wider font-mono">Present</p>
+                          <p className="text-xs font-bold text-amber-600 uppercase tracking-wider font-mono">{L('Present', 'حاضر')}</p>
                           <span className="text-2xl font-black text-amber-700">
                             {Object.values(scratchAttendance).filter(v => v === 'present').length}
                           </span>
                         </div>
                         <div>
-                          <p className="text-xs font-bold text-rose-500 uppercase tracking-wider font-mono">Absent</p>
+                          <p className="text-xs font-bold text-rose-500 uppercase tracking-wider font-mono">{L('Absent', 'غیر حاضر')}</p>
                           <span className="text-2xl font-black text-rose-800">
                             {Object.values(scratchAttendance).filter(v => v === 'absent').length}
                           </span>
@@ -2772,7 +2772,7 @@ export default function TeacherDashboard({
                     </div>
                   )
                 ) : (
-                  <div className="p-12 text-center text-slate-400 ">No students in this class.</div>
+                  <div className="p-12 text-center text-slate-400 ">{L('No students in this class.', 'اس کلاس میں کوئی طالب علم نہیں۔')}</div>
                 )}
               </div>
             )}
@@ -2785,16 +2785,16 @@ export default function TeacherDashboard({
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                     <div>
                       <h3 className="text-xs font-black uppercase tracking-widest text-amber-400 flex items-center gap-1.5 font-display">
-                        📢 WhatsApp Absent Alert Center
+                        📢 {L('WhatsApp Absent Alert Center', 'واٹس ایپ غیر حاضری الرٹ سینٹر')}
                       </h3>
                       <p className="text-xs text-teal-200">
-                        Prowl through absent registers on active date {attendanceDate} and execute direct manual alerts or auto rule models to parent contacts.
+                        {L('Prowl through absent registers on active date', 'منتخب تاریخ')} {attendanceDate} {L('and execute direct manual alerts or auto rule models to parent contacts.', 'کی غیر حاضری دیکھیں اور والدین کو دستی یا خودکار الرٹ بھیجیں۔')}
                       </p>
                     </div>
                     {absentsList.length > 0 && (
                       <div className="bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 flex items-center gap-2">
-                         <span className="text-xs font-black text-amber-500 uppercase tracking-widest">Read-Only View</span>
-                         <p className="text-xs text-slate-400 font-bold uppercase ">Absence alerts must be approved and dispatched by the school coordinator.</p>
+                         <span className="text-xs font-black text-amber-500 uppercase tracking-widest">{L('Read-Only View', 'صرف دیکھنے کی اجازت')}</span>
+                         <p className="text-xs text-slate-400 font-bold uppercase ">{L('Absence alerts must be approved and dispatched by the school coordinator.', 'غیر حاضری کے الرٹ اسکول کارڈینیٹر کی منظوری سے بھیجے جاتے ہیں۔')}</p>
                       </div>
                     )}
                   </div>
@@ -2806,11 +2806,11 @@ export default function TeacherDashboard({
                           <div key={st.id} className="bg-white/5 border border-white/10 p-3.5 space-y-2 flex flex-col">
                             <div className="flex justify-between items-start border-b border-white/5 pb-2">
                               <h4 className="text-xs font-bold text-white uppercase">{st.name}</h4>
-                              <span className="text-xs font-mono text-teal-300 font-bold bg-teal-500/10 px-1.5">Roll: #{st.rollNumber}</span>
+                              <span className="text-xs font-mono text-teal-300 font-bold bg-teal-500/10 px-1.5">{L('Roll', 'رول')}: #{st.rollNumber}</span>
                             </div>
                             <div className="pt-1">
-                              <p className="text-xs text-slate-400 font-black uppercase tracking-widest">Parent Name</p>
-                              <p className="text-xs text-amber-400 font-bold uppercase mt-0.5">{st.guardianName || 'Guardian'}</p>
+                              <p className="text-xs text-slate-400 font-black uppercase tracking-widest">{L('Parent Name', 'والد کا نام')}</p>
+                              <p className="text-xs text-amber-400 font-bold uppercase mt-0.5">{st.guardianName || L('Guardian', 'والدین')}</p>
                             </div>
                           </div>
                         );
@@ -2818,7 +2818,7 @@ export default function TeacherDashboard({
                     </div>
                   ) : (
                     <div className="p-4 bg-slate-850/50 border border-white/5 text-center text-xs text-slate-400 hover:text-white transition-all">
-                      ★ Perfect Attendance Record for {viewClass?.className || 'Class Group'} on Date {attendanceDate}! No Parent pings necessary.
+                      ★ {L('Perfect Attendance Record for', 'مکمل حاضری ریکارڈ —')} {viewClass?.className || L('Class Group', 'کلاس گروپ')} {L('on Date', 'بتاریخ')} {attendanceDate}! {L('No Parent pings necessary.', 'والدین کو اطلاع دینے کی ضرورت نہیں۔')}
                     </div>
                   )}
                 </div>
@@ -2836,7 +2836,7 @@ export default function TeacherDashboard({
                 <div>
                   <h2 className="text-xl sm:text-2xl font-black tracking-tight font-display uppercase leading-none flex items-center gap-3">
                     <ClipboardList size={24} className="text-amber-200 shrink-0" />
-                    Teacher Diary & Assignments
+                    {L('Teacher Diary & Assignments', 'استاد ڈائری و ہوم ورک')}
                   </h2>
                   <p className="text-xs text-amber-100 font-bold mt-2 uppercase tracking-widest">
                     Post homework instantly — visible only to the students of the selected class.
@@ -2853,18 +2853,18 @@ export default function TeacherDashboard({
             <div className="bg-white border border-slate-200 shadow-sm rounded-2xl p-6 space-y-5">
               <div className="flex items-center gap-2 border-b border-slate-100 pb-4">
                 <PlusCircle size={16} className="text-amber-600" />
-                <h3 className="text-sm font-black uppercase tracking-widest text-slate-900">Post New Assignment</h3>
+                <h3 className="text-sm font-black uppercase tracking-widest text-slate-900">{L('Post New Assignment', 'نیا ہوم ورک لگائیں')}</h3>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Class</label>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">{L('Class', 'کلاس')}</label>
                   <select
                     value={diaryClassId}
                     onChange={(e) => setDiaryClassId(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200 focus:border-amber-500 focus:bg-white p-3 text-xs font-bold outline-none transition-all rounded-xl cursor-pointer"
                   >
-                    {myClasses.length === 0 && <option value="">No assigned classes</option>}
+                    {myClasses.length === 0 && <option value="">{L('No assigned classes', 'کوئی تفویض شدہ کلاس نہیں')}</option>}
                     {myClasses.map(c => (
                       <option key={c.id} value={c.id}>{c.className}-{c.section}</option>
                     ))}
@@ -2872,10 +2872,10 @@ export default function TeacherDashboard({
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Subject</label>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">{L('Subject', 'مضمون')}</label>
                   <input
                     type="text"
-                    placeholder={teacherSubject || 'e.g. Mathematics'}
+                    placeholder={teacherSubject || L('e.g. Mathematics', 'مثلاً ریاضی')}
                     value={diarySubject}
                     onChange={(e) => setDiarySubject(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200 focus:border-amber-500 focus:bg-white p-3 text-xs font-bold outline-none transition-all rounded-xl"
@@ -2883,7 +2883,7 @@ export default function TeacherDashboard({
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Due Date</label>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">{L('Due Date', 'آخری تاریخ')}</label>
                   <input
                     type="date"
                     value={diaryDueDate}
@@ -2893,10 +2893,10 @@ export default function TeacherDashboard({
                 </div>
 
                 <div className="space-y-1.5 sm:col-span-2 lg:col-span-1">
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Assignment Title *</label>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">{L('Assignment Title *', 'ہوم ورک کا عنوان *')}</label>
                   <input
                     type="text"
-                    placeholder="e.g. Chapter 5 Exercise Questions"
+                    placeholder={L('e.g. Chapter 5 Exercise Questions', 'مثلاً باب 5 کے مشقی سوالات')}
                     value={diaryTitle}
                     onChange={(e) => setDiaryTitle(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200 focus:border-amber-500 focus:bg-white p-3 text-xs font-bold outline-none transition-all rounded-xl"
@@ -2905,10 +2905,10 @@ export default function TeacherDashboard({
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Instructions / Details</label>
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">{L('Instructions / Details', 'ہدایات / تفصیل')}</label>
                 <textarea
                   rows={3}
-                  placeholder="Write the assignment details, page numbers, or submission instructions here..."
+                  placeholder={L('Write the assignment details, page numbers, or submission instructions here...', 'یہاں ہوم ورک کی تفصیل، صفحہ نمبر یا جمع کرانے کی ہدایات لکھیں...')}
                   value={diaryDescription}
                   onChange={(e) => setDiaryDescription(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 focus:border-amber-500 focus:bg-white p-3 text-xs font-bold outline-none transition-all rounded-xl resize-none"
@@ -2927,15 +2927,15 @@ export default function TeacherDashboard({
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
-                  <ClipboardList size={14} /> My Posted Assignments
+                  <ClipboardList size={14} /> {L('My Posted Assignments', 'میرے لگائے گئے ہوم ورک')}
                 </h3>
               </div>
 
               {myAssignments.length === 0 ? (
                 <div className="py-14 text-center border-2 border-dashed border-slate-200 rounded-2xl bg-white/60">
                   <ClipboardList size={32} className="mx-auto text-amber-400 mb-3 opacity-30" />
-                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest">No assignments posted yet</p>
-                  <p className="text-[10px] font-bold text-slate-300 uppercase tracking-wider mt-1">Use the form above to publish homework to your class.</p>
+                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{L('No assignments posted yet', 'ابھی کوئی ہوم ورک نہیں لگایا گیا')}</p>
+                  <p className="text-[10px] font-bold text-slate-300 uppercase tracking-wider mt-1">{L('Use the form above to publish homework to your class.', 'اپنی کلاس کو ہوم ورک دینے کے لیے اوپر کا فارم استعمال کریں۔')}</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -2963,17 +2963,17 @@ export default function TeacherDashboard({
                           <button
                             onClick={() => handleDeleteAssignment(assn.id)}
                             className="p-2 text-slate-300 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all shrink-0 cursor-pointer"
-                            title="Delete assignment"
+                            title={L('Delete assignment', 'ہوم ورک حذف کریں')}
                           >
                             <Trash2 size={15} />
                           </button>
                         </div>
                         <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100">
                           <div className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${isOverdue ? 'bg-rose-50 text-rose-600 border border-rose-200' : 'bg-teal-50 text-teal-600 border border-teal-100'}`}>
-                            {isOverdue ? 'Overdue' : `Due: ${assn.dueDate}`}
+                            {isOverdue ? L('Overdue', 'تاریخ گزر گئی') : `${L('Due', 'آخری تاریخ')}: ${assn.dueDate}`}
                           </div>
                           <span className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">
-                            Posted {assn.createdAt ? new Date(assn.createdAt).toLocaleDateString() : ''}
+                            {L('Posted', 'لگایا گیا')} {assn.createdAt ? new Date(assn.createdAt).toLocaleDateString() : ''}
                           </span>
                         </div>
                       </div>
@@ -3020,9 +3020,9 @@ export default function TeacherDashboard({
               /* ========== EXAM MARKS ENTRY (bulk, any exam) ========== */
               <div id="teacher-exam-marks-builder" className="space-y-6">
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Exam Marks Entry</h1>
+                  <h1 className="text-2xl font-bold text-gray-900">{L('Exam Marks Entry', 'امتحان کے نمبر درج کریں')}</h1>
                   <p className="text-xs text-slate-500 mt-1 font-bold uppercase tracking-wider">
-                    Enter marks for ALL students of the selected class for any exam — 1st / 2nd / 3rd Term, Annual, Monthly Test, or any custom name.
+                    {L('Enter marks for ALL students of the selected class for any exam — 1st / 2nd / 3rd Term, Annual, Monthly Test, or any custom name.', 'منتخب کلاس کے تمام طلبہ کے نمبر کسی بھی امتحان — پہلی / دوسری / تیسری ششماہی، سالانہ، ماہانہ ٹیسٹ یا کوئی بھی نام — کے لیے درج کریں۔')}
                   </p>
                 </div>
 
@@ -3030,7 +3030,7 @@ export default function TeacherDashboard({
                 <div className="bg-white border border-teal-200 rounded-2xl p-5 shadow-sm space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
                     <div className="space-y-1">
-                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest">Class</label>
+                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest">{L('Class', 'کلاس')}</label>
                       <select
                         value={selectedMarkClassId}
                         onChange={(e) => {
@@ -3042,7 +3042,7 @@ export default function TeacherDashboard({
                         }}
                         className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:border-teal-500"
                       >
-                        <option value="">-- Choose Class --</option>
+                        <option value="">{L('-- Choose Class --', '-- کلاس منتخب کریں --')}</option>
                         {myClasses.map(cl => (
                           <option key={cl.id} value={cl.id}>{cl.className} ({cl.section})</option>
                         ))}
@@ -3050,7 +3050,7 @@ export default function TeacherDashboard({
                     </div>
 
                     <div className="space-y-1">
-                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest">Subject</label>
+                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest">{L('Subject', 'مضمون')}</label>
                       {selectedSubject !== '__manual__' ? (
                         <select
                           value={selectedSubject}
@@ -3068,7 +3068,7 @@ export default function TeacherDashboard({
                           }}
                           className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:border-teal-500"
                         >
-                          <option value="">-- Choose Subject --</option>
+                          <option value="">{L('-- Choose Subject --', '-- مضمون منتخب کریں --')}</option>
                           {(() => {
                             const cs = selectedMarkClassId ? (classes.find(c => String(c.id) === String(selectedMarkClassId))?.subjects || []) : [];
                             const opts = cs.length > 0 ? cs : [teacherSubject, ...SUBJECT_OPTIONS.filter(s => s.toLowerCase() !== (teacherSubject || '').toLowerCase())];
@@ -3076,7 +3076,7 @@ export default function TeacherDashboard({
                               <option key={sub} value={sub}>{sub}</option>
                             ));
                           })()}
-                          <option value="__manual__">➕ Add Manual Subject</option>
+                          <option value="__manual__">{L('➕ Add Manual Subject', '➕ نیا مضمون شامل کریں')}</option>
                         </select>
                       ) : (
                         <div className="flex items-center gap-2">
@@ -3095,14 +3095,14 @@ export default function TeacherDashboard({
                                 handleEnterMarksTab(selectedMarkClassId, manualSubjectInput.trim(), selectedExamType);
                               }
                             }}
-                            placeholder="Type subject name (e.g. Quran, Art)"
+                            placeholder={L('Type subject name (e.g. Quran, Art)', 'مضمون کا نام لکھیں (مثلاً قرآن، آرٹ)')}
                             className="w-full px-3 py-2 bg-white border border-teal-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:border-teal-500"
                           />
                           <button
                             type="button"
                             onClick={() => { setManualSubjectInput(''); setSelectedSubject(''); }}
                             className="px-2.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-lg text-xs font-black uppercase transition-all cursor-pointer"
-                            title="Back to list"
+                            title={L('Back to list', 'فہرست پر واپس')}
                           >
                             ✕
                           </button>
@@ -3111,12 +3111,12 @@ export default function TeacherDashboard({
                     </div>
 
                     <div className="space-y-1">
-                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest">Exam Name</label>
+                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest">{L('Exam Name', 'امتحان کا نام')}</label>
                       <input
                         list="teacher-exam-names-list"
                         value={examNameDraft}
                         onChange={(e) => setExamNameDraft(e.target.value)}
-                        placeholder="e.g. 1st Term / Annual"
+                        placeholder={L('e.g. 1st Term / Annual', 'مثلاً پہلی ششماہی / سالانہ')}
                         className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-xs font-bold text-teal-800 focus:outline-none focus:border-teal-500"
                       />
                       <datalist id="teacher-exam-names-list">
@@ -3125,7 +3125,7 @@ export default function TeacherDashboard({
                     </div>
 
                     <div className="space-y-1">
-                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest">Total / Max Marks</label>
+                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest">{L('Total / Max Marks', 'کل / زیادہ سے زیادہ نمبر')}</label>
                       <input
                         type="number"
                         min="1"
@@ -3138,17 +3138,17 @@ export default function TeacherDashboard({
                     <div>
                       <button
                         onClick={() => {
-                          if (!selectedMarkClassId) { toast.error('Please select a class first.'); return; }
-                          if (!selectedSubject.trim()) { toast.error('Please select a subject.'); return; }
+                          if (!selectedMarkClassId) { toast.error(L('Please select a class first.', 'پہلے کلاس منتخب کریں۔')); return; }
+                          if (!selectedSubject.trim()) { toast.error(L('Please select a subject.', 'مضمون منتخب کریں۔')); return; }
                           const exam = examNameDraft.trim() || 'Monthly Test';
                           setSelectedExamType(exam);
                           setExamNameDraft(exam);
                           handleEnterMarksTab(selectedMarkClassId, selectedSubject, exam);
-                          toast.success(`Roster loaded for ${exam} — enter marks below`);
+                          toast.success(L(`Roster loaded for ${exam} — enter marks below`, `${exam} کی فہرست لوڈ ہو گئی — نیچے نمبر درج کریں`));
                         }}
                         className="w-full px-4 py-2 bg-teal-600 text-white hover:bg-teal-700 rounded-lg text-xs font-black uppercase tracking-wider shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
                       >
-                        <RefreshCw size={14} /> Load Roster
+                        <RefreshCw size={14} /> {L('Load Roster', 'فہرست لوڈ کریں')}
                       </button>
                     </div>
                   </div>
@@ -3172,7 +3172,7 @@ export default function TeacherDashboard({
                   return (
                     <div className="bg-white border border-slate-200 rounded-2xl p-4 mb-4 space-y-2">
                       <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                        <Award size={12} className="text-teal-500" /> Saved Exams — long-press to Edit / Delete
+                        <Award size={12} className="text-teal-500" /> {L('Saved Exams — long-press to Edit / Delete', 'محفوظ امتحانات — ترمیم / حذف کے لیے دیر تک دبائیں')}
                       </h4>
                       {savedExams.map(se => {
                         const cls = classes.find(c => c.id === se.classId);
@@ -3182,22 +3182,22 @@ export default function TeacherDashboard({
                             onEdit={() => {
                               handleEnterMarksTab(se.classId, se.subject, se.exam as ExamType);
                               setExamNameDraft(se.exam);
-                              toast.success(`Editing: ${se.exam} · ${se.subject} — roster loaded with existing marks`);
+                              toast.success(L(`Editing: ${se.exam} · ${se.subject} — roster loaded with existing marks`, `ترمیم: ${se.exam} · ${se.subject} — موجودہ نمبروں کے ساتھ فہرست لوڈ ہو گئی`));
                             }}
                             onDelete={() => {
-                              if (!window.confirm(`Delete ALL marks for "${se.exam} · ${se.subject}"?`)) return;
+                              if (!window.confirm(L(`Delete ALL marks for \"${se.exam} · ${se.subject}\"?`, `\"${se.exam} · ${se.subject}\" کے تمام نمبر حذف کریں؟`))) return;
                               const removed = marks.filter(x => (x.examType || '') === se.exam && (x.subject || '').toLowerCase() === se.subject.toLowerCase() && students.some(s => String(s.id) === String(x.studentId) && s.classId === se.classId));
-                              if (removed.length === 0) { toast.error('No marks found to delete.'); return; }
+                              if (removed.length === 0) { toast.error(L('No marks found to delete.', 'حذف کرنے کے لیے کوئی نمبر نہیں ملا۔')); return; }
                               setMarks(prev => prev.filter(m => !removed.includes(m)));
                               syncMarksToFirestore(removed, []);
-                              toast.success(`${removed.length} marks deleted.`);
+                              toast.success(L(`${removed.length} marks deleted.`, `${removed.length} نمبر حذف ہو گئے۔`));
                             }}
                             className="rounded-xl border border-slate-100"
                           >
                             <div className="px-3 py-2.5 flex items-center justify-between gap-2 cursor-pointer">
                               <div className="min-w-0">
                                 <p className="text-xs font-black text-slate-800 truncate">{se.exam}</p>
-                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider truncate">{se.subject} · {cls ? `Class ${cls.className}${cls.section ? '-' + cls.section : ''}` : 'Class'}</p>
+                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider truncate">{se.subject} · {cls ? `Class ${cls.className}${cls.section ? '-' + cls.section : ''}` : L('Class', 'کلاس')}</p>
                               </div>
                               <span className="text-[10px] font-black text-teal-600 shrink-0">{se.count} marks</span>
                             </div>
@@ -3219,9 +3219,9 @@ export default function TeacherDashboard({
                         <div className="w-16 h-16 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center mb-4 text-slate-300">
                           <Award size={24} />
                         </div>
-                        <h3 className="text-sm font-bold text-slate-700">Configure the Exam First</h3>
+                        <h3 className="text-sm font-bold text-slate-700">{L('Configure the Exam First', 'پہلے امتحان ترتیب دیں')}</h3>
                         <p className="text-xs text-slate-400 max-w-sm mx-auto mt-2 leading-relaxed">
-                          Choose the class, subject and exam name (e.g. 1st Term, 2nd Term, 3rd Term, Annual, Monthly Test) then press Load Roster to begin entering marks.
+                          {L('Choose the class, subject and exam name (e.g. 1st Term, 2nd Term, 3rd Term, Annual, Monthly Test) then press Load Roster to begin entering marks.', 'کلاس، مضمون اور امتحان کا نام منتخب کریں (مثلاً پہلی، دوسری، تیسری ششماہی، سالانہ، ماہانہ ٹیسٹ) اور پھر نمبر درج کرنے کے لیے "فہرست لوڈ کریں" دبائیں۔')}
                         </p>
                       </div>
                     );
@@ -3231,10 +3231,10 @@ export default function TeacherDashboard({
                     <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-xs">
                       <div className="p-4 sm:p-5 border-b border-gray-100 bg-teal-50/50 flex flex-wrap items-center justify-between gap-3">
                         <h3 className="text-sm font-black text-teal-900 uppercase tracking-widest flex items-center gap-2">
-                          <Award size={16} className="text-teal-600" /> {selectedExamType} Marks — {selectedSubject}
+                          <Award size={16} className="text-teal-600" /> {selectedExamType} {L('Marks', 'نمبر')} — {selectedSubject}
                         </h3>
                         <span className="text-xs font-black text-slate-500 uppercase tracking-wider bg-white border border-teal-100 px-3 py-1 rounded-full">
-                          {examClassStudents.length} Student(s) · Total {maxMarksInput}
+                          {examClassStudents.length} {L('Student(s)', 'طالب علم')} · {L('Total', 'کل')} {maxMarksInput}
                         </span>
                       </div>
 
@@ -3242,7 +3242,7 @@ export default function TeacherDashboard({
                       <div className="block md:hidden divide-y divide-slate-100">
                         {examClassStudents.length === 0 ? (
                           <div className="py-10 text-center text-slate-400 text-xs font-bold uppercase tracking-widest">
-                            No students enrolled in this class.
+                            {L('No students enrolled in this class.', 'اس کلاس میں کوئی طالب علم داخل نہیں۔')}
                           </div>
                         ) : (
                           examClassStudents.map((s, idx) => (
@@ -3252,15 +3252,15 @@ export default function TeacherDashboard({
                                   <span className="text-xs font-black text-teal-500 w-6 shrink-0">#{idx + 1}</span>
                                   <div className="min-w-0">
                                     <h4 className="font-black text-slate-900 uppercase tracking-tight text-xs truncate">{s.name}</h4>
-                                    <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mt-0.5">Roll #{s.rollNumber}</p>
+                                    <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mt-0.5">{L('Roll #', 'رول نمبر')} {s.rollNumber}</p>
                                   </div>
                                 </div>
                               </div>
                               <div className="flex items-center justify-between gap-3 pt-2.5 border-t border-slate-100">
-                                <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Obtained Marks</span>
+                                <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{L('Obtained Marks', 'حاصل کردہ نمبر')}</span>
                                 <div className="flex items-center gap-2">
                                   {['absent', 'leave'].includes(getStudentAttendanceStatus(s.id, attendanceDate) || '') ? (
-                                    <span className="px-3 py-2 bg-rose-50 border border-rose-200 rounded-lg text-sm text-center font-extrabold text-rose-600 w-24">Absent</span>
+                                    <span className="px-3 py-2 bg-rose-50 border border-rose-200 rounded-lg text-sm text-center font-extrabold text-rose-600 w-24">{L('Absent', 'غیر حاضر')}</span>
                                   ) : (
                                     <input
                                       type="number"
@@ -3286,17 +3286,17 @@ export default function TeacherDashboard({
                           <thead>
                             <tr className="border-b border-gray-100 text-xs font-bold text-gray-500 uppercase tracking-widest bg-gray-50">
                               <th className="px-6 py-4 w-14">#</th>
-                              <th className="px-6 py-4">Roll No</th>
-                              <th className="px-6 py-4">Student</th>
-                              <th className="px-6 py-4 text-center w-44">Obtained Marks</th>
-                              <th className="px-6 py-4 text-center w-20">Total</th>
+                              <th className="px-6 py-4">{L('Roll No', 'رول نمبر')}</th>
+                              <th className="px-6 py-4">{L('Student', 'طالب علم')}</th>
+                              <th className="px-6 py-4 text-center w-44">{L('Obtained Marks', 'حاصل کردہ نمبر')}</th>
+                              <th className="px-6 py-4 text-center w-20">{L('Total', 'کل')}</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-gray-150 text-sm">
                             {examClassStudents.length === 0 ? (
                               <tr>
                                 <td colSpan={5} className="px-6 py-12 text-center text-gray-400 text-sm font-medium">
-                                  No students enrolled in this class.
+                                  {L('No students enrolled in this class.', 'اس کلاس میں کوئی طالب علم داخل نہیں۔')}
                                 </td>
                               </tr>
                             ) : (
@@ -3307,7 +3307,7 @@ export default function TeacherDashboard({
                                   <td className="px-6 py-3 font-bold text-slate-900 uppercase tracking-tight">{s.name}</td>
                                   <td className="px-6 py-3 text-center">
                                     {['absent', 'leave'].includes(getStudentAttendanceStatus(s.id, attendanceDate) || '') ? (
-                                      <span className="px-3 py-2 bg-rose-50 border border-rose-200 rounded-lg text-sm text-center font-extrabold text-rose-600 inline-block">Absent</span>
+                                      <span className="px-3 py-2 bg-rose-50 border border-rose-200 rounded-lg text-sm text-center font-extrabold text-rose-600 inline-block">{L('Absent', 'غیر حاضر')}</span>
                                     ) : (
                                       <input
                                         type="number"
@@ -3348,13 +3348,13 @@ export default function TeacherDashboard({
               <>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Student Report Card Builder</h1>
+                <h1 className="text-2xl font-bold text-gray-900">{L('Student Report Card Builder', 'طلبہ رپورٹ کارڈ بنائیں')}</h1>
               </div>
 
               {/* Filter tools */}
               <div className="flex flex-wrap items-center gap-4">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-semibold text-gray-500">Select Class:</span>
+                  <span className="text-xs font-semibold text-gray-500">{L('Select Class', 'کلاس منتخب کریں')}:</span>
                   <select
                     id="marks-class-select"
                     value={selectedMarkClassId}
@@ -3364,7 +3364,7 @@ export default function TeacherDashboard({
                     }}
                     className="px-2 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:border-amber-500"
                   >
-                    <option value="">-- Choose Class --</option>
+                    <option value="">{L('-- Choose Class --', '-- کلاس منتخب کریں --')}</option>
                     {myClasses.map(cl => (
                       <option key={cl.id} value={cl.id}>{cl.className} ({cl.section})</option>
                     ))}
@@ -3373,13 +3373,13 @@ export default function TeacherDashboard({
                 
                 {selectedMarkClassId && (
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-semibold text-gray-500">Select Student:</span>
+                    <span className="text-xs font-semibold text-gray-500">{L('Select Student', 'طالب علم منتخب کریں')}:</span>
                     <select
                       value={reportStudentId}
                       onChange={(e) => setReportStudentId(e.target.value)}
                       className="px-2 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-bold text-teal-800 focus:outline-none focus:border-teal-500 w-48"
                     >
-                      <option value="">-- Choose Student --</option>
+                      <option value="">{L('-- Choose Student --', '-- طالب علم منتخب کریں --')}</option>
                       {students.filter(s => s.classId === selectedMarkClassId).map(st => (
                         <option key={st.id} value={st.id}>{st.rollNumber} - {st.name}</option>
                       ))}
@@ -3413,17 +3413,17 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                   {/* Student + Exam Name Header */}
                   <div className="bg-gradient-to-r from-teal-600 to-teal-600 text-white p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
                     <div>
-                      <p className="text-[10px] uppercase tracking-[0.3em] opacity-80">Report Card For</p>
+                      <p className="text-[10px] uppercase tracking-[0.3em] opacity-80">{L('Report Card For', 'رپورٹ کارڈ برائے')}</p>
                       <h3 className="text-lg font-black uppercase tracking-tight leading-tight">{student.name}</h3>
                       <p className="text-xs opacity-90 mt-0.5">Roll #{student.rollNumber} · {classesMap.get(String(student.classId))?.className || 'N/A'}{classesMap.get(String(student.classId))?.section ? ` - ${classesMap.get(String(student.classId))?.section}` : ''}</p>
                     </div>
                     <div className="w-full sm:w-64">
-                      <label className="block text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Exam / Assessment Name</label>
+                      <label className="block text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">{L('Exam / Assessment Name', 'امتحان / جانچ کا نام')}</label>
                       <input
                         type="text"
                         value={reportExamName}
                         onChange={(e) => setReportExamName(e.target.value)}
-                        placeholder="e.g. 1st Term 2025"
+                        placeholder={L('e.g. 1st Term 2025', 'مثلاً پہلی ششماہی 2025')}
                         className="w-full px-3 py-2 bg-white border border-white/30 rounded-lg text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-white"
                       />
                     </div>
@@ -3433,30 +3433,30 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                   <div className="bg-teal-50/50 border border-teal-100/50 rounded-xl p-4 shadow-sm">
                     <div className="flex items-center gap-2 mb-3">
                       <div className="bg-teal-100 text-teal-700 p-1.5 rounded-lg"><Award size={16} /></div>
-                      <h3 className="text-sm font-bold text-teal-900">Add Subject to Report</h3>
+                      <h3 className="text-sm font-bold text-teal-900">{L('Add Subject to Report', 'رپورٹ میں مضمون شامل کریں')}</h3>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
                       <div className="sm:col-span-3 space-y-1">
-                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest">Active Subject</label>
+                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest">{L('Active Subject', 'فعال مضمون')}</label>
                         {reportSubjectToAdd !== 'Other' ? (
                           <select
                             value={reportSubjectToAdd}
                             onChange={(e) => setReportSubjectToAdd(e.target.value)}
                             className="w-full px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-slate-950 focus:outline-none focus:border-teal-500"
                           >
-                            <option value="">Select Subject</option>
-                            <option value="English">English</option>
-                            <option value="Mathematics">Mathematics</option>
-                            <option value="Science">Science</option>
-                            <option value="Urdu">Urdu</option>
-                            <option value="Islamiat">Islamiat</option>
-                            <option value="Computer">Computer</option>
-                            <option value="Physics">Physics</option>
-                            <option value="Chemistry">Chemistry</option>
-                            <option value="Biology">Biology</option>
-                            <option value="History">History</option>
-                            <option value="Geography">Geography</option>
-                            <option value="Other">➕ Manual Subject...</option>
+                            <option value="">{L('Select Subject', 'مضمون منتخب کریں')}</option>
+                            <option value="English">{L('English', 'انگریزی')}</option>
+                            <option value="Mathematics">{L('Mathematics', 'ریاضی')}</option>
+                            <option value="Science">{L('Science', 'سائنس')}</option>
+                            <option value="Urdu">{L('Urdu', 'اردو')}</option>
+                            <option value="Islamiat">{L('Islamiat', 'اسلامیات')}</option>
+                            <option value="Computer">{L('Computer', 'کمپیوٹر')}</option>
+                            <option value="Physics">{L('Physics', 'فزکس')}</option>
+                            <option value="Chemistry">{L('Chemistry', 'کیمسٹری')}</option>
+                            <option value="Biology">{L('Biology', 'بیالوجی')}</option>
+                            <option value="History">{L('History', 'تاریخ')}</option>
+                            <option value="Geography">{L('Geography', 'جغرافیہ')}</option>
+                            <option value="Other">{L('➕ Manual Subject...', '➕ نیا مضمون...')}</option>
                           </select>
                         ) : (
                           <div className="flex items-center gap-2">
@@ -3464,14 +3464,14 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                               type="text"
                               value={reportManualSubject}
                               onChange={(e) => setReportManualSubject(e.target.value)}
-                              placeholder="Type subject name (e.g. Quran, Art)"
+                              placeholder={L('Type subject name (e.g. Quran, Art)', 'مضمون کا نام لکھیں (مثلاً قرآن، آرٹ)')}
                               className="w-full px-3 py-1.5 bg-white border border-teal-300 rounded-lg text-xs font-semibold text-slate-950 focus:outline-none focus:border-teal-500"
                             />
                             <button
                               type="button"
                               onClick={() => { setReportManualSubject(''); setReportSubjectToAdd(''); }}
                               className="px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-lg text-xs font-black transition-all cursor-pointer"
-                              title="Back to list"
+                              title={L('Back to list', 'فہرست پر واپس')}
                             >
                               ✕
                             </button>
@@ -3480,12 +3480,12 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                       </div>
 
                       <div className="sm:col-span-4 space-y-1">
-                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest">Book / Test Reference</label>
+                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest">{L('Book / Test Reference', 'کتاب / ٹیسٹ حوالہ')}</label>
                         <input
                           type="text"
                           value={reportRefToAdd}
                           onChange={(e) => setReportRefToAdd(e.target.value)}
-                          placeholder="e.g. Oxford Book Ch 2, Mid Term"
+                          placeholder={L('e.g. Oxford Book Ch 2, Mid Term', 'مثلاً آکسفورڈ باب 2، ششماہی')}
                           className="w-full px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-slate-950 focus:outline-none focus:border-teal-500"
                         />
                       </div>
@@ -3495,7 +3495,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                           type="button"
                           onClick={() => {
                             const finalSubject = reportSubjectToAdd === 'Other' ? reportManualSubject.trim() : reportSubjectToAdd.trim();
-                            if (!finalSubject) { toast.error('Please enter a subject'); return; }
+                            if (!finalSubject) { toast.error(L('Please enter a subject', 'مضمون لکھیں')); return; }
                             setReportSubjectsList([...reportSubjectsList, { 
                               id: Date.now().toString(), 
                               subject: finalSubject, 
@@ -3506,12 +3506,12 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                             setReportSubjectToAdd('');
                             setReportManualSubject('');
                             setReportRefToAdd('');
-                            toast.success('Subject row added below');
+                            toast.success(L('Subject row added below', 'مضمون کی سطر نیچے شامل ہو گئی'));
                           }}
                           className="py-1.5 px-4 bg-teal-600 text-white hover:bg-teal-700 rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm transition-all flex items-center gap-2"
                         >
                           <Plus size={14} />
-                          Add subject to Report
+                          {L('Add subject to Report', 'رپورٹ میں مضمون شامل کریں')}
                         </button>
                       </div>
                     </div>
@@ -3546,7 +3546,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                           }}
                           className="shrink-0 px-3.5 py-2 bg-teal-50 text-teal-600 hover:bg-teal-600 hover:text-white border border-teal-100 rounded-lg text-xs font-black uppercase tracking-widest transition-all shadow-sm"
                         >
-                          Profile
+                          {L('Profile', 'پروفائل')}
                         </button>
                       </div>
                       <div className="flex items-center justify-between gap-2 pt-2.5 mt-2.5 border-t border-slate-100">
@@ -3557,7 +3557,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                   ))
                 ) : (
                   <div className="py-12 text-center text-gray-400 text-sm">
-                    No student profiles enrolled inside this class register.
+                    {L('No student profiles enrolled inside this class register.', 'اس کلاس رجسٹر میں کوئی طالب علم درج نہیں۔')}
                   </div>
                 )}
               </div>
@@ -3567,18 +3567,18 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                       <table className="w-full text-left">
                         <thead>
                           <tr className="border-b border-gray-100 text-xs font-bold text-gray-500 uppercase tracking-widest bg-gray-50">
-                            <th className="px-6 py-4">Subject</th>
-                            <th className="px-6 py-4">Assessment Reference</th>
-                            <th className="px-6 py-4 text-center">Total Marks</th>
-                            <th className="px-6 py-4 text-center">Obtained Marks</th>
-                            <th className="px-4 py-4 text-center w-16">Action</th>
+                            <th className="px-6 py-4">{L('Subject', 'مضمون')}</th>
+                            <th className="px-6 py-4">{L('Assessment Reference', 'جانچ کا حوالہ')}</th>
+                            <th className="px-6 py-4 text-center">{L('Total Marks', 'کل نمبر')}</th>
+                            <th className="px-6 py-4 text-center">{L('Obtained Marks', 'حاصل کردہ نمبر')}</th>
+                            <th className="px-4 py-4 text-center w-16">{L('Action', 'کارروائی')}</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-150 text-sm">
                           {reportSubjectsList.length === 0 ? (
                             <tr>
                               <td colSpan={5} className="px-6 py-12 text-center text-gray-400 text-sm  font-medium">
-                                No subjects added to this report card yet. Select a subject above and press Add.
+                                {L('No subjects added to this report card yet. Select a subject above and press Add.', 'اس رپورٹ کارڈ میں ابھی کوئی مضمون شامل نہیں۔ اوپر سے مضمون منتخب کر کے شامل کریں دبائیں۔')}
                               </td>
                             </tr>
                           ) : (
@@ -3653,21 +3653,21 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                     <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
                       <div className="bg-gradient-to-r from-teal-600 to-teal-600 text-white px-5 py-4 flex items-center justify-between gap-3">
                         <div>
-                          <h3 className="text-base font-black uppercase tracking-wide">Result Card</h3>
-                          <p className="text-xs opacity-90">{reportExamName.trim() || 'General Assessment'}</p>
+                          <h3 className="text-base font-black uppercase tracking-wide">{L('Result Card', 'رزلٹ کارڈ')}</h3>
+                          <p className="text-xs opacity-90">{reportExamName.trim() || L('General Assessment', 'عمومی جانچ')}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-[10px] opacity-80 uppercase tracking-widest">Overall</p>
+                          <p className="text-[10px] opacity-80 uppercase tracking-widest">{L('Overall', 'مجموعی')}</p>
                           <p className="text-3xl font-black leading-none">{overallPct}%</p>
                         </div>
                       </div>
                       <table className="w-full text-left">
                         <thead>
                           <tr className="border-b border-slate-100 text-xs font-bold text-slate-500 uppercase tracking-widest bg-slate-50">
-                            <th className="px-5 py-3">Subject</th>
-                            <th className="px-5 py-3">Reference</th>
-                            <th className="px-5 py-3 text-center">Marks</th>
-                            <th className="px-5 py-3 text-center">Percentage</th>
+                            <th className="px-5 py-3">{L('Subject', 'مضمون')}</th>
+                            <th className="px-5 py-3">{L('Reference', 'حوالہ')}</th>
+                            <th className="px-5 py-3 text-center">{L('Marks', 'نمبر')}</th>
+                            <th className="px-5 py-3 text-center">{L('Percentage', 'فیصد')}</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
@@ -3689,15 +3689,15 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                         </tbody>
                         <tfoot>
                           <tr className="bg-slate-50 border-t border-slate-200">
-                            <td colSpan={2} className="px-5 py-3 font-black text-slate-900 uppercase text-xs">Total</td>
+                            <td colSpan={2} className="px-5 py-3 font-black text-slate-900 uppercase text-xs">{L('Total', 'کل')}</td>
                             <td className="px-5 py-3 text-center font-black text-slate-900">{totalObtained}/{totalMax}</td>
                             <td className="px-5 py-3 text-center font-black text-teal-700">{overallPct}%</td>
                           </tr>
                         </tfoot>
                       </table>
                       <div className="px-5 py-3 flex items-center justify-between bg-white border-t border-slate-100">
-                        <span className={`text-sm font-black uppercase tracking-wider px-3 py-1 rounded-full ${overallPct >= 40 ? 'bg-amber-600 text-white' : 'bg-rose-600 text-white'}`}>{overallPct >= 40 ? 'PASS' : 'RE-STUDY'}</span>
-                        <span className="text-xs text-slate-400">Generated from entered marks</span>
+                        <span className={`text-sm font-black uppercase tracking-wider px-3 py-1 rounded-full ${overallPct >= 40 ? 'bg-amber-600 text-white' : 'bg-rose-600 text-white'}`}>{overallPct >= 40 ? L('PASS', 'کامیاب') : L('RE-STUDY', 'دوبارہ پڑھائی')}</span>
+                        <span className="text-xs text-slate-400">{L('Generated from entered marks', 'درج شدہ نمبروں سے تیار شدہ')}</span>
                       </div>
                     </div>
                   )}
@@ -3709,9 +3709,9 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                 <div className="w-16 h-16 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center mb-4 text-slate-300">
                   <Award size={24} />
                 </div>
-                <h3 className="text-sm font-bold text-slate-700">No Student Selected</h3>
+                <h3 className="text-sm font-bold text-slate-700">{L('No Student Selected', 'کوئی طالب علم منتخب نہیں')}</h3>
                 <p className="text-xs text-slate-400 max-w-sm mx-auto mt-2 leading-relaxed">
-                  Please select a class and then choose a student from the dropdown above to begin building their multi-subject report card.
+                  {L('Please select a class and then choose a student from the dropdown above to begin building their multi-subject report card.', 'پہلے کلاس منتخب کریں اور پھر اوپر کی فہرست سے طالب علم چنیں تاکہ کثیر المضمون رپورٹ کارڈ بنایا جا سکے۔')}
                 </p>
               </div>
              )}
@@ -3720,32 +3720,32 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                {marksSubTab === 'report' && (
                <div id="teacher-student-result-card" className="space-y-6">
                  <div>
-                   <h1 className="text-2xl font-bold text-gray-900">Exam / Test Marks Entry</h1>
-                   <p className="text-xs text-slate-500 mt-1 font-bold uppercase tracking-wider">First add the exam/test name and its subjects, then click a student to enter their marks for that complete test.</p>
+                   <h1 className="text-2xl font-bold text-gray-900">{L('Exam / Test Marks Entry', 'امتحان / ٹیسٹ نمبر اندراج')}</h1>
+                   <p className="text-xs text-slate-500 mt-1 font-bold uppercase tracking-wider">{L('First add the exam/test name and its subjects, then click a student to enter their marks for that complete test.', 'پہلے امتحان / ٹیسٹ کا نام اور اس کے مضامین شامل کریں، پھر نمبر درج کرنے کے لیے کسی طالب علم پر کلک کریں۔')}</p>
                  </div>
 
                  {/* Step 1: Class + Exam/Test name */}
                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                    <div className="bg-teal-50/50 border border-teal-100/50 rounded-xl p-4 shadow-sm space-y-1">
-                     <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest">Select Class</label>
+                     <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest">{L('Select Class', 'کلاس منتخب کریں')}</label>
                      <select
                        value={selectedMarkClassId}
                        onChange={(e) => { setSelectedMarkClassId(e.target.value); setCardStudentId(''); setCardObtained({}); }}
                        className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold text-slate-950 focus:outline-none focus:border-teal-500"
                      >
-                       <option value="">-- Choose Class --</option>
+                       <option value="">{L('-- Choose Class --', '-- کلاس منتخب کریں --')}</option>
                        {myClasses.map(cl => (
                          <option key={cl.id} value={cl.id}>{cl.className} ({cl.section})</option>
                        ))}
                      </select>
                    </div>
                    <div className="bg-teal-50/50 border border-teal-100/50 rounded-xl p-4 shadow-sm space-y-1">
-                     <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest">Exam / Test Name</label>
+                     <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest">{L('Exam / Test Name', 'امتحان / ٹیسٹ کا نام')}</label>
                      <input
                        type="text"
                        value={cardExamName}
                        onChange={(e) => setCardExamName(e.target.value)}
-                       placeholder="e.g. 1st Term 2025 / Weekly Test 3"
+                       placeholder={L('e.g. 1st Term 2025 / Weekly Test 3', 'مثلاً پہلی ششماہی 2025 / ہفتہ وار ٹیسٹ 3')}
                        className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold text-slate-950 placeholder:text-slate-400 focus:outline-none focus:border-teal-500"
                      />
                    </div>
@@ -3757,9 +3757,9 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                           <div className="bg-amber-100 text-amber-700 p-1.5 rounded-lg"><ClipboardList size={16} /></div>
-                          <h3 className="text-sm font-bold text-slate-700">Saved Tests / Exams</h3>
+                          <h3 className="text-sm font-bold text-slate-700">{L('Saved Tests / Exams', 'محفوظ ٹیسٹ / امتحانات')}</h3>
                         </div>
-                        <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">Click to open &amp; view marks</span>
+                        <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">{L('Click to open & view marks', 'نمبر دیکھنے کے لیے کلک کریں')}</span>
                       </div>
                       {(() => {
                         const css = students.filter(s => String(s.classId) === String(selectedMarkClassId));
@@ -3768,7 +3768,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                           marks.filter(m => classMarkIds.has(String(m.studentId))).map(m => m.examType)
                         )).filter(Boolean);
                         if (testNames.length === 0) {
-                          return <p className="text-xs text-slate-400">No saved tests yet for this class. Create one above.</p>;
+                          return <p className="text-xs text-slate-400">{L('No saved tests yet for this class. Create one above.', 'اس کلاس کے لیے ابھی کوئی محفوظ ٹیسٹ نہیں۔ اوپر نیا بنائیں۔')}</p>;
                         }
                         return (
                           <div className="flex flex-wrap gap-2">
@@ -3782,7 +3782,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                                   tMarks.forEach(m => { if (!(m.subject in subjMap)) subjMap[m.subject] = m.maxMarks; });
                                   const rec = Object.keys(subjMap).map((s, i) => ({ id: 'sv_' + i, subject: s, maxMarks: String(subjMap[s]) }));
                                   setCardExamName(tn); setCardSubjects(rec); setCardStudentId(''); setCardObtained({});
-                                  toast.success('Opened saved test: ' + tn);
+                                  toast.success(L('Opened saved test: ', 'محفوظ ٹیسٹ کھل گیا: ') + tn);
                                 }} className="text-left bg-amber-50 border border-amber-100 hover:bg-amber-100 text-amber-700 text-xs font-bold px-3 py-2 rounded-xl flex flex-col gap-0.5">
                                   <span>{tn}</span>
                                   <span className="text-[10px] font-semibold text-amber-500">{subjCount} subjects · {marked}/{css.length} students</span>
@@ -3803,10 +3803,10 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                    </div>
                    <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
                      <div className="sm:col-span-5 space-y-1">
-                       <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest">Subject</label>
+                       <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest">{L('Subject', 'مضمون')}</label>
                        {cardSubjectToAdd !== 'Other' ? (
                          <select value={cardSubjectToAdd} onChange={(e) => setCardSubjectToAdd(e.target.value)} className="w-full px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-slate-950 focus:outline-none focus:border-teal-500">
-                            <option value="">Select Subject</option>
+                            <option value="">{L('Select Subject', 'مضمون منتخب کریں')}</option>
                             {(() => {
                               const cs = selectedMarkClassId ? (classes.find(c => String(c.id) === String(selectedMarkClassId))?.subjects || []) : [];
                               const fallback = ['English','Mathematics','Urdu','Pakistan Studies','Islamiyat','Physics','Chemistry','Biology','History','Geography'];
@@ -3815,28 +3815,28 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                                 <option key={s} value={s}>{s}</option>
                               ));
                             })()}
-                            <option value="Other">➕ Manual Subject...</option>
+                            <option value="Other">{L('➕ Manual Subject...', '➕ نیا مضمون...')}</option>
                          </select>
                        ) : (
                          <div className="flex items-center gap-2">
-                           <input type="text" value={cardManualSubject} onChange={(e) => setCardManualSubject(e.target.value)} placeholder="Type subject name" className="w-full px-3 py-1.5 bg-white border border-teal-300 rounded-lg text-xs font-semibold text-slate-950 focus:outline-none focus:border-teal-500" />
+                           <input type="text" value={cardManualSubject} onChange={(e) => setCardManualSubject(e.target.value)} placeholder={L('Type subject name', 'مضمون کا نام لکھیں')} className="w-full px-3 py-1.5 bg-white border border-teal-300 rounded-lg text-xs font-semibold text-slate-950 focus:outline-none focus:border-teal-500" />
                            <button type="button" onClick={() => { setCardManualSubject(''); setCardSubjectToAdd(''); }} className="px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-lg text-xs font-black">✕</button>
                          </div>
                        )}
                      </div>
                      <div className="sm:col-span-3 space-y-1">
-                       <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest">Total Marks</label>
+                       <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest">{L('Total Marks', 'کل نمبر')}</label>
                        <input type="number" min="1" value={cardMaxToAdd} onChange={(e) => setCardMaxToAdd(e.target.value)} placeholder="100" className="w-full px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-slate-950 focus:outline-none focus:border-teal-500" />
                      </div>
                      <div className="sm:col-span-4 flex justify-end">
                        <button type="button" onClick={() => {
                          const fSubj = cardSubjectToAdd === 'Other' ? cardManualSubject.trim() : cardSubjectToAdd.trim();
-                         if (!fSubj) { toast.error('Please enter a subject'); return; }
-                         if (!cardMaxToAdd || Number(cardMaxToAdd) <= 0) { toast.error('Enter total marks'); return; }
+                         if (!fSubj) { toast.error(L('Please enter a subject', 'مضمون لکھیں')); return; }
+                         if (!cardMaxToAdd || Number(cardMaxToAdd) <= 0) { toast.error(L('Enter total marks', 'کل نمبر لکھیں')); return; }
                          setCardSubjects([...cardSubjects, { id: Date.now().toString(), subject: fSubj, maxMarks: cardMaxToAdd }]);
                          setCardSubjectToAdd(''); setCardManualSubject(''); setCardMaxToAdd('100');
-                         toast.success('Subject added to test');
-                       }} className="py-1.5 px-4 bg-teal-600 text-white hover:bg-teal-700 rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm flex items-center gap-2"><Plus size={14} /> Add Subject</button>
+                         toast.success(L('Subject added to test', 'مضمون ٹیسٹ میں شامل ہو گیا'));
+                       }} className="py-1.5 px-4 bg-teal-600 text-white hover:bg-teal-700 rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm flex items-center gap-2"><Plus size={14} /> {L('Add Subject', 'مضمون شامل کریں')}</button>
                      </div>
                    </div>
 
@@ -3856,15 +3856,15 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                  {!cardExamName.trim() || cardSubjects.length === 0 ? (
                    <div className="bg-white border text-center border-gray-200 p-10 rounded-2xl shadow-sm text-slate-500 flex flex-col items-center justify-center">
                      <div className="w-14 h-14 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center mb-3 text-slate-300"><ClipboardList size={22} /></div>
-                     <h3 className="text-sm font-bold text-slate-700">Define the test first</h3>
-                     <p className="text-xs text-slate-400 max-w-sm mx-auto mt-1">Add the exam/test name and at least one subject above, then choose a student to enter marks.</p>
+                     <h3 className="text-sm font-bold text-slate-700">{L('Define the test first', 'پہلے ٹیسٹ کی تفصیل بنائیں')}</h3>
+                     <p className="text-xs text-slate-400 max-w-sm mx-auto mt-1">{L('Add the exam/test name and at least one subject above, then choose a student to enter marks.', 'اوپر امتحان / ٹیسٹ کا نام اور کم از کم ایک مضمون شامل کریں، پھر نمبر درج کرنے کے لیے طالب علم چنیں۔')}</p>
                    </div>
                  ) : selectedMarkClassId ? (
                    (() => {
                      const examN = cardExamName.trim();
                      const classStudents = students.filter(s => String(s.classId) === String(selectedMarkClassId));
                      const handleSaveStudentTest = () => {
-                       if (!cardStudentId) { toast.error('Select a student'); return; }
+                       if (!cardStudentId) { toast.error(L('Select a student', 'طالب علم منتخب کریں')); return; }
                        const student = students.find(s => String(s.id) === String(cardStudentId));
                        if (!student) return;
                         const clean = marks.filter(m => !(String(m.studentId) === String(student.id) && m.examType === examN));
@@ -3879,11 +3879,11 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                         }));
                         setMarks([...clean, ...recs]);
                         syncMarksToFirestore(removedCard, recs);
-                        toast.success(`Saved ${examN} for ${student.name}`);
+                        toast.success(L(`Saved ${examN} for ${student.name}`, `${examN} — ${student.name} کے نمبر محفوظ ہو گئے`));
                       };
                       const handlePrintResultCard = () => {
                         const st = students.find(s => String(s.id) === String(cardStudentId));
-                        if (!st) { toast.error('Select a student'); return; }
+                        if (!st) { toast.error(L('Select a student', 'طالب علم منتخب کریں')); return; }
                         const cls = classesMap.get(String(st.classId));
                         const rows = cardSubjects.map(sj => {
                           const rmax = Number(sj.maxMarks) || 0;
@@ -3900,7 +3900,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                         const totM = cardSubjects.reduce((a, sj) => a + (Number(sj.maxMarks) || 0), 0);
                         const pct = totM > 0 ? Math.round((totO / totM) * 100) : 0;
                         const clsName = cls ? `${cls.className}${cls.section ? (' - ' + cls.section) : ''}` : 'N/A';
-                        const html = `<!doctype html><html><head><meta charset="utf-8"><title>Result Card - ${st.name}</title>
+                        const html = `<!doctype html><html><head><meta charset="utf-8"><title>${L('Result Card', 'رزلٹ کارڈ')} - ${st.name}</title>
   <style>
     * { box-sizing: border-box; }
     body { font-family: 'Inter', Arial, sans-serif; color:#0f172a; margin:0; padding:32px; }
@@ -3922,21 +3922,21 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
   <body>
     <div class="card">
       <div class="head">
-        <div><h1>${st.name}</h1><div class="sub">${examN} · Roll #${st.rollNumber}</div></div>
-        <div class="pct"><div class="lbl">Overall</div><div class="big">${pct}%</div><div class="sub">${pct >= 40 ? 'PASS' : 'RE-STUDY'}</div></div>
+        <div><h1>${st.name}</h1><div class="sub">${examN} · ${L('Roll #', 'رول نمبر')}${st.rollNumber}</div></div>
+        <div class="pct"><div class="lbl">${L('Overall', 'مجموعی')}</div><div class="big">${pct}%</div><div class="sub">${pct >= 40 ? L('PASS', 'کامیاب') : L('RE-STUDY', 'دوبارہ پڑھائی')}</div></div>
       </div>
-      <div class="meta"><div><b>Class</b>${clsName}</div><div><b>Roll Number</b>#${st.rollNumber}</div><div><b>Total</b>${totO} / ${totM}</div></div>
+      <div class="meta"><div><b>${L('Class', 'کلاس')}</b>${clsName}</div><div><b>${L('Roll Number', 'رول نمبر')}</b>#${st.rollNumber}</div><div><b>${L('Total', 'کل')}</b>${totO} / ${totM}</div></div>
       <table>
-        <thead><tr><th>Subject</th><th class="c">Marks</th><th class="c">Percentage</th></tr></thead>
+        <thead><tr><th>${L('Subject', 'مضمون')}</th><th class="c">${L('Marks', 'نمبر')}</th><th class="c">${L('Percentage', 'فیصد')}</th></tr></thead>
         <tbody>${rows}</tbody>
-        <tfoot><tr><td colspan="2">Total Percentage</td><td class="c">${pct}%</td></tr></tfoot>
+        <tfoot><tr><td colspan="2">${L('Total Percentage', 'کل فیصد')}</td><td class="c">${pct}%</td></tr></tfoot>
       </table>
-      <div class="foot"><span>${schoolName} — Result Card</span><span>Date: ${new Date().toLocaleDateString()}</span></div>
+      <div class="foot"><span>${schoolName} — ${L('Result Card', 'رزلٹ کارڈ')}</span><span>${L('Date', 'تاریخ')}: ${new Date().toLocaleDateString()}</span></div>
     </div>
     <script>window.onload=function(){setTimeout(function(){window.print();},300);};</script>
   </body></html>`;
                         const w = window.open('', '_blank');
-                        if (!w) { toast.error('Pop-up blocked. Allow pop-ups to print.'); return; }
+                        if (!w) { toast.error(L('Pop-up blocked. Allow pop-ups to print.', 'پاپ اپ بلاک ہو گیا۔ پرنٹ کرنے کے لیے پاپ اپ کی اجازت دیں۔')); return; }
                         w.document.open();
                         w.document.write(html);
                         w.document.close();
@@ -3951,11 +3951,11 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                          <div className="space-y-6">
                            <div className="bg-gradient-to-r from-teal-600 to-teal-600 text-white p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
                              <div>
-                               <p className="text-[10px] uppercase tracking-[0.3em] opacity-80">Entering: {examN}</p>
+                               <p className="text-[10px] uppercase tracking-[0.3em] opacity-80">{L('Entering', 'اندراج')}: {examN}</p>
                                <h3 className="text-lg font-black uppercase tracking-tight">{student.name}</h3>
-                               <p className="text-xs opacity-90 mt-0.5">Roll #{student.rollNumber} · {classesMap.get(String(student.classId))?.className || 'N/A'}{(classesMap.get(String(student.classId))?.section) ? ` - ${classesMap.get(String(student.classId))?.section}` : ''}</p>
+                               <p className="text-xs opacity-90 mt-0.5">{L('Roll #', 'رول نمبر')} {student.rollNumber} · {classesMap.get(String(student.classId))?.className || 'N/A'}{(classesMap.get(String(student.classId))?.section) ? ` - ${classesMap.get(String(student.classId))?.section}` : ''}</p>
                              </div>
-                             <button onClick={() => { setCardStudentId(''); setCardObtained({}); }} className="px-3 py-1.5 bg-white/15 hover:bg-white/25 rounded-lg text-xs font-black uppercase tracking-wider">â† Back to Students</button>
+                             <button onClick={() => { setCardStudentId(''); setCardObtained({}); }} className="px-3 py-1.5 bg-white/15 hover:bg-white/25 rounded-lg text-xs font-black uppercase tracking-wider">â† {L('Back to Students', 'طلبہ پر واپس')}</button>
                            </div>
 
                            <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-xs">
@@ -3963,9 +3963,9 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                                <table className="w-full text-left">
                                  <thead>
                                    <tr className="border-b border-gray-100 text-xs font-bold text-gray-500 uppercase tracking-widest bg-gray-50">
-                                     <th className="px-6 py-4">Subject</th>
-                                     <th className="px-6 py-4 text-center">Total Marks</th>
-                                     <th className="px-6 py-4 text-center">Obtained Marks</th>
+                                     <th className="px-6 py-4">{L('Subject', 'مضمون')}</th>
+                                     <th className="px-6 py-4 text-center">{L('Total Marks', 'کل نمبر')}</th>
+                                     <th className="px-6 py-4 text-center">{L('Obtained Marks', 'حاصل کردہ نمبر')}</th>
                                    </tr>
                                  </thead>
                                  <tbody className="divide-y divide-gray-150 text-sm">
@@ -3993,9 +3993,9 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                                ))}
                              </div>
                              <div className="border-t border-gray-100 p-4 bg-gray-50/50 flex flex-col sm:flex-row items-center justify-between gap-3">
-                               <div className="text-xs font-bold text-slate-600 uppercase tracking-widest">Total: <span className="text-teal-700 text-sm">{totO}/{totM}</span> ({pct}%) · <span className={pct >= 40 ? 'text-amber-600' : 'text-rose-600'}>{pct >= 40 ? 'PASS' : 'RE-STUDY'}</span></div>
-                                <button onClick={handlePrintResultCard} className="py-2 px-5 bg-slate-900 text-white hover:bg-slate-800 rounded-lg text-xs font-black uppercase tracking-wider shadow-sm flex items-center gap-2"><Printer size={14} /> Print</button>
-                                <button onClick={handleSaveStudentTest} className="py-2 px-5 bg-teal-600 text-white hover:bg-teal-700 rounded-lg text-xs font-black uppercase tracking-wider shadow-sm flex items-center gap-2"><Save size={14} /> Save Test</button>
+                               <div className="text-xs font-bold text-slate-600 uppercase tracking-widest">{L('Total', 'کل')}: <span className="text-teal-700 text-sm">{totO}/{totM}</span> ({pct}%) · <span className={pct >= 40 ? 'text-amber-600' : 'text-rose-600'}>{pct >= 40 ? L('PASS', 'کامیاب') : L('RE-STUDY', 'دوبارہ پڑھائی')}</span></div>
+                                <button onClick={handlePrintResultCard} className="py-2 px-5 bg-slate-900 text-white hover:bg-slate-800 rounded-lg text-xs font-black uppercase tracking-wider shadow-sm flex items-center gap-2"><Printer size={14} /> {L('Print', 'پرنٹ')}</button>
+                                <button onClick={handleSaveStudentTest} className="py-2 px-5 bg-teal-600 text-white hover:bg-teal-700 rounded-lg text-xs font-black uppercase tracking-wider shadow-sm flex items-center gap-2"><Save size={14} /> {L('Save Test', 'ٹیسٹ محفوظ کریں')}</button>
                              </div>
                            </div>
 
@@ -4003,20 +4003,20 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                              <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
                                <div className="bg-gradient-to-r from-teal-600 to-teal-600 text-white px-5 py-4 flex items-center justify-between gap-3">
                                  <div>
-                                   <h3 className="text-base font-black uppercase tracking-wide">Result Card</h3>
+                                   <h3 className="text-base font-black uppercase tracking-wide">{L('Result Card', 'رزلٹ کارڈ')}</h3>
                                    <p className="text-xs opacity-90">{examN}</p>
                                  </div>
                                  <div className="text-right">
-                                   <p className="text-[10px] opacity-80 uppercase tracking-widest">Overall</p>
+                                   <p className="text-[10px] opacity-80 uppercase tracking-widest">{L('Overall', 'مجموعی')}</p>
                                    <p className="text-3xl font-black leading-none">{pct}%</p>
                                  </div>
                                </div>
                                <table className="w-full text-left">
                                  <thead>
                                    <tr className="border-b border-slate-100 text-xs font-bold text-slate-500 uppercase tracking-widest bg-slate-50">
-                                     <th className="px-5 py-3">Subject</th>
-                                     <th className="px-5 py-3 text-center">Marks</th>
-                                     <th className="px-5 py-3 text-center">Percentage</th>
+                                     <th className="px-5 py-3">{L('Subject', 'مضمون')}</th>
+                                     <th className="px-5 py-3 text-center">{L('Marks', 'نمبر')}</th>
+                                     <th className="px-5 py-3 text-center">{L('Percentage', 'فیصد')}</th>
                                    </tr>
                                  </thead>
                                  <tbody className="divide-y divide-slate-100">
@@ -4033,7 +4033,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                                  </tbody>
                                  <tfoot>
                                    <tr className="bg-slate-50 border-t border-slate-200">
-                                     <td colSpan={2} className="px-5 py-3 font-black text-slate-900 uppercase text-xs">Total</td>
+                                     <td colSpan={2} className="px-5 py-3 font-black text-slate-900 uppercase text-xs">{L('Total', 'کل')}</td>
                                      <td className="px-5 py-3 text-center font-black text-teal-700">{pct}%</td>
                                    </tr>
                                  </tfoot>
@@ -4047,7 +4047,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
                          <div className="p-4 bg-gray-50/50 border-b border-gray-100 flex items-center justify-between">
                            <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">Students in {classesMap.get(String(selectedMarkClassId))?.className || 'N/A'} — click to enter {examN}</h3>
-                           <span className="text-xs bg-slate-200 text-slate-800 font-bold px-2 py-0.5 rounded">{classStudents.length} Pupils</span>
+                           <span className="text-xs bg-slate-200 text-slate-800 font-bold px-2 py-0.5 rounded">{classStudents.length} {L('Pupils', 'طلبہ')}</span>
                          </div>
                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 p-4">
                            {classStudents.map(st => {
@@ -4066,9 +4066,9 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                                  )}
                                  <div className="min-w-0 flex-1">
                                    <p className="font-bold text-slate-900 text-sm truncate">{st.name.split(' ').slice(0, 1).join(' ') || st.name}</p>
-                                   <p className="text-xs text-slate-400">Roll #{st.rollNumber}</p>
+                                   <p className="text-xs text-slate-400">{L('Roll #', 'رول نمبر')} {st.rollNumber}</p>
                                  </div>
-                                 {done && <span className="text-[10px] font-black text-amber-600 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-full">SAVED</span>}
+                                 {done && <span className="text-[10px] font-black text-amber-600 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-full">{L('SAVED', 'محفوظ')}</span>}
                                </button>
                              );
                            })}
@@ -4079,8 +4079,8 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                  ) : (
                    <div className="bg-white border text-center border-gray-200 p-10 rounded-2xl shadow-sm text-slate-500 flex flex-col items-center justify-center">
                      <div className="w-14 h-14 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center mb-3 text-slate-300"><User size={22} /></div>
-                     <h3 className="text-sm font-bold text-slate-700">No Class Selected</h3>
-                     <p className="text-xs text-slate-400 max-w-sm mx-auto mt-1">Select a class above to see its students.</p>
+                     <h3 className="text-sm font-bold text-slate-700">{L('No Class Selected', 'کوئی کلاس منتخب نہیں')}</h3>
+                     <p className="text-xs text-slate-400 max-w-sm mx-auto mt-1">{L('Select a class above to see its students.', 'طلبہ دیکھنے کے لیے اوپر سے کلاس منتخب کریں۔')}</p>
                    </div>
                  )}
                </div>
@@ -4093,7 +4093,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
           <div id="panel-teacher-timetable" className="space-y-6 animate-fade-in bg-amber-50/50 p-4 sm:p-6 -mx-4 sm:-mx-6 rounded-2xl border border-amber-100 shadow-inner">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Class Schedule Overview</h1>
+                <h1 className="text-2xl font-bold text-gray-900">{L('Class Schedule Overview', 'کلاس شیڈول کا جائزہ')}</h1>
               </div>
 
               {/* Sub-tabs for Timetable */}
@@ -4102,20 +4102,20 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                   onClick={() => setTimetableSubTab('my')}
                   className={`px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${timetableSubTab === 'my' ? 'bg-amber-500 text-white shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
                 >
-                  My Schedule
+                  {L('My Schedule', 'میرا شیڈول')}
                 </button>
                 <button 
                   onClick={() => setTimetableSubTab('class')}
                   className={`px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${timetableSubTab === 'class' ? 'bg-amber-500 text-white shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
                 >
-                  Class Schedule
+                  {L('Class Schedule', 'کلاس شیڈول')}
                 </button>
               </div>
             </div>
 
             {timetableSubTab === 'class' && (
               <div className="flex items-center gap-3 bg-white p-4 rounded-2xl border border-amber-100 shadow-sm animate-fade-in">
-                <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Select Class:</span>
+                <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{L('Select Class', 'کلاس منتخب کریں')}:</span>
                 <select 
                   value={timetableClassId}
                   onChange={(e) => setTimetableClassId(e.target.value)}
@@ -4130,18 +4130,18 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
 
             {timetableSubTab === 'my' && (
               <div className="flex items-center gap-3 bg-white p-4 rounded-2xl border border-amber-100 shadow-sm animate-fade-in flex-wrap">
-                <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Select Day:</span>
+                <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{L('Select Day', 'دن منتخب کریں')}:</span>
                 <select 
                   value={scheduleDay}
                   onChange={(e) => setScheduleDay(e.target.value)}
                   className="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-amber-500 transition-all cursor-pointer"
                 >
                   {DAYS.map(d => (
-                    <option key={d} value={d}>{d}{d === currentDayName ? ' (Today)' : ''}</option>
+                    <option key={d} value={d}>{d}{d === currentDayName ? ` (${L('Today', 'آج')})` : ''}</option>
                   ))}
                 </select>
                 <span className="text-[10px] font-black uppercase tracking-widest text-amber-600 ml-auto">
-                  {myWeekLectures.filter(tt => tt.day === scheduleDay).length} Lecture(s) on {scheduleDay}
+                  {myWeekLectures.filter(tt => tt.day === scheduleDay).length} {L('Lecture(s) on', 'لیکچر —')} {scheduleDay}
                 </span>
               </div>
             )}
@@ -4154,7 +4154,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                   <thead>
                     <tr className="bg-gray-100/60 border-b border-gray-200">
                       <th className="px-4 py-3.5 text-xs font-bold text-gray-500 uppercase tracking-widest w-28">
-                        Weekday
+                        {L('Weekday', 'ہفتے کا دن')}
                       </th>
                       {PERIODS.map(p => (
                         <th key={p} className="px-4 py-3.5 text-sm font-bold text-gray-500 uppercase tracking-wider text-center border-l border-gray-150">
@@ -4182,7 +4182,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                               {(() => {
                                 if (!entry) return (
                                   <span className="text-xs text-gray-300 font-medium  block py-4 select-none">
-                                    No Lecture
+                                    {L('No Lecture', 'کوئی لیکچر نہیں')}
                                   </span>
                                 );
                                 
@@ -4215,12 +4215,12 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                                       </div>
                                       {isLive && (
                                         <span className="shrink-0 bg-red-650 text-white text-[10px] font-black tracking-widest px-1 py-0.5 rounded uppercase font-display scale-90">
-                                          LIVE
+                                          {L('LIVE', 'جاری')}
                                         </span>
                                       )}
                                     </div>
                                     <div className="text-xs text-slate-755 mt-0.5 truncate font-medium">
-                                      👤 Teacher: {getTeacherName(entry.teacherId)}
+                                      👤 {L('Teacher', 'استاد')}: {getTeacherName(entry.teacherId)}
                                     </div>
                                     <div className="text-xs font-mono text-slate-500 mt-1 flex items-center justify-between">
                                       <span>{entry.time}</span>
@@ -4246,8 +4246,8 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                     return (
                       <div className="py-14 text-center bg-white border-2 border-dashed border-amber-200 rounded-2xl">
                         <CalendarDays size={32} className="mx-auto text-amber-300 mb-3 opacity-50" />
-                        <p className="text-xs font-black text-slate-400 uppercase tracking-widest">No Lectures on {scheduleDay}</p>
-                        <p className="text-[10px] font-bold text-slate-300 uppercase tracking-wider mt-1">You have no classes scheduled for this day.</p>
+                        <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{L('No Lectures on', 'کوئی لیکچر نہیں —')} {scheduleDay}</p>
+                        <p className="text-[10px] font-bold text-slate-300 uppercase tracking-wider mt-1">{L('You have no classes scheduled for this day.', 'اس دن آپ کی کوئی کلاس مقرر نہیں۔')}</p>
                       </div>
                     );
                   }
@@ -4318,8 +4318,8 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
           <div id="panel-teacher-my-attendance" className="space-y-6 animate-fade-in bg-teal-50/50 p-4 sm:p-6 -mx-4 sm:-mx-6 rounded-2xl border border-teal-100 shadow-inner">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">My Attendance</h1>
-                <p className="text-xs text-slate-500 mt-1 uppercase tracking-widest font-bold">GPS Verified Check-in / Check-out — Digital Staff Register</p>
+                <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">{L('My Attendance', 'میری حاضری')}</h1>
+                <p className="text-xs text-slate-500 mt-1 uppercase tracking-widest font-bold">{L('GPS Verified Check-in / Check-out — Digital Staff Register', 'جی پی ایس تصدیق شدہ حاضری / رخصتی — ڈیجیٹل اسٹاف رجسٹر')}</p>
               </div>
             </div>
 
@@ -4332,22 +4332,22 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                   const badge = !rec ? 'bg-slate-500 text-white' : rec.status === 'present' ? 'bg-teal-600 text-white' : rec.status === 'late' ? 'bg-amber-500 text-white' : 'bg-rose-500 text-white';
                   return (
                     <div className="relative z-10">
-                      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-teal-300 mb-1">Today · {todayStr}</p>
+                      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-teal-300 mb-1">{L('Today', 'آج')} · {todayStr}</p>
                       <div className="flex items-center gap-3 flex-wrap">
                         <h3 className="text-lg sm:text-xl font-black text-white tracking-tight uppercase">{new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' })}</h3>
-                        <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${badge}`}>{rec ? rec.status.toUpperCase() : 'NOT CHECKED IN'}</span>
+                        <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${badge}`}>{rec ? rec.status.toUpperCase() : L('NOT CHECKED IN', 'حاضری نہیں لگی')}</span>
                       </div>
                       <div className="mt-4 grid grid-cols-3 gap-3">
                         <div className="bg-white/10 border border-white/10 rounded-xl p-3">
-                          <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">Check-In</p>
+                          <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">{L('Check-In', 'حاضری')}</p>
                           <p className="text-sm font-black text-teal-300">{rec?.checkIn ? new Date(rec.checkIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—'}</p>
                         </div>
                         <div className="bg-white/10 border border-white/10 rounded-xl p-3">
-                          <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">Check-Out</p>
+                          <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">{L('Check-Out', 'رخصتی')}</p>
                           <p className="text-sm font-black text-teal-300">{rec?.checkOut ? new Date(rec.checkOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—'}</p>
                         </div>
                         <div className="bg-white/10 border border-white/10 rounded-xl p-3">
-                          <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">School Dist</p>
+                          <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">{L('School Dist', 'اسکول فاصلہ')}</p>
                           <p className="text-sm font-black text-teal-300">{formatDistance(rec?.distanceMeters)}</p>
                         </div>
                       </div>
@@ -4357,23 +4357,23 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                           disabled={Boolean(myTodayAttendance?.checkIn)}
                           className="flex items-center gap-2 px-6 py-3.5 bg-teal-500 hover:bg-teal-600 disabled:bg-slate-600 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 disabled:cursor-not-allowed"
                         >
-                          <Fingerprint size={16} /> Check-In
+                          <Fingerprint size={16} /> {L('Check-In', 'حاضری لگائیں')}
                         </button>
                         <button
                           onClick={handleTeacherCheckOut}
                           disabled={!myTodayAttendance?.checkIn || Boolean(myTodayAttendance?.checkOut)}
                           className="flex items-center gap-2 px-6 py-3.5 bg-amber-500 hover:bg-amber-600 disabled:bg-slate-600 text-slate-950 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 disabled:cursor-not-allowed"
                         >
-                          <LogOut size={16} /> Check-Out
+                          <LogOut size={16} /> {L('Check-Out', 'رخصتی درج کریں')}
                         </button>
                         <label className="flex items-center gap-2 cursor-pointer select-none">
                           <input type="checkbox" checked={useDemoPosition} onChange={(e) => setUseDemoPosition(e.target.checked)} className="w-4 h-4 accent-teal-600" />
-                          <span className="text-[9px] font-black uppercase tracking-wider text-teal-200">Demo GPS (School Location)</span>
+                          <span className="text-[9px] font-black uppercase tracking-wider text-teal-200">{L('Demo GPS (School Location)', 'ڈیمو جی پی ایس (اسکول لوکیشن)')}</span>
                         </label>
                       </div>
                       <p className="text-[10px] text-slate-300 font-bold mt-3 flex items-center gap-1.5">
                         <MapPin size={12} className="text-teal-300" />
-                        School: {schoolLocation.name} · Radius {schoolLocation.radiusMeters} m — check-in sirf school ke andar se hota hai.
+                        {L('School', 'اسکول')}: {schoolLocation.name} · {L('Radius', 'رداس')} {schoolLocation.radiusMeters} m — {L('check-in works only from inside the school.', 'حاضری صرف اسکول کے اندر سے لگ سکتی ہے۔')}
                       </p>
                     </div>
                   );
@@ -4381,11 +4381,11 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
               </div>
               <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2"><CalendarClock size={14} className="text-teal-600" /> Monthly Overview</h3>
+                  <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2"><CalendarClock size={14} className="text-teal-600" /> {L('Monthly Overview', 'ماہانہ جائزہ')}</h3>
                   <input type="month" value={selfAttMonth} onChange={(e) => setSelfAttMonth(e.target.value)} className="px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800" />
                 </div>
                 <div className="grid grid-cols-3 sm:grid-cols-5 gap-2.5 text-center">
-                  {[['Present', selfAttSummary.presentDays, 'bg-teal-50 text-teal-700 border-teal-200'], ['Late', selfAttSummary.lateDays, 'bg-amber-50 text-amber-700 border-amber-200'], ['Absent', selfAttSummary.absentDays, 'bg-rose-50 text-rose-700 border-rose-200'], ['Leave', selfAttSummary.leaveDays, 'bg-slate-50 text-slate-600 border-slate-200'], ['Marked', selfAttSummary.totalMarked, 'bg-slate-50 text-slate-600 border-slate-200']].map((item) => (
+                  {[[L('Present', 'حاضر'), selfAttSummary.presentDays, 'bg-teal-50 text-teal-700 border-teal-200'], [L('Late', 'تاخیر'), selfAttSummary.lateDays, 'bg-amber-50 text-amber-700 border-amber-200'], [L('Absent', 'غیر حاضر'), selfAttSummary.absentDays, 'bg-rose-50 text-rose-700 border-rose-200'], [L('Leave', 'رخصت'), selfAttSummary.leaveDays, 'bg-slate-50 text-slate-600 border-slate-200'], [L('Marked', 'درج شدہ'), selfAttSummary.totalMarked, 'bg-slate-50 text-slate-600 border-slate-200']].map((item) => (
                     <div key={String(item[0])} className={`rounded-xl border p-2.5 ${item[2]}`}>
                       <p className="text-[8px] font-black uppercase tracking-widest">{item[0]}</p>
                       <p className="text-lg font-black mt-0.5">{item[1]}</p>
@@ -4394,7 +4394,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                 </div>
 
                 <div className="mt-4">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Attendance Calendar — {monthLabel(selfAttYear, selfAttMonthIdx)}</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{L('Attendance Calendar', 'حاضری کیلنڈر')} — {monthLabel(selfAttYear, selfAttMonthIdx)}</p>
                   <div className="grid grid-cols-7 gap-1 mt-2">
                     {['M','T','W','T','F','S','S'].map((d, i) => <div key={i} className="text-center text-[9px] font-black text-slate-400">{d}</div>)}
                     {selfAttGrid.map((d, i) => {
@@ -4415,18 +4415,18 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
               <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
               <div className="px-5 py-3 bg-slate-50 flex items-center gap-2">
                 <Receipt size={14} className="text-teal-600" />
-                <h3 className="text-xs font-black text-slate-600 uppercase tracking-widest">My Attendance History</h3>
+                <h3 className="text-xs font-black text-slate-600 uppercase tracking-widest">{L('My Attendance History', 'میری حاضری کی تاریخ')}</h3>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
                   <thead>
                     <tr className="border-b border-gray-100 text-xs font-bold text-gray-500 uppercase tracking-widest bg-gray-50">
-                      <th className="px-5 py-3">Date</th>
-                      <th className="px-5 py-3">Status</th>
-                      <th className="px-5 py-3">Check-In</th>
-                      <th className="px-5 py-3">Check-Out</th>
-                      <th className="px-5 py-3">School Dist</th>
-                      <th className="px-5 py-3">Source</th>
+                      <th className="px-5 py-3">{L('Date', 'تاریخ')}</th>
+                      <th className="px-5 py-3">{L('Status', 'صورتحال')}</th>
+                      <th className="px-5 py-3">{L('Check-In', 'حاضری')}</th>
+                      <th className="px-5 py-3">{L('Check-Out', 'رخصتی')}</th>
+                      <th className="px-5 py-3">{L('School Dist', 'اسکول فاصلہ')}</th>
+                      <th className="px-5 py-3">{L('Source', 'ذریعہ')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-150 text-sm">
@@ -4455,7 +4455,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
           <div id="panel-teacher-my-pay" className="space-y-6 animate-fade-in bg-amber-50/50 p-4 sm:p-6 -mx-4 sm:-mx-6 rounded-2xl border border-amber-100 shadow-inner">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">My Pay & Salary Slip</h1>
+                <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">{L('My Pay & Salary Slip', 'میری تنخواہ و پے سلپ')}</h1>
                 <p className="text-xs text-slate-500 mt-1 uppercase tracking-widest font-bold">{L('Monthly salary account — linked to attendance (Digital Registrar)', 'ماہانہ تنخواہ کا حساب — حاضری سے منسلک (ڈیجیٹل رجسٹرار)')}</p>
               </div>
               <select
@@ -4478,48 +4478,48 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
             <div className="bg-gradient-to-br from-slate-900 via-teal-900 to-slate-900 animate-gradient rounded-2xl shadow-xl shadow-teal-100 p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 overflow-hidden relative animate-slide-up">
               <div className="absolute -top-16 -right-16 w-64 h-64 bg-amber-400/20 rounded-full blur-3xl pointer-events-none animate-float"></div>
               <div className="relative z-10">
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-teal-300 mb-1">Payslip · {monthLabel(myPayslip.year, myPayslip.month)}</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-teal-300 mb-1">{L('Payslip', 'تنخواہ پرچی')} · {monthLabel(myPayslip.year, myPayslip.month)}</p>
                 <h3 className="text-2xl font-black text-white tracking-tight uppercase">{teacherProfile?.name || userSession.name}</h3>
                 <p className="text-xs text-teal-200 font-bold uppercase tracking-widest mt-1">{teacherProfile?.subject || teacherSubject}</p>
                 <p className="text-[10px] text-teal-300/80 font-bold uppercase tracking-widest mt-1.5 flex items-center gap-1.5">
                   <CalendarClock size={12} />
                   {salaryHistory.joinDate ? (
-                    <>Joined: {salaryHistory.joinDate} · {salaryHistory.tenureYears} Saal {salaryHistory.tenureRemMonths} Mahine</>
+                    <>{L('Joined', 'شمولیت')}: {salaryHistory.joinDate} · {salaryHistory.tenureYears} {L('Saal', 'سال')} {salaryHistory.tenureRemMonths} {L('Mahine', 'ماہ')}</>
                   ) : (
-                    <>Since {salaryHistory.startLabel} · {salaryHistory.tenureYears} Saal {salaryHistory.tenureRemMonths} Mahine</>
+                    <>{L('Since', 'سے')} {salaryHistory.startLabel} · {salaryHistory.tenureYears} {L('Saal', 'سال')} {salaryHistory.tenureRemMonths} {L('Mahine', 'ماہ')}</>
                   )}
                 </p>
               </div>
               <div className="relative z-10 text-right">
-                <p className="text-[10px] font-black uppercase tracking-widest text-amber-300">Net Payable</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-amber-300">{L('Net Payable', 'قابل ادائیگی')}</p>
                 <p className="text-3xl font-black text-amber-400 tracking-tight">{formatPKR(myPayslip.netPay)}</p>
                 <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${myPayslip.paid ? 'bg-teal-500 text-white' : 'bg-amber-500 text-slate-950'}`}>
-                  {myPayslip.paid ? `PAID ${myPayslip.paidDate ? '· ' + myPayslip.paidDate : ''}` : 'PENDING'}
+                  {myPayslip.paid ? `${L('PAID', 'ادا شدہ')}${myPayslip.paidDate ? ' · ' + myPayslip.paidDate : ''}` : L('PENDING', 'باقی')}
                 </span>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-                <div className="px-5 py-3 bg-slate-50 flex items-center gap-2"><Wallet size={14} className="text-teal-600" /><h3 className="text-xs font-black text-slate-600 uppercase tracking-widest">Earnings</h3></div>
+                <div className="px-5 py-3 bg-slate-50 flex items-center gap-2"><Wallet size={14} className="text-teal-600" /><h3 className="text-xs font-black text-slate-600 uppercase tracking-widest">{L('Earnings', 'آمدنی')}</h3></div>
                 <div className="space-y-2.5 px-5 py-4">
-                  <div className="flex justify-between"><span className="text-xs font-bold text-slate-500">Base Salary</span><span className="text-xs font-black text-slate-900">{formatPKR(myPayslip.baseSalary)}</span></div>
-                  <div className="flex justify-between"><span className="text-xs font-bold text-slate-500">Present Bonus ({myPayslip.presentDays} days × {formatPKR(myPayConfig.bonusPerPresentDay)})</span><span className="text-xs font-black text-teal-600">+ {formatPKR(myPayslip.presentBonus)}</span></div>
-                  <div className="flex justify-between"><span className="text-xs font-bold text-slate-500">Allowances</span><span className="text-xs font-black text-teal-600">+ {formatPKR(myPayslip.allowances)}</span></div>
+                  <div className="flex justify-between"><span className="text-xs font-bold text-slate-500">{L('Base Salary', 'بنیادی تنخواہ')}</span><span className="text-xs font-black text-slate-900">{formatPKR(myPayslip.baseSalary)}</span></div>
+                  <div className="flex justify-between"><span className="text-xs font-bold text-slate-500">{L('Present Bonus', 'حاضری بونس')} ({myPayslip.presentDays} {L('days', 'دن')} × {formatPKR(myPayConfig.bonusPerPresentDay)})</span><span className="text-xs font-black text-teal-600">+ {formatPKR(myPayslip.presentBonus)}</span></div>
+                  <div className="flex justify-between"><span className="text-xs font-bold text-slate-500">{L('Allowances', 'الاؤنس')}</span><span className="text-xs font-black text-teal-600">+ {formatPKR(myPayslip.allowances)}</span></div>
                 </div>
                 <div className="px-5 py-3 bg-teal-50 text-teal-800 border border-teal-100">
-                  <div className="flex justify-between text-xs font-black"><span>Total Earnings</span><span>{formatPKR(myPayslip.baseSalary + myPayslip.presentBonus + myPayslip.allowances)}</span></div>
+                  <div className="flex justify-between text-xs font-black"><span>{L('Total Earnings', 'کل آمدنی')}</span><span>{formatPKR(myPayslip.baseSalary + myPayslip.presentBonus + myPayslip.allowances)}</span></div>
                 </div>
               </div>
 
               <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-                <div className="px-5 py-3 bg-slate-50 flex items-center gap-2"><Coins size={14} className="text-amber-600" /><h3 className="text-xs font-black text-slate-600 uppercase tracking-widest">Deductions</h3></div>
+                <div className="px-5 py-3 bg-slate-50 flex items-center gap-2"><Coins size={14} className="text-amber-600" /><h3 className="text-xs font-black text-slate-600 uppercase tracking-widest">{L('Deductions', 'کٹوتیاں')}</h3></div>
                 <div className="space-y-2.5 px-5 py-4">
-                  <div className="flex justify-between"><span className="text-xs font-bold text-slate-500">Late ({myPayslip.lateDays} day × {formatPKR(myPayConfig.lateDeductionPerDay)})</span><span className="text-xs font-black text-rose-600">- {formatPKR(myPayslip.lateDeduction)}</span></div>
-                  <div className="flex justify-between"><span className="text-xs font-bold text-slate-500">Absent ({myPayslip.absentDays} day × {formatPKR(myPayConfig.absentDeductionPerDay)})</span><span className="text-xs font-black text-rose-600">- {formatPKR(myPayslip.absentDeduction)}</span></div>
-                  <div className="flex justify-between"><span className="text-xs font-bold text-slate-500">Fixed Deductions</span><span className="text-xs font-black text-rose-600">- {formatPKR(myPayslip.fixedDeductions)}</span></div>
+                  <div className="flex justify-between"><span className="text-xs font-bold text-slate-500">{L('Late', 'تاخیر')} ({myPayslip.lateDays} {L('day', 'دن')} × {formatPKR(myPayConfig.lateDeductionPerDay)})</span><span className="text-xs font-black text-rose-600">- {formatPKR(myPayslip.lateDeduction)}</span></div>
+                  <div className="flex justify-between"><span className="text-xs font-bold text-slate-500">{L('Absent', 'غیر حاضر')} ({myPayslip.absentDays} {L('day', 'دن')} × {formatPKR(myPayConfig.absentDeductionPerDay)})</span><span className="text-xs font-black text-rose-600">- {formatPKR(myPayslip.absentDeduction)}</span></div>
+                  <div className="flex justify-between"><span className="text-xs font-bold text-slate-500">{L('Fixed Deductions', 'مقررہ کٹوتیاں')}</span><span className="text-xs font-black text-rose-600">- {formatPKR(myPayslip.fixedDeductions)}</span></div>
                 </div>
                 <div className="px-5 py-3 bg-amber-50 text-amber-800 border border-amber-200">
-                  <div className="flex justify-between text-xs font-black"><span>Net Payable</span><span>{formatPKR(myPayslip.netPay)}</span></div>
+                  <div className="flex justify-between text-xs font-black"><span>{L('Net Payable', 'قابل ادائیگی')}</span><span>{formatPKR(myPayslip.netPay)}</span></div>
                 </div>
               </div>
             </div>
@@ -4530,14 +4530,14 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                 <div className="flex items-center gap-2">
                   <CalendarDays size={16} className="text-white" />
                   <div>
-                    <h3 className="text-xs font-black text-white uppercase tracking-widest">Complete Salary History</h3>
+                    <h3 className="text-xs font-black text-white uppercase tracking-widest">{L('Complete Salary History', 'مکمل تنخواہ ریکارڈ')}</h3>
                     <p className="text-[10px] text-teal-100 font-bold uppercase tracking-widest mt-0.5">
                       {L(`Full salary account for ${salaryHistory.monthsCount} months since ${salaryHistory.startLabel}`, `${salaryHistory.startLabel} سے ${salaryHistory.monthsCount} ماہ کا مکمل تنخواہ حساب`)}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-[9px] font-black text-teal-100 uppercase tracking-widest">Service Tenure</p>
+                  <p className="text-[9px] font-black text-teal-100 uppercase tracking-widest">{L('Service Tenure', 'خدمت کا عرصہ')}</p>
                   <p className="text-lg font-black text-white tracking-tight leading-none">
                     {salaryHistory.tenureYears}<span className="text-xs"> {L('years', 'سال')}</span> {salaryHistory.tenureRemMonths}<span className="text-xs"> {L('months', 'ماہ')}</span>
                   </p>
@@ -4547,10 +4547,10 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
               {/* Lifetime Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4 bg-slate-50 border-b border-slate-100">
                 {[
-                  { label: 'Total Earned (Net)', val: formatPKR(salaryHistory.totalNet), color: 'text-slate-900' },
-                  { label: 'Total Paid', val: formatPKR(salaryHistory.totalPaid), color: 'text-teal-600' },
-                  { label: 'Pending', val: formatPKR(salaryHistory.totalPending), color: 'text-rose-600' },
-                  { label: 'Avg / Month', val: formatPKR(salaryHistory.avgMonthly), color: 'text-amber-600' },
+                  { label: L('Total Earned (Net)', 'کل کمائی (نیٹ)'), val: formatPKR(salaryHistory.totalNet), color: 'text-slate-900' },
+                  { label: L('Total Paid', 'کل ادا شدہ'), val: formatPKR(salaryHistory.totalPaid), color: 'text-teal-600' },
+                  { label: L('Pending', 'باقی'), val: formatPKR(salaryHistory.totalPending), color: 'text-rose-600' },
+                  { label: L('Avg / Month', 'اوسط / ماہ'), val: formatPKR(salaryHistory.avgMonthly), color: 'text-amber-600' },
                 ].map((st, i) => (
                   <motion.div
                     key={st.label}
@@ -4662,32 +4662,32 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
           <div id="panel-teacher-fees" className="space-y-6 animate-fade-in bg-slate-50/50 p-4 sm:p-6 -mx-4 sm:-mx-6 rounded-2xl border border-slate-100 shadow-inner">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase ">Ledger & Financials</h1>
-                <p className="text-xs text-slate-500 mt-1 uppercase tracking-widest font-bold">Class Fee Tracking & Collection Status (Digital Registrar)</p>
+                <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase ">{L('Ledger & Financials', 'کھاتہ و مالیات')}</h1>
+                <p className="text-xs text-slate-500 mt-1 uppercase tracking-widest font-bold">{L('Class Fee Tracking & Collection Status (Digital Registrar)', 'کلاس فیس کی نگرانی و وصولی کی صورتحال (ڈیجیٹل رجسٹرار)')}</p>
               </div>
               <button
                 onClick={() => setShowAddFeeModal(true)}
                 className="px-6 py-3 bg-slate-900 text-white text-xs font-black uppercase tracking-[0.3em] flex items-center gap-2 hover:bg-amber-600 transition-all shadow-xl shadow-slate-200"
               >
-                <Plus size={14} /> Record Cash Collection
+                <Plus size={14} /> {L('Record Cash Collection', 'نقد وصولی درج کریں')}
               </button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="bg-white p-6 border border-slate-100 shadow-sm rounded-xl">
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 ">Total Expected</p>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 ">{L('Total Expected', 'کل متوقع')}</p>
                 <h3 className="text-2xl font-black text-slate-900 tracking-tighter">
                   {students.length * 5500}
                 </h3>
               </div>
               <div className="bg-white p-6 border border-amber-100 shadow-sm rounded-xl">
-                <p className="text-xs font-bold text-amber-600 uppercase tracking-widest mb-1 ">Cash Collected</p>
+                <p className="text-xs font-bold text-amber-600 uppercase tracking-widest mb-1 ">{L('Cash Collected', 'نقد وصول شدہ')}</p>
                 <h3 className="text-2xl font-black text-amber-700 tracking-tighter">
                   {fees.reduce((acc, curr) => acc + curr.amount, 0)}
                 </h3>
               </div>
               <div className="bg-white p-6 border border-amber-100 shadow-sm rounded-xl">
-                <p className="text-xs font-bold text-amber-600 uppercase tracking-widest mb-1 ">Pending Dues</p>
+                <p className="text-xs font-bold text-amber-600 uppercase tracking-widest mb-1 ">{L('Pending Dues', 'باقی واجبات')}</p>
                 <h3 className="text-2xl font-black text-amber-700 tracking-tighter">
                   {(students.length * 5500) - fees.reduce((acc, curr) => acc + curr.amount, 0)}
                 </h3>
@@ -4697,18 +4697,18 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
             <div className="bg-white border border-slate-200 shadow-sm overflow-hidden">
               <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
                 <h3 className="text-xs font-black uppercase tracking-widest text-slate-900 flex items-center gap-2">
-                  <CreditCard size={14} className="text-amber-600" /> Recent Collection Ledger
+                  <CreditCard size={14} className="text-amber-600" /> {L('Recent Collection Ledger', 'حالیہ وصولی کا کھاتہ')}
                 </h3>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
                   <thead className="bg-slate-50 border-b border-slate-100 uppercase text-xs font-black tracking-widest text-slate-400">
                     <tr>
-                      <th className="px-6 py-4">Transaction ID</th>
-                      <th className="px-6 py-4">Student Profile</th>
-                      <th className="px-6 py-4">Date</th>
-                      <th className="px-6 py-4">Amount</th>
-                      <th className="px-6 py-4">Status</th>
+                      <th className="px-6 py-4">{L('Transaction ID', 'ٹرانزیکشن آئی ڈی')}</th>
+                      <th className="px-6 py-4">{L('Student Profile', 'طالب علم پروفائل')}</th>
+                      <th className="px-6 py-4">{L('Date', 'تاریخ')}</th>
+                      <th className="px-6 py-4">{L('Amount', 'رقم')}</th>
+                      <th className="px-6 py-4">{L('Status', 'صورتحال')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-50 text-xs">
@@ -4716,7 +4716,7 @@ Total: ${totalObtained}/${totalMax} (${overallPct}%). Status: ${overallPct >= 40
                       fees.slice().reverse().map(fee => {
                         const student = students.find(s => String(s.id) === String(fee.studentId));
 const sName = student?.name || (fee as any).studentName || ('Student #' + String(fee.studentId || '').slice(-4));
-const sRoll = student?.rollNumber ? ('Roll #' + student.rollNumber) : 'Student Record';
+const sRoll = student?.rollNumber ? (L('Roll #', 'رول نمبر') + ' ' + student.rollNumber) : L('Student Record', 'طالب علم ریکارڈ');
                         return (
                           <tr key={fee.id} className="hover:bg-slate-50/50 transition-colors">
                             <td className="px-6 py-4 font-mono font-bold text-slate-400">#{fee.id.slice(-6)}</td>
@@ -4727,14 +4727,14 @@ const sRoll = student?.rollNumber ? ('Roll #' + student.rollNumber) : 'Student R
                             <td className="px-6 py-4 text-slate-500 font-bold tracking-widest text-xs">{fee.paidDate || fee.month}</td>
                             <td className="px-6 py-4 text-amber-600 font-black tracking-tighter text-sm">{fee.amount}</td>
                             <td className="px-6 py-4 uppercase">
-                              <span className="bg-amber-50 text-amber-600 px-2 py-1 text-xs font-black tracking-widest border border-amber-100">Verified</span>
+                              <span className="bg-amber-50 text-amber-600 px-2 py-1 text-xs font-black tracking-widest border border-amber-100">{L('Verified', 'تصدیق شدہ')}</span>
                             </td>
                           </tr>
                         );
                       })
                     ) : (
                       <tr>
-                        <td colSpan={5} className="px-6 py-12 text-center text-slate-400  font-bold uppercase tracking-widest text-xs">No collection records found in active period</td>
+                        <td colSpan={5} className="px-6 py-12 text-center text-slate-400  font-bold uppercase tracking-widest text-xs">{L('No collection records found in active period', 'منتخب مدت میں کوئی وصولی ریکارڈ نہیں ملی')}</td>
                       </tr>
                     )}
                   </tbody>
@@ -4756,8 +4756,8 @@ const sRoll = student?.rollNumber ? ('Roll #' + student.rollNumber) : 'Student R
                   <Sparkles size={24} className="text-teal-600" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Security & Profile Settings</h2>
-                  <p className="text-xs text-slate-500">Update your portal login identity and password credentials below.</p>
+                  <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">{L('Security & Profile Settings', 'سیکیورٹی و پروفائل ترتیبات')}</h2>
+                  <p className="text-xs text-slate-500">{L('Update your portal login identity and password credentials below.', 'اپنا پورٹل لاگ اِن اور پاس ورڈ نیچے اپ ڈیٹ کریں۔')}</p>
                 </div>
               </div>
 
@@ -4770,12 +4770,12 @@ const sRoll = student?.rollNumber ? ('Roll #' + student.rollNumber) : 'Student R
                   const confirmPass = (form.elements.namedItem('confirm_password') as HTMLInputElement).value;
 
                   if (!newID.trim() || !newPass.trim()) {
-                    toast.error("ID and Password cannot be empty.");
+                    toast.error(L('ID and Password cannot be empty.', 'آئی ڈی اور پاس ورڈ خالی نہیں ہو سکتے۔'));
                     return;
                   }
 
                   if (newPass !== confirmPass) {
-                    toast.error("Passwords do not match.");
+                    toast.error(L('Passwords do not match.', 'پاس ورڈ آپس میں نہیں ملتے۔'));
                     return;
                   }
 
@@ -4784,42 +4784,42 @@ const sRoll = student?.rollNumber ? ('Roll #' + student.rollNumber) : 'Student R
                     t.id === userSession.id ? { ...t, username: newID, password: newPass } : t
                   );
                   setTeachers(updatedTeachers);
-                  toast.success("Profile credentials updated successfully! These changes are now active.");
+                  toast.success(L('Profile credentials updated successfully! These changes are now active.', 'پروفائل کی تفصیلات کامیابی سے اپ ڈیٹ ہو گئیں! تبدیلیاں فعال ہیں۔'));
                 }}
                 className="max-w-md space-y-6"
               >
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">Portal Login ID / Username</label>
+                    <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">{L('Portal Login ID / Username', 'پورٹل لاگ اِن آئی ڈی / صارف نام')}</label>
                     <input 
                       name="username"
                       type="text" 
                       defaultValue={teacherProfile?.username || ''}
                       className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl focus:ring-1 focus:ring-teal-500 outline-none font-mono text-sm"
-                      placeholder="Enter new login ID"
+                      placeholder={L('Enter new login ID', 'نیا لاگ اِن آئی ڈی لکھیں')}
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">New Password</label>
+                    <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">{L('New Password', 'نیا پاس ورڈ')}</label>
                     <input 
                       name="password"
                       type="password" 
                       defaultValue={teacherProfile?.password || ''}
                       className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl focus:ring-1 focus:ring-teal-500 outline-none font-mono text-sm"
-                      placeholder="Enter new password"
+                      placeholder={L('Enter new password', 'نیا پاس ورڈ لکھیں')}
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">Confirm New Password</label>
+                    <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">{L('Confirm New Password', 'نیا پاس ورڈ دوبارہ لکھیں')}</label>
                     <input 
                       name="confirm_password"
                       type="password" 
                       className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl focus:ring-1 focus:ring-teal-500 outline-none font-mono text-sm"
-                      placeholder="Confirm new password"
+                      placeholder={L('Confirm new password', 'نیا پاس ورڈ دوبارہ لکھیں')}
                       required
                     />
                   </div>
@@ -4830,15 +4830,15 @@ const sRoll = student?.rollNumber ? ('Roll #' + student.rollNumber) : 'Student R
                   className="w-full py-4 bg-teal-600 hover:bg-teal-700 text-white font-black uppercase tracking-widest text-xs transition-all shadow-lg shadow-teal-100 flex items-center justify-center gap-2"
                 >
                   <Save size={16} />
-                  Update Credentials
+                  {L('Update Credentials', 'لاگ اِن تفصیلات اپ ڈیٹ کریں')}
                 </button>
               </form>
 
               <div className="mt-12 p-4 bg-amber-50 border border-amber-100 text-amber-800 text-xs leading-relaxed">
                 <p className="font-bold flex items-center gap-1.5 mb-1 uppercase tracking-wider">
-                  <AlertCircle size={12} /> Security Notice
+                  <AlertCircle size={12} /> {L('Security Notice', 'سیکیورٹی نوٹس')}
                 </p>
-                Once you change your ID or Password, you must use the new credentials for your next login session. These settings are tracked by the Digital Registrar Office (Principal Dashboard) for administrative security protocols.
+                {L('Once you change your ID or Password, you must use the new credentials for your next login session. These settings are tracked by the Digital Registrar Office (Principal Dashboard) for administrative security protocols.', 'آئی ڈی یا پاس ورڈ تبدیل کرنے کے بعد اگلی لاگ اِن میں نئی تفصیلات استعمال کرنا ضروری ہے۔ یہ ترتیبات انتظامی سیکیورٹی کے لیے ڈیجیٹل رجسٹرار آفس (پرنسپل ڈیش بورڈ) میں محفوظ رہتی ہیں۔')}
               </div>
             </div>
           </div>
@@ -4982,37 +4982,37 @@ const sRoll = student?.rollNumber ? ('Roll #' + student.rollNumber) : 'Student R
                 {/* Information Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   <div className="space-y-4">
-                    <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] border-b border-slate-100 pb-2">Student Bio</h3>
+                    <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] border-b border-slate-100 pb-2">{L('Student Bio', 'طالب علم کا تعارف')}</h3>
                     <div className="space-y-3">
                       <div>
-                        <p className="text-xs font-bold text-slate-400 uppercase">Academic Email</p>
+                        <p className="text-xs font-bold text-slate-400 uppercase">{L('Academic Email', 'تعلیمی ای میل')}</p>
                         <p className="text-xs font-bold text-slate-800">{selectedStudentProfile.email}</p>
                       </div>
                       <div>
-                        <p className="text-xs font-bold text-slate-400 uppercase">Username</p>
+                        <p className="text-xs font-bold text-slate-400 uppercase">{L('Username', 'صارف نام')}</p>
                         <p className="text-xs font-mono text-slate-600">{selectedStudentProfile.username}</p>
                       </div>
                     </div>
                   </div>
 
                   <div className="space-y-4">
-                    <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] border-b border-slate-100 pb-2">Guardian Context</h3>
+                    <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] border-b border-slate-100 pb-2">{L('Guardian Context', 'والدین کی تفصیل')}</h3>
                     <div className="space-y-3">
                       <div>
-                        <p className="text-xs font-bold text-slate-400 uppercase">Parent Phone</p>
+                        <p className="text-xs font-bold text-slate-400 uppercase">{L('Parent Phone', 'والدین کا فون')}</p>
                         <p className="text-xs font-mono font-bold text-slate-800">{selectedStudentProfile.parentPhone}</p>
                       </div>
                       <div>
-                        <p className="text-xs font-bold text-slate-400 uppercase">Guardian Name</p>
+                        <p className="text-xs font-bold text-slate-400 uppercase">{L('Guardian Name', 'والد / سرپرست کا نام')}</p>
                         <p className="text-xs font-bold text-slate-800">{selectedStudentProfile.guardianName || 'N/A'}</p>
                       </div>
                     </div>
                   </div>
 
                   <div className="space-y-4">
-                    <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] border-b border-slate-100 pb-2">Financial Status</h3>
+                    <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] border-b border-slate-100 pb-2">{L('Financial Status', 'مالی صورتحال')}</h3>
                     <div className="bg-slate-50 p-3 border border-slate-100">
-                      <p className="text-xs font-bold text-slate-400 uppercase">Monthly Base Fee</p>
+                      <p className="text-xs font-bold text-slate-400 uppercase">{L('Monthly Base Fee', 'ماہانہ بنیادی فیس')}</p>
                       <p className="text-lg font-black text-slate-900">{selectedStudentProfile.baseFee || '0'}</p>
                     </div>
                   </div>
@@ -5024,13 +5024,13 @@ const sRoll = student?.rollNumber ? ('Roll #' + student.rollNumber) : 'Student R
                   <div className="space-y-6">
                     <div className="flex items-center gap-2">
                        <Award className="text-teal-600" size={20} />
-                       <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider ">Direct Mark Management</h3>
+                       <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider ">{L('Direct Mark Management', 'براہِ راست نمبروں کا انتظام')}</h3>
                     </div>
                     
                     <div className="bg-teal-50/50 p-6 border border-teal-100 space-y-4 shadow-sm">
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5 font-sans">
-                          <label className="text-xs font-black text-teal-900 uppercase">Subject</label>
+                          <label className="text-xs font-black text-teal-900 uppercase">{L('Subject', 'مضمون')}</label>
                           <input 
                             type="text"
                             value={profileMarkSubject}
@@ -5039,7 +5039,7 @@ const sRoll = student?.rollNumber ? ('Roll #' + student.rollNumber) : 'Student R
                           />
                         </div>
                         <div className="space-y-1.5 font-sans">
-                          <label className="text-xs font-black text-teal-900 uppercase">Max Marks</label>
+                          <label className="text-xs font-black text-teal-900 uppercase">{L('Max Marks', 'زیادہ سے زیادہ نمبر')}</label>
                           <input 
                             type="number"
                             value={profileMarkMax}
@@ -5050,24 +5050,24 @@ const sRoll = student?.rollNumber ? ('Roll #' + student.rollNumber) : 'Student R
                       </div>
 
                       <div className="space-y-1.5 font-sans">
-                         <label className="text-xs font-black text-teal-900 uppercase">Test / Assignment Title</label>
+                         <label className="text-xs font-black text-teal-900 uppercase">{L('Test / Assignment Title', 'ٹیسٹ / ہوم ورک کا عنوان')}</label>
                          <input 
                            type="text"
                            value={profileMarkExam}
                            onChange={(e) => setProfileMarkExam(e.target.value)}
-                           placeholder="e.g. Monthly Test, Assignment 1"
+                           placeholder={L('e.g. Monthly Test, Assignment 1', 'مثلاً ماہانہ ٹیسٹ، ہوم ورک 1')}
                            className="w-full px-3 py-2 bg-white border border-teal-200 text-xs font-bold focus:border-teal-600 focus:outline-none"
                          />
                       </div>
 
                       <div className="space-y-1.5 font-sans">
-                         <label className="text-xs font-black text-teal-900 uppercase">Marks Obtained</label>
+                         <label className="text-xs font-black text-teal-900 uppercase">{L('Marks Obtained', 'حاصل کردہ نمبر')}</label>
                          <div className="flex items-center gap-3">
                            <input 
                              type="number"
                               value={profileMarkObtained}
                               onChange={(e) => setProfileMarkObtained(e.target.value.replace(/^0+(?=\d)/, ''))}
-                             placeholder="Score"
+                             placeholder={L('Score', 'نمبر')}
                              className="w-full px-4 py-3 bg-white border border-teal-200 text-lg font-black text-teal-900 focus:border-teal-600 focus:outline-none"
                            />
                            <span className="text-slate-400 font-black text-xl ">/ {profileMarkMax}</span>
@@ -5078,7 +5078,7 @@ const sRoll = student?.rollNumber ? ('Roll #' + student.rollNumber) : 'Student R
                         onClick={handleAddMarkFromProfile}
                         className="w-full py-4 bg-teal-600 hover:bg-slate-900 text-white text-xs font-black uppercase tracking-[0.2em] shadow-lg shadow-teal-200 transition-all active:scale-95"
                       >
-                        Commit Mark to Record
+                        {L('Commit Mark to Record', 'نمبر ریکارڈ میں محفوظ کریں')}
                       </button>
                     </div>
                   </div>
@@ -5086,8 +5086,8 @@ const sRoll = student?.rollNumber ? ('Roll #' + student.rollNumber) : 'Student R
                   {/* Existing Marks List */}
                   <div className="space-y-6">
                     <div className="flex items-center justify-between">
-                       <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Academic History</h3>
-                       <span className="text-xs font-bold text-teal-600 uppercase">Latest Entries</span>
+                       <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">{L('Academic History', 'تعلیمی تاریخ')}</h3>
+                       <span className="text-xs font-bold text-teal-600 uppercase">{L('Latest Entries', 'تازہ اندراجات')}</span>
                     </div>
 
                     <div className="space-y-3 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
@@ -5112,7 +5112,7 @@ const sRoll = student?.rollNumber ? ('Roll #' + student.rollNumber) : 'Student R
                       ) : (
                         <div className="py-12 border-2 border-dashed border-slate-100 flex flex-col items-center justify-center text-slate-400 gap-3">
                            <Award size={32} className="opacity-20" />
-                           <p className="text-xs font-bold uppercase tracking-widest">No academic records found</p>
+                           <p className="text-xs font-bold uppercase tracking-widest">{L('No academic records found', 'کوئی تعلیمی ریکارڈ نہیں ملا')}</p>
                         </div>
                       )}
                     </div>
@@ -5125,7 +5125,7 @@ const sRoll = student?.rollNumber ? ('Roll #' + student.rollNumber) : 'Student R
                   onClick={() => setShowProfileModal(false)}
                   className="px-8 py-3 bg-slate-900 text-white text-xs font-black uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg"
                 >
-                  Close Profile
+                  {L('Close Profile', 'پروفائل بند کریں')}
                 </button>
               </div>
             </motion.div>
@@ -5144,12 +5144,12 @@ const sRoll = student?.rollNumber ? ('Roll #' + student.rollNumber) : 'Student R
             <div className="p-6 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Bell size={20} className="text-teal-600" />
-                <h3 className="text-sm font-black uppercase tracking-tight text-slate-900">Receipt Dispatch</h3>
+                <h3 className="text-sm font-black uppercase tracking-tight text-slate-900">{L('Receipt Dispatch', 'رسید ارسال')}</h3>
               </div>
               <button 
                 onClick={() => setFeeNotificationPopup(null)}
                 className="text-slate-400 hover:text-slate-900 transition-colors"
-                title="Close window"
+                title={L('Close window', 'ونڈو بند کریں')}
               >
                 <X size={20} />
               </button>
@@ -5158,17 +5158,17 @@ const sRoll = student?.rollNumber ? ('Roll #' + student.rollNumber) : 'Student R
             <div className="p-8 space-y-6">
               <div className="flex justify-between items-end border-b border-slate-50 pb-4">
                 <div className="text-left">
-                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Recipient Parent</p>
+                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{L('Recipient Parent', 'وصول کنندہ والدین')}</p>
                   <p className="text-sm font-bold text-slate-900">{feeNotificationPopup.guardianName}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Phone Number</p>
+                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{L('Phone Number', 'فون نمبر')}</p>
                   <p className="text-xs font-mono font-bold text-slate-600">{feeNotificationPopup.parentPhone}</p>
                 </div>
               </div>
 
               <div className="space-y-2 text-left">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Message Content</label>
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{L('Message Content', 'پیغام کا متن')}</label>
                 <textarea
                   value={feeNotificationPopup.messageText}
                   onChange={(e) => {
@@ -5185,11 +5185,11 @@ const sRoll = student?.rollNumber ? ('Roll #' + student.rollNumber) : 'Student R
                   type="button"
                   onClick={() => {
                     navigator.clipboard.writeText(feeNotificationPopup.messageText);
-                    toast.success("Copied to clipboard");
+                    toast.success(L('Copied to clipboard', 'کلپ بورڈ میں کاپی ہو گیا'));
                   }}
                   className="py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-black uppercase tracking-[0.2em] transition-all"
                 >
-                  Copy Text
+                  {L('Copy Text', 'متن کاپی کریں')}
                 </button>
               </div>
             </div>
@@ -5200,7 +5200,7 @@ const sRoll = student?.rollNumber ? ('Roll #' + student.rollNumber) : 'Student R
                 onClick={() => setFeeNotificationPopup(null)}
                 className="px-6 py-2 bg-slate-900 text-white text-xs font-black uppercase tracking-widest hover:bg-slate-800 transition-all font-sans"
               >
-                Dismiss
+                {L('Dismiss', 'بند کریں')}
               </button>
             </div>
           </motion.div>

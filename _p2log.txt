@@ -1,0 +1,12 @@
+=== _ur_p2_stud1.cjs ===
+APPLIED: 26
+MISSES: none
+=== _ur_p2_stud2.cjs ===
+APPLIED: 25
+MISSES: none
+=== _ur_p2_stud3.cjs ===
+APPLIED: 24
+MISSES: none
+=== _ur_p2_small.cjs ===
+APPLIED: 12
+MISSES: none

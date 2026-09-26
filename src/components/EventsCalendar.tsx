@@ -149,7 +149,7 @@ export default function EventsCalendar({ userSession }: EventsCalendarProps) {
 
         {/* Upcoming List */}
         <div className="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-          <h3 className="text-xs font-black uppercase tracking-widest text-slate-500 mb-3">Upcoming</h3>
+          <h3 className="text-xs font-black uppercase tracking-widest text-slate-500 mb-3">{L('Upcoming', 'آئندہ اوقات')}</h3>
           <div className="space-y-2.5">
             {upcoming.length === 0 && <p className="text-xs font-bold text-slate-400 uppercase tracking-widest py-6 text-center">{L('No events', 'کوئی ایونٹ نہیں')}</p>}
             {upcoming.map(e => {

@@ -1,3 +1,4 @@
+import { L } from '../lib/i18n';
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Calendar } from 'lucide-react';
@@ -32,7 +33,7 @@ export default function AttendanceSwipeOverlay({ isOpen, onClose, children }: Pr
             </button>
             <div className="flex items-center gap-2 mb-4 border-b pb-4">
               <Calendar className="text-teal-600" />
-              <h2 className="text-lg font-bold">Attendance Details</h2>
+              <h2 className="text-lg font-bold">{L('Attendance Details', 'حاضری کی تفصیل')}</h2>
             </div>
             {children}
           </motion.div>

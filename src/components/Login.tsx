@@ -1,3 +1,5 @@
+import { L, t, useLang, i18nCls } from '../lib/i18n';
+import LanguageToggle from './LanguageToggle';
 import React, { useState } from 'react';
 import { GraduationCap, Mail, Lock, Eye, EyeOff, Shield, User, Users, AlertCircle } from 'lucide-react';
 import { Role, UserSession, Teacher, Student, Coordinator } from '../types';
@@ -24,6 +26,8 @@ export default function Login({ teachers, students, coordinators, onLogin, onBac
   // School ka naam + logo (Developer Portal → School Identity se set hote hain;
   // set na hon to default "Demo School" + /logo.png).
   const { schoolName, logoSrc } = useSchoolIdentity();
+  const [lang] = useLang();
+  const cls = i18nCls(lang);
 
   /**
    * AUTH: profiles row → UserSession.
@@ -87,7 +91,7 @@ export default function Login({ teachers, students, coordinators, onLogin, onBac
 
     const input = email.trim();
     if (!input || !password.trim()) {
-      setError('Please fill in all fields.');
+      setError(t('login.errBoth'));
       return;
     }
 
@@ -103,10 +107,10 @@ export default function Login({ teachers, students, coordinators, onLogin, onBac
             const session = await buildSessionFromProfile(data.user.id, input, authEmail);
             if (session) {
               onLogin(session);
-              toast.success(`Welcome ${session.name}!`);
+              toast.success(L(`Welcome ${session.name}!`, `${session.name}، خوش آمدید!`));
               return;
             }
-            setError('Aap ka account kisi staff/student profile se linked nahi hai. Principal se rabta karein.');
+            setError(L('Your account is not linked to a staff/student profile. Please contact the principal.', 'آپ کا اکاؤنٹ کسی اسٹاف/طالب علم پروفائل سے منسلک نہیں۔ پرنسپل سے رابطہ کریں۔'));
             return;
           }
         }
@@ -116,13 +120,13 @@ export default function Login({ teachers, students, coordinators, onLogin, onBac
       const localSession = matchLocalRecord(input);
       if (localSession) {
         onLogin(localSession);
-        toast.success(`Welcome ${localSession.name}!`);
+        toast.success(L(`Welcome ${localSession.name}!`, `${localSession.name}، خوش آمدید!`));
         return;
       }
 
-      setError('Invalid ID or Password. Portal access denied.');
+      setError(t('login.errWrong'));
     } catch (err: any) {
-      setError(err?.message || 'Login failed. Please try again.');
+      setError(err?.message || L('Login failed. Please try again.', 'لاگ اِن ناکام ہو گئی — دوبارہ کوشش کریں۔'));
     } finally {
       setBusy(false);
     }
@@ -141,13 +145,18 @@ export default function Login({ teachers, students, coordinators, onLogin, onBac
             referrerPolicy="no-referrer"
           />
           <div className="space-y-1">
-            <h2 id="login-title" className="text-3xl font-light tracking-tighter text-slate-950 dark:text-white uppercase  text-center">
-              Portal <span className="font-extrabold not-">Login</span>
+            <h2 id="login-title" className={`text-3xl font-light tracking-tighter text-slate-950 dark:text-white uppercase  text-center ${cls}`}>
+              {L('Portal', 'پورٹل')} <span className="font-extrabold not-">{L('Login', 'لاگ اِن')}</span>
             </h2>
             <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.4em] text-center">
               {schoolName}
             </p>
           </div>
+        </div>
+
+        {/* EN | اردو — login screen par bhi zaban badli ja sakti hai */}
+        <div className="flex justify-center">
+          <LanguageToggle />
         </div>
 
         {/* Unified Form */}
@@ -166,7 +175,7 @@ export default function Login({ teachers, students, coordinators, onLogin, onBac
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Login ID (e.g. teacher1)"
+                placeholder={t('login.username') + ' (e.g. teacher1)'}
                 className="w-full bg-transparent border-b border-slate-200 dark:border-slate-800 py-4 text-[11px] font-bold tracking-[0.2em] focus:outline-none focus:border-teal-600 dark:focus:border-teal-500 text-slate-900 dark:text-white transition-all placeholder:text-slate-300 dark:placeholder:text-slate-650"
               />
             </div>
@@ -178,7 +187,7 @@ export default function Login({ teachers, students, coordinators, onLogin, onBac
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
+                placeholder={t('login.password')}
                 className="w-full bg-transparent border-b border-slate-200 dark:border-slate-800 py-4 text-[11px] font-bold tracking-[0.2em] focus:outline-none focus:border-teal-600 dark:focus:border-teal-500 text-slate-900 dark:text-white transition-all placeholder:text-slate-300 dark:placeholder:text-slate-650"
               />
               <button
@@ -198,7 +207,7 @@ export default function Login({ teachers, students, coordinators, onLogin, onBac
               disabled={busy}
               className="w-full py-4 bg-slate-950 dark:bg-teal-600 hover:bg-slate-800 dark:hover:bg-teal-500 text-white font-bold text-[10px] uppercase tracking-[0.4em] transition-all cursor-pointer shadow-2xl disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {busy ? 'Signing In...' : 'Sign In to Portal'}
+              {busy ? t('login.signing') : t('login.signin')}
             </button>
 
             <div className="text-center">
@@ -207,7 +216,7 @@ export default function Login({ teachers, students, coordinators, onLogin, onBac
                   onClick={onBackToLanding}
                   className="text-[11px] font-bold text-slate-400 hover:text-slate-950 uppercase tracking-[0.2em] border-b border-slate-100 transition-all cursor-pointer"
                 >
-                  Return to Overview
+                  {L('Return to Overview', 'اوور ویو پر واپس جائیں')}
                 </button>
               )}
             </div>
@@ -215,8 +224,8 @@ export default function Login({ teachers, students, coordinators, onLogin, onBac
         </form>
 
         <div className="pt-8 border-t border-slate-50 dark:border-slate-900 text-center">
-            <p className="text-[10px] font-bold text-slate-300 dark:text-slate-700 uppercase tracking-widest">
-                {schoolName} Digital Management Infrastructure
+            <p className={`text-[10px] font-bold text-slate-300 dark:text-slate-700 uppercase tracking-widest ${cls}`}>
+                {schoolName} {L('Digital Management Infrastructure', 'ڈیجیٹل مینجمنٹ انفراسٹرکچر')}
             </p>
         </div>
       </div>

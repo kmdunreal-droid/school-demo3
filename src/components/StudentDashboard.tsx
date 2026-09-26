@@ -209,7 +209,7 @@ export default function StudentDashboard({
     setDarkTheme(nextVal);
     safeStorage.setItem('acadamis_dark_theme', String(nextVal));
     window.dispatchEvent(new Event('acadamis_toggle_theme'));
-    toast.success(nextVal ? "🌙 Dark theme ho gya!" : "☀️ Light theme ho gya!");
+    toast.success(nextVal ? L('🌙 Dark theme applied!', '🌙 ڈارک تھیم لاگو ہو گئی!') : L('☀️ Light theme applied!', '☀️ ہلکی تھیم لاگو ہو گئی!'));
   };
 
   /* ═══════════════════════════════════════════════════════════════════════
@@ -309,10 +309,10 @@ export default function StudentDashboard({
               notifiedPeriodsRef.current.push(lecture.id);
               
               const teacherObj = teachers.find(t => t.id === lecture.teacherId);
-              const instStr = teacherObj ? teacherObj.name : 'Faculty';
+              const instStr = teacherObj ? teacherObj.name : L('Faculty', 'استاد');
               
               // Trigger Toast Notification
-              toast.success(`🔔 Class Bell: ${lecture.period} has started!`, {
+              toast.success(L(`🔔 Class Bell: ${lecture.period} has started!`, `🔔 کلاس بیل: ${lecture.period} شروع ہو گئی!`), {
                 description: `Subject "${lecture.subject}" has commenced with ${instStr}.`,
                 duration: 8000
               });
@@ -344,13 +344,13 @@ export default function StudentDashboard({
     const updated = notifications.map(n => ({ ...n, isUnread: false }));
     saveNotifications(updated);
     setNotifications(updated);
-    toast.success("All messages marked as read.");
+    toast.success(L('All messages marked as read.', 'تمام پیغامات پڑھے ہوئے نشان زد ہو گئے۔'));
   };
 
   const handleClearNotifications = () => {
     saveNotifications([]);
     setNotifications([]);
-    toast.success("Notification history cleared.");
+    toast.success(L('Notification history cleared.', 'اطلاعات کی تاریخ صاف ہو گئی۔'));
   };
 
   // Get classroom properties
@@ -430,10 +430,10 @@ export default function StudentDashboard({
     try {
       sbQueueWrite('students', String(studentProfile.id), updatedStudent);
       await flushSupabase();
-      toast.success("ID Card design saved permanently!");
+      toast.success(L('ID Card design saved permanently!', 'شناختی کارڈ ڈیزائن ہمیشہ کے لیے محفوظ ہو گیا!'));
     } catch (err) {
       console.error(err);
-      toast.error("Saved locally, but failed to sync with cloud.");
+      toast.error(L('Saved locally, but failed to sync with cloud.', 'مقامی طور پر محفوظ ہو گیا، مگر کلاؤڈ سے سنک نہیں ہو سکا۔'));
     }
   };
 
@@ -463,7 +463,7 @@ export default function StudentDashboard({
   // Get teacher's name helper
   const getTeacherName = (tId: string) => {
     const t = teachers.find(item => item.id === tId);
-    return t ? t.name : 'Unknown Faculty';
+    return t ? t.name : L('Unknown Faculty', 'نامعلوم استاد');
   };
 
   // Convert scores into letter grade categories
@@ -517,10 +517,10 @@ export default function StudentDashboard({
          <div className="space-y-4">
             <div className="text-center">
                 <span className="text-4xl font-black text-teal-600">{attendancePercent}%</span>
-                <p className="text-sm font-bold text-gray-500">Attendance Rate</p>
+                <p className="text-sm font-bold text-gray-500">{L('Attendance Rate', 'حاضری کی شرح')}</p>
             </div>
             <div className="border-t pt-4">
-                <p className="text-xs font-bold uppercase text-gray-400">Log Summary</p>
+                <p className="text-xs font-bold uppercase text-gray-400">{L('Log Summary', 'لاگ خلاصہ')}</p>
                 <div className="mt-2 text-sm text-gray-700">
                     <p>Total Days: {totalDays}</p>
                     <p className="text-amber-600">Present Days: {presentDays}</p>
@@ -536,7 +536,7 @@ export default function StudentDashboard({
           <img src={logoSrc} alt={`${schoolName} Logo`} className="w-20 h-20 object-contain" referrerPolicy="no-referrer" />
           <div className="leading-none">
             <h1 className="font-black text-gray-900 tracking-tight uppercase tracking-[0.1em] text-xl sm:text-2xl">{schoolName}</h1>
-            <p className="text-teal-600 font-black text-[10px] tracking-[0.3em] uppercase mt-1">Student Portal</p>
+            <p className="text-teal-600 font-black text-[10px] tracking-[0.3em] uppercase mt-1">{L('Student Portal', 'طلبہ پورٹل')}</p>
           </div>
         </div>
         <div className="flex items-center gap-2 relative">
@@ -597,7 +597,7 @@ export default function StudentDashboard({
               className="h-16 w-auto object-contain animate-bounce-slow"
               referrerPolicy="no-referrer"
             />
-            <button onClick={() => setSidebarOpen(false)} aria-label="Close menu" className="md:hidden flex items-center justify-center px-2 h-9 rounded-lg text-slate-300 hover:text-slate-600 hover:bg-slate-50 transition-colors">
+            <button onClick={() => setSidebarOpen(false)} aria-label={L('Close menu', 'مینو بند کریں')} className="md:hidden flex items-center justify-center px-2 h-9 rounded-lg text-slate-300 hover:text-slate-600 hover:bg-slate-50 transition-colors">
               <X size={18} />
             </button>
           </div>
@@ -636,7 +636,7 @@ export default function StudentDashboard({
                         type="button"
                         onClick={() => handleTogglePin(item.id)}
                         title={isPinned ? L('Unpin', 'پن ہٹائیں') : L('Pin', 'پن کریں')}
-                        aria-label={isPinned ? 'Unpin' : 'Pin'}
+                        aria-label={isPinned ? L('Unpin', 'پن ہٹائیں') : L('Pin', 'پن کریں')}
                         className={`absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 transition-all ${
                           isActive
                             ? 'text-white/80 hover:text-white'
@@ -725,7 +725,7 @@ export default function StudentDashboard({
               if (!currentPeriodObj) return (
                 <div className="flex items-center gap-2 px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-bold uppercase tracking-wider">
                   <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                  No Active Class Right Now
+                  {L('No Active Class Right Now', 'ابھی کوئی کلاس نہیں چل رہی')}
                 </div>
               );
 
@@ -778,10 +778,10 @@ export default function StudentDashboard({
                       className="absolute right-0 mt-2 w-80 bg-white border border-slate-200 rounded-xl shadow-xl z-50 py-3 flex flex-col font-sans"
                     >
                       <div className="px-4 pb-2 border-b border-slate-150 flex items-center justify-between">
-                        <span className="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Campus Broadcaster</span>
+                        <span className="text-xs font-extrabold text-slate-400 uppercase tracking-widest">{L('Campus Broadcaster', 'کیمپس براڈکاسٹر')}</span>
                         <div className="flex items-center gap-2">
                           {notifications.length > 0 && (
-                            <button onClick={handleMarkAllRead} className="text-xs hover:underline text-teal-600 font-bold uppercase">Mark Read</button>
+                            <button onClick={handleMarkAllRead} className="text-xs hover:underline text-teal-600 font-bold uppercase">{L('Mark Read', 'پڑھ لیں')}</button>
                           )}
                           {notifications.length > 0 && (
                             <span className="text-slate-200">|</span>
@@ -793,7 +793,7 @@ export default function StudentDashboard({
                       <div className="max-h-64 overflow-y-auto divide-y divide-slate-100">
                         {notifications.length === 0 ? (
                           <div className="py-8 text-center text-slate-400 text-xs ">
-                            No notifications received yet
+                            {L('No notifications received yet', 'ابھی کوئی اطلاع نہیں آئی')}
                           </div>
                         ) : (
                           notifications.map(notif => (
@@ -833,7 +833,7 @@ export default function StudentDashboard({
             <div className="greet-student rounded-2xl p-6 md:p-8 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 text-white relative overflow-hidden">
               <div className="absolute -top-16 -right-14 w-56 h-56 bg-white/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
               <div className="relative z-10">
-                <span className="text-xs font-extrabold text-emerald-300 uppercase tracking-widest block mb-1">STUDENT ADVISORY</span>
+                <span className="text-xs font-extrabold text-emerald-300 uppercase tracking-widest block mb-1">{L('STUDENT ADVISORY', 'طلبہ مشورہ')}</span>
                 <h1 className={`text-2xl font-black tracking-tight font-display uppercase ${cls}`}>
                   {t('home.hello')}, {userSession.name.split(' ').slice(0, 1).join(' ') || userSession.name}!
                 </h1>
@@ -902,8 +902,8 @@ export default function StudentDashboard({
                     </div>
                     <p className="text-xs text-slate-500 mt-2">
                       {attendancePercent >= 75 
-                        ? 'Good Job! Your attendance is matching the required collegiate percentage index.' 
-                        : 'Warning: Your attendance is below standard requirements (75%). please attend regular lectures.'}
+                        ? L('Good Job! Your attendance is matching the required collegiate percentage index.', 'شاباش! آپ کی حاضری طلبہ کے لیے مطلوبہ فیصد کے مطابق ہے۔') 
+                        : L('Warning: Your attendance is below standard requirements (75%). please attend regular lectures.', 'انتباہ: آپ کی حاضری معیاری شرائط (75%) سے کم ہے۔ باقاعدہ لیکرز میں شرکت کریں۔')}
                     </p>
                   </div>
                 </div>
@@ -921,7 +921,7 @@ export default function StudentDashboard({
                 <div>
                   <h3 className="text-base font-bold text-slate-900 uppercase tracking-wide font-display flex items-center gap-1.5 mb-3">
                     <Award className="text-amber-500" size={18} />
-                    Report Card Highlights
+                    {L('Report Card Highlights', 'رپورٹ کارڈ نمایاں خطوط')}
                   </h3>
                   
                   {myMarks.length > 0 ? (
@@ -962,14 +962,14 @@ export default function StudentDashboard({
                 <div>
                   <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wide font-display flex items-center gap-2">
                     <BookOpen className="text-amber-500" size={18} />
-                    Academic Mastery & Subject Progress
+                    {L('Academic Mastery & Subject Progress', 'تعلیمی مہارت اور مضموزن کی پیش رفت')}
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Analyzing cumulative score percentages across all logged examinations and curriculum blocks.
+                    {L('Analyzing cumulative score percentages across all logged examinations and curriculum blocks.', 'تمام درج امتحانات اور نصابی حصوں میں فیصد کا تجزیہ۔')}
                   </p>
                 </div>
                 <div className="text-xs uppercase font-mono font-bold text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-850 border border-slate-150 dark:border-slate-800 px-2.5 py-1">
-                  Overall Academic Weightage
+                  {L('Overall Academic Weightage', 'مجموعی تعلیمی وزن')}
                 </div>
               </div>
 
@@ -1051,10 +1051,10 @@ export default function StudentDashboard({
                 <div>
                   <h3 className="text-base font-bold text-slate-900 uppercase tracking-wide font-display flex items-center gap-2">
                     <TrendingUp className="text-teal-600" size={18} />
-                    Academic Performance Trends
+                    {L('Academic Performance Trends', 'تعلیمی کارکردگی کے رجحانات')}
                   </h3>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Visualizing normalized percentage scores scored across sequential evaluation cycles.
+                    {L('Visualizing normalized percentage scores scored across sequential evaluation cycles.', 'مسلسل جانچو کے پیشِ نظر فیصد نتائج کا گراف۔')}
                   </p>
                 </div>
 
@@ -1144,25 +1144,25 @@ export default function StudentDashboard({
         {activeTab === 'attendance' && (
           <div id="panel-student-attendance" className="space-y-6 animate-fade-in bg-rose-50/50 p-4 sm:p-6 -mx-4 sm:-mx-6 rounded-2xl border border-rose-100 shadow-inner">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Attendance Log History</h1>
-              <p className="text-xs text-gray-500 mt-0.5">Evaluate cumulative presence, date stamps, and verify teacher registers.</p>
+              <h1 className="text-2xl font-bold text-gray-900">{L('Attendance Log History', 'حاضری لاگ تاریخ')}</h1>
+              <p className="text-xs text-gray-500 mt-0.5">{L('Evaluate cumulative presence, date stamps, and verify teacher registers.', 'کل حاضری، تاریخیں اور اساتذہ کے رجسٹر جانچیں۔')}</p>
             </div>
 
             {/* Attendance Gauge Bar chart summary */}
             <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
               <div className="text-center md:border-r border-gray-100 py-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Total Classes Conducted</span>
+                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">{L('Total Classes Conducted', 'کل ہوئی کلاسیں')}</span>
                 <h3 className="text-4xl font-black text-gray-900 mt-2">{totalDays} Sessions</h3>
               </div>
 
               <div className="text-center md:border-r border-gray-100 py-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Total days Attended</span>
+                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">{L('Total days Attended', 'حاضری کے کل دن')}</span>
                 <h3 className="text-4xl font-black text-amber-600 mt-2">{presentDays} Present</h3>
                 <p className="text-xs text-gray-400 mt-0.5">{totalDays - presentDays} absent logs</p>
               </div>
 
               <div className="text-center py-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Overall Ratio</span>
+                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">{L('Overall Ratio', 'مجموعی تناسب')}</span>
                 <h3 className={`text-4xl font-black mt-2 ${attendancePercent >= 75 ? 'text-teal-600' : 'text-rose-600'}`}>
                   {attendancePercent}%
                 </h3>
@@ -1172,16 +1172,16 @@ export default function StudentDashboard({
             {/* Attendance Days list table */}
             <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-xs">
               <div className="p-4 bg-gray-50/50 border-b border-gray-100">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500">Attendance Log Journal</h3>
+                <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500">{L('Attendance Log Journal', 'حاضری لاگ جرنال')}</h3>
               </div>
 
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
                   <thead>
                     <tr className="border-b border-gray-100 text-sm font-bold text-gray-500 uppercase tracking-widest bg-gray-50">
-                      <th className="px-6 py-3.5">Log Date</th>
-                      <th className="px-6 py-3.5">Academic Calendar Period</th>
-                      <th className="px-6 py-3.5 text-center">Status</th>
+                      <th className="px-6 py-3.5">{L('Log Date', 'لاگ تاریخ')}</th>
+                      <th className="px-6 py-3.5">{L('Academic Calendar Period', 'تعلیمی کیلنڈر مدت')}</th>
+                      <th className="px-6 py-3.5 text-center">{L('Status', 'صورتحال')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 text-sm">
@@ -1189,7 +1189,7 @@ export default function StudentDashboard({
                       myAttendance.map(log => (
                         <tr key={log.id} className="hover:bg-gray-55/20 transition-colors">
                           <td className="px-6 py-4 font-bold text-slate-800">{log.date}</td>
-                          <td className="px-6 py-4 text-sm font-semibold text-gray-500">General Academic Session</td>
+                          <td className="px-6 py-4 text-sm font-semibold text-gray-500">{L('General Academic Session', 'عمومی تعلیمی سیشن')}</td>
                           <td className="px-6 py-4">
                             <div className="flex justify-center text-center">
                               <span className={`inline-flex px-3 py-1 text-sm font-extrabold rounded-full ${
@@ -1204,7 +1204,7 @@ export default function StudentDashboard({
                     ) : (
                       <tr>
                         <td colSpan={3} className="px-6 py-12 text-center text-gray-400  text-sm font-medium">
-                          No attendance records have been registered for your ID.
+                          {L('No attendance records have been registered for your ID.', 'آپ کی آئی ڈی کی کوئی حاضری درج نہیں ہے۔')}
                         </td>
                       </tr>
                     )}
@@ -1220,8 +1220,8 @@ export default function StudentDashboard({
         {activeTab === 'marks' && (
           <div id="panel-student-marks" className="space-y-6 animate-fade-in bg-teal-50/50 p-4 sm:p-6 -mx-4 sm:-mx-6 rounded-2xl border border-teal-100 shadow-inner">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Academic Score Sheets</h1>
-              <p className="text-xs text-gray-500 mt-0.5">Review scores, max markings, automated letter grades, and subject distributions.</p>
+              <h1 className="text-2xl font-bold text-gray-900">{L('Academic Score Sheets', 'تعلیمی نتائج شیٹس')}</h1>
+              <p className="text-xs text-gray-500 mt-0.5">{L('Review scores, max markings, automated letter grades, and subject distributions.', 'نمبر، زیادہ سے زیادہ نمبر، خودکار گریڈ اور مضامین کی توزیع دیکھیں۔')}</p>
             </div>
 
             {/* ========== ACADEMIC PERFORMANCE TREND CHART ========== */}
@@ -1231,10 +1231,10 @@ export default function StudentDashboard({
                   <div>
                     <h3 className="text-base font-bold text-slate-900 uppercase tracking-wide font-display flex items-center gap-2">
                       <TrendingUp className="text-amber-500" size={18} />
-                      Academic Performance Trends
+                      {L('Academic Performance Trends', 'تعلیمی کارکردگی کے رجحانات')}
                     </h3>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      Progress tracking of subject scores across unit and summative tests.
+                      {L('Progress tracking of subject scores across unit and summative tests.', 'یونٹ اور حتمی امتحانات میں مضامین کے نمبروں کی پیش رفت۔')}
                     </p>
                   </div>
                   <div className="bg-amber-50 text-amber-900 border border-amber-150 px-2.5 py-1 text-xs font-bold uppercase font-mono">
@@ -1312,10 +1312,10 @@ export default function StudentDashboard({
                     <table className="w-full text-left">
                       <thead>
                         <tr className="border-b border-gray-100 text-xs font-bold text-gray-400 uppercase tracking-widest bg-gray-50/20">
-                          <th className="px-6 py-3">Subject Name</th>
-                          <th className="px-6 py-3">Marking Scored</th>
-                          <th className="px-6 py-3">Percentage Scored</th>
-                          <th className="px-6 py-3 text-center">Letter Grade</th>
+                          <th className="px-6 py-3">{L('Subject Name', 'مضمون کا نام')}</th>
+                          <th className="px-6 py-3">{L('Marking Scored', 'حاصل نمبر')}</th>
+                          <th className="px-6 py-3">{L('Percentage Scored', 'حاصل فیصد')}</th>
+                          <th className="px-6 py-3 text-center">{L('Letter Grade', 'حروف گریڈ')}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100 text-sm">
@@ -1348,7 +1348,7 @@ export default function StudentDashboard({
 
             {myMarks.length === 0 && (
               <div className="py-12 text-center text-gray-400 bg-white border border-dashed border-gray-200 rounded-xl">
-                No score records have been logged into your student register yet.
+                {L('No score records have been logged into your student register yet.', 'آپ کے طلبہ رجسٹر میں ابھی کوئی نتیجہ درج نہیں ہوا۔')}
               </div>
             )}
           </div>
@@ -1362,7 +1362,7 @@ export default function StudentDashboard({
                 <div>
                   <h2 className="text-xl sm:text-2xl font-black tracking-tight font-display uppercase leading-none flex items-center gap-3">
                     <ClipboardList size={24} className="text-amber-200 shrink-0" />
-                    Homework Diary
+                    {L('Homework Diary', 'گھر کا کام ڈائری')}
                   </h2>
                   <p className="text-xs text-amber-100 font-bold mt-2 uppercase tracking-widest">
                     Assignments posted by your teachers — check deadlines and complete on time.
@@ -1382,7 +1382,7 @@ export default function StudentDashboard({
                   <div className="py-16 text-center border-2 border-dashed border-amber-200 rounded-2xl bg-white/70">
                     <ClipboardList size={36} className="mx-auto text-amber-400 mb-4 opacity-30" />
                     <p className="text-xs font-black text-slate-400 uppercase tracking-widest">No assignments yet</p>
-                    <p className="text-[10px] font-bold text-slate-300 uppercase tracking-wider mt-1">Your teacher has not posted any homework for this class.</p>
+                    <p className="text-[10px] font-bold text-slate-300 uppercase tracking-wider mt-1">{L('Your teacher has not posted any homework for this class.', 'اس کلاس کے لیے استاد نے کوئی گھر کا کام نہیں دیا۔')}</p>
                   </div>
                 );
               }
@@ -1404,12 +1404,12 @@ export default function StudentDashboard({
                             </span>
                             {isOverdue && (
                               <span className="px-2.5 py-1 bg-rose-50 text-rose-600 border border-rose-200 rounded-full text-[9px] font-black uppercase tracking-widest">
-                                Overdue
+                                {L('Overdue', 'میعادگزشتہ')}
                               </span>
                             )}
                             {dueSoon && (
                               <span className="px-2.5 py-1 bg-amber-50 text-amber-600 border border-amber-200 rounded-full text-[9px] font-black uppercase tracking-widest">
-                                Due Soon
+                                {L('Due Soon', 'جلد واجب')}
                               </span>
                             )}
                           </div>
@@ -1423,7 +1423,7 @@ export default function StudentDashboard({
                         <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100">
                           <div className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest ${isOverdue ? 'bg-rose-50 text-rose-600 border border-rose-200' : 'bg-teal-50 text-teal-600 border border-teal-100'}`}>
                             <Calendar size={11} className="inline-block mr-1 -mt-0.5" />
-                            {isOverdue ? 'Deadline Passed' : `Due: ${assn.dueDate}`}
+                            {isOverdue ? L('Deadline Passed', 'آخری تاریخ گزر گئی') : L(`Due: ${assn.dueDate}`, `آخری تاریخ: ${assn.dueDate}`)}
                           </div>
                           <span className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">
                             {assn.createdAt ? new Date(assn.createdAt).toLocaleDateString() : ''}
@@ -1442,8 +1442,8 @@ export default function StudentDashboard({
         {activeTab === 'timetable' && (
           <div id="panel-student-timetable" className="space-y-6 animate-fade-in bg-amber-50/50 p-4 sm:p-6 -mx-4 sm:-mx-6 rounded-2xl border border-amber-100 shadow-inner">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Weekly Subject Schedule</h1>
-              <p className="text-xs text-gray-500 mt-0.5">Inspect weekly blocks, periods, assigned subject sessions, and faculty teachers.</p>
+              <h1 className="text-2xl font-bold text-gray-900">{L('Weekly Subject Schedule', 'ہفتہ وار مضمون شیڈول')}</h1>
+              <p className="text-xs text-gray-500 mt-0.5">{L('Inspect weekly blocks, periods, assigned subject sessions, and faculty teachers.', 'ہفتہ وار اوقات، پیریڈیں، مضامین اور اساتذہ دیکھیں۔')}</p>
             </div>
 
             {/* Grid display */}
@@ -1453,7 +1453,7 @@ export default function StudentDashboard({
                   <thead>
                     <tr className="bg-gray-100/60 border-b border-gray-200">
                       <th className="px-4 py-3.5 text-xs font-bold text-gray-500 uppercase tracking-widest w-28">
-                        Weekday
+                        {L('Weekday', 'دن')}
                       </th>
                       {PERIODS.map(p => (
                         <th key={p} className="px-4 py-3.5 text-xs font-bold text-gray-500 uppercase tracking-wider text-center border-l border-gray-100">
@@ -1466,7 +1466,7 @@ export default function StudentDashboard({
                     {DAYS.map(day => (
                       <tr key={day} className="hover:bg-gray-50/20">
                         <td className="px-4 py-6 font-bold text-gray-700 text-xs bg-gray-50/50">
-                          {day}
+                          {L(day, ({ Monday: 'پیر', Tuesday: 'منگل', Wednesday: 'بدھ', Thursday: 'جمعرات', Friday: 'جمعہ', Saturday: 'ہفتہ', Sunday: 'اتوار' } as Record<string, string>)[day] ?? day)}
                         </td>
                         {PERIODS.map(p => {
                           const entry = timetable.find(
@@ -1480,7 +1480,7 @@ export default function StudentDashboard({
                               {(() => {
                                 if (!entry) return (
                                   <span className="text-xs text-gray-300 font-medium  block py-4 select-none">
-                                    Free Period
+                                    {L('Free Period', 'آزاد پیریڈ')}
                                   </span>
                                 );
                                 
@@ -1559,40 +1559,40 @@ export default function StudentDashboard({
             <div id="panel-student-fees" className={`space-y-8 animate-fade-in font-sans font-medium bg-amber-50/50 p-4 sm:p-6 -mx-4 sm:-mx-6 rounded-2xl border border-amber-100 shadow-inner ${darkTheme ? 'text-slate-100 bg-amber-600/20 border-amber-900' : 'text-slate-800'}`}>
               <div>
                 <span className={`text-xs px-2 py-0.5 font-black uppercase tracking-widest font-mono ${darkTheme ? 'bg-teal-900 text-teal-400 border border-teal-900' : 'bg-teal-50 text-teal-600 border border-teal-100'}`}>
-                  Academic Fee Passbook
+                  {L('Academic Fee Passbook', 'تعلیمی فیس پاس بک')}
                 </span>
                 <h1 className={`text-2xl font-black uppercase font-display tracking-tight mt-1 flex items-center gap-2 ${darkTheme ? 'text-white' : 'text-slate-900'}`}>
                   <CreditCard size={24} className="text-teal-500" />
                   Your Account Ledger (2026)
                 </h1>
                 <p className={`text-xs mt-1 leading-relaxed ${darkTheme ? 'text-slate-400' : 'text-slate-500'}`}>
-                  Real-time ledger entries displaying school tuition, other funds, fine accruals, and transaction receipts.
+                  {L('Real-time ledger entries displaying school tuition, other funds, fine accruals, and transaction receipts.', 'اسکول فیس، دیگر فنڈز، جرمانے اور رسیدوں کا ریئل ٹائم ریکارڈ۔')}
                 </p>
               </div>
 
               {/* KPI CARDS */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className={`p-4 border shadow-sm rounded-2xl flex flex-col justify-between ${darkTheme ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
-                  <p className="text-xs font-black uppercase tracking-widest text-slate-400">Total Billed</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-slate-400">{L('Total Billed', 'کل بل')}</p>
                   <p className={`text-xl font-black mt-1 ${darkTheme ? 'text-white' : 'text-slate-900'}`}>{account.totalDue.toLocaleString()}</p>
                   <p className="text-xs text-slate-400 font-mono mt-2">12 Months Core Tuition</p>
                 </div>
                 <div className={`p-4 border shadow-sm rounded-2xl flex flex-col justify-between ${darkTheme ? 'bg-amber-600/20 border-amber-900' : 'bg-amber-50 border-amber-100'}`}>
-                  <p className="text-xs font-black uppercase tracking-widest text-amber-600">Total Settled</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-amber-600">{L('Total Settled', 'کل ادا شدہ')}</p>
                   <p className="text-xl font-black text-amber-600 mt-1">{account.totalPaid.toLocaleString()}</p>
-                  <p className="text-xs text-amber-500 font-mono mt-2">Paid ledger transactions</p>
+                  <p className="text-xs text-amber-500 font-mono mt-2">{L('Paid ledger transactions', 'ادا شدہ لین دین')}</p>
                 </div>
                 <div className={`p-4 border shadow-sm rounded-2xl flex flex-col justify-between ${darkTheme ? 'bg-rose-950/20 border-rose-900' : 'bg-rose-50 border-rose-100'}`}>
-                  <p className="text-xs font-black uppercase tracking-widest text-rose-600">Pending Tuition</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-rose-600">{L('Pending Tuition', 'باقی فیس')}</p>
                   <p className="text-xl font-black text-rose-600 mt-1">{account.totalPending.toLocaleString()}</p>
-                  <p className="text-xs text-rose-500 font-mono mt-2">Pending installments</p>
+                  <p className="text-xs text-rose-500 font-mono mt-2">{L('Pending installments', 'باقی اقساط')}</p>
                 </div>
                 <div className={`p-4 border shadow-sm rounded-2xl flex flex-col justify-between ${
                   account.grandTotalPending === 0
                     ? (darkTheme ? 'bg-amber-600/20 border-amber-900' : 'bg-amber-50 border-amber-100')
                     : (darkTheme ? 'bg-amber-950/20 border-amber-900' : 'bg-amber-50 border-amber-100')
                 }`}>
-                  <p className={`text-xs font-black uppercase tracking-widest ${account.grandTotalPending === 0 ? 'text-amber-600' : 'text-amber-600'}`}>Grand Payable</p>
+                  <p className={`text-xs font-black uppercase tracking-widest ${account.grandTotalPending === 0 ? 'text-amber-600' : 'text-amber-600'}`}>{L('Grand Payable', 'کل قابل ادائیگی')}</p>
                   <p className={`text-xl font-black mt-1 ${account.grandTotalPending === 0 ? 'text-amber-600' : 'text-amber-600'}`}>{account.grandTotalPending.toLocaleString()}</p>
                   <span className={`text-xs font-bold uppercase mt-2 block ${account.grandTotalPending === 0 ? 'text-amber-500' : 'text-amber-500'}`}>
                     {account.grandTotalPending === 0 ? '✓ perfect standing' : '⚠️ Settle soon'}
@@ -1606,7 +1606,7 @@ export default function StudentDashboard({
                 <div className="lg:col-span-8 space-y-4">
                   <div className={`p-6 border shadow-sm rounded-3xl overflow-hidden ${darkTheme ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
                     <h3 className={`text-xs font-black uppercase tracking-widest mb-4 border-b pb-2 ${darkTheme ? 'text-slate-200 border-slate-800' : 'text-slate-900 border-slate-100'}`}>
-                      Monthly Tuition Installments
+                      {L('Monthly Tuition Installments', 'ماہانہ فیس اقساط')}
                     </h3>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1650,7 +1650,7 @@ export default function StudentDashboard({
                   {/* Other Funds list */}
                   <div className={`p-6 border shadow-sm rounded-3xl ${darkTheme ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
                     <h3 className={`text-xs font-black uppercase tracking-widest mb-4 border-b pb-2 ${darkTheme ? 'text-slate-200 border-slate-800' : 'text-slate-900 border-slate-100'}`}>
-                      Other Funds & Fines
+                      {L('Other Funds & Fines', 'دیگر فنڈز اور جرمانے')}
                     </h3>
 
                     <div className="space-y-2 max-h-56 overflow-y-auto custom-scrollbar">
@@ -1668,7 +1668,7 @@ export default function StudentDashboard({
                         ))
                       ) : (
                         <div className="py-8 text-center text-xs text-slate-400 uppercase tracking-widest  font-bold">
-                          No extra fines or class funds recorded
+                          {L('No extra fines or class funds recorded', 'کوئی اضافی جرمانہ یا کلاس فنڈ درج نہیں')}
                         </div>
                       )}
                     </div>
@@ -1695,14 +1695,14 @@ export default function StudentDashboard({
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
               <div>
                 <span className={`text-xs px-2 py-0.5 font-black uppercase tracking-widest font-mono ${darkTheme ? 'bg-amber-950 text-amber-400 border border-amber-900' : 'bg-amber-50 text-amber-600 border border-amber-100'}`}>
-                  Student Identity Designer
+                  {L('Student Identity Designer', 'طلبہ شناختی ڈیزائنر')}
                 </span>
                 <h1 className={`text-2xl font-black uppercase font-display tracking-tight mt-1 flex items-center gap-2 ${darkTheme ? 'text-white' : 'text-slate-900'}`}>
                   <Award size={24} className="text-amber-500" />
-                  Design Your ID Card
+                  {L('Design Your ID Card', 'اپنا شناختی کارڈ بنائیں')}
                 </h1>
                 <p className={`text-xs mt-1 leading-relaxed ${darkTheme ? 'text-slate-400' : 'text-slate-500'}`}>
-                  Customize your academic identity card with themes and colors.
+                  {L('Customize your academic identity card with themes and colors.', 'اپنے شناختی کارڈ کو تھیم اور رنگ سے پسند کے مطابق بنائیں۔')}
                 </p>
               </div>
               <button 
@@ -1717,7 +1717,7 @@ export default function StudentDashboard({
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Preview Section */}
               <div className="flex flex-col items-center justify-center space-y-6">
-                <h3 className={`text-xs font-black uppercase tracking-[0.2em] ${darkTheme ? 'text-slate-400' : 'text-slate-500'}`}>Card Preview</h3>
+                <h3 className={`text-xs font-black uppercase tracking-[0.2em] ${darkTheme ? 'text-slate-400' : 'text-slate-500'}`}>{L('Card Preview', 'کارڈ پیش منظر')}</h3>
                 
                 {/* THE CARD */}
                 <div 
@@ -1765,7 +1765,7 @@ export default function StudentDashboard({
                       </div>
 
                       <div className="mt-auto">
-                        <p className="text-xs font-black uppercase tracking-[0.2em] opacity-50">Student Identity</p>
+                        <p className="text-xs font-black uppercase tracking-[0.2em] opacity-50">{L('Student Identity', 'طلبہ شناخت')}</p>
                         <p className="text-xs font-mono font-bold mt-0.5">#{studentProfile?.id.substring(2, 10).toUpperCase()}</p>
                         <p className="text-[9px] font-bold uppercase tracking-widest opacity-60 mt-0.5">
                           {studentProfile?.parentPhone || ''}
@@ -1793,13 +1793,13 @@ export default function StudentDashboard({
               {/* Controls Section */}
               <div className={`p-6 rounded-3xl border ${darkTheme ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
                 <h3 className={`text-xs font-black uppercase tracking-widest mb-6 border-b pb-2 ${darkTheme ? 'text-slate-200 border-slate-800' : 'text-slate-900 border-slate-100'}`}>
-                  Design Controls
+                  {L('Design Controls', 'ڈیزائن کنٹرولز')}
                 </h3>
 
                 <div className="space-y-6">
                   {/* Theme Selection */}
                   <div className="space-y-3">
-                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Select Theme</label>
+                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{L('Select Theme', 'تھیم منتخب کریں')}</label>
                     <div className="grid grid-cols-3 gap-3">
                       {['classic', 'dark', 'vibrant'].map((theme) => (
                         <button
@@ -1820,7 +1820,7 @@ export default function StudentDashboard({
 
                   {/* Accent Color Selection */}
                   <div className="space-y-3">
-                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Accent Color</label>
+                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest">{L('Accent Color', 'اکسنٹ رنگ')}</label>
                     <div className="flex flex-wrap gap-3">
                       {['#0d9488', '#0d9488', '#f59e0b', '#ef4444', '#0ea5e9', '#d946ef', '#f97316'].map((color) => (
                         <button

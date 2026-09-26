@@ -100,17 +100,17 @@ export default function NoticeBoard({ userSession }: NoticeBoardProps) {
           />
           <div className="flex flex-wrap gap-3 items-center">
             <select value={priority} onChange={e => setPriority(e.target.value as NoticePriority)} className="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-black uppercase tracking-widest">
-              <option value="normal">Normal</option>
-              <option value="important">Important</option>
-              <option value="urgent">Urgent</option>
+              <option value="normal">{L('Normal', 'عام')}</option>
+              <option value="important">{L('Important', 'اہم')}</option>
+              <option value="urgent">{L('Urgent', 'فوری')}</option>
             </select>
             <select value={audience} onChange={e => setAudience(e.target.value as NoticeAudience)} className="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-black uppercase tracking-widest">
-              <option value="all">Everyone</option>
-              <option value="teachers">Teachers Only</option>
-              <option value="students">Students Only</option>
+              <option value="all">{L('Everyone', 'سب')}</option>
+              <option value="teachers">{L('Teachers Only', 'صرف اساتذہ')}</option>
+              <option value="students">{L('Students Only', 'صرف طلبہ')}</option>
             </select>
             <button onClick={handlePost} className="ml-auto px-5 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-black uppercase tracking-widest">
-              Publish
+              {L('Publish', 'شائع کریں')}
             </button>
           </div>
         </motion.div>

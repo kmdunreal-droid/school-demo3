@@ -1,0 +1,25 @@
+/* Phase 1 batch — App.tsx (install modal, sync banner, maintenance/suspended screens) */
+module.exports = {
+  'src/App.tsx': [
+    { line: 219, find: "To install ${getSchoolName(appSettings).toUpperCase()}, click the install icon (desktop) in your browser's address bar or select 'Add to Home Screen' from the browser menu (e.g., Safari iOS Share menu).", replace: "L(`To install ${getSchoolName(appSettings).toUpperCase()}, click the install icon (desktop) in your browser's address bar or select 'Add to Home Screen' from the browser menu (e.g., Safari iOS Share menu).`, `ہوم اسکرین پر شامل کرنے کے لیے، اپنے براؤزر کے ایڈریس بار میں انسٹال آئیکن (ڈیسکٹاپ) پر کلک کریں یا براؤزر مینو (جیسے Safari iOS شیئر مینو) سے 'Add to Home Screen' منتخب کریں۔`)" },
+    { line: 1004, find: 'Cloud sync issue: {syncError} — data saved locally', replace: "{L('Cloud sync issue:', 'کلاؤڈ سنک مسئلہ:')} {syncError} {L('— data saved locally', '— ڈیٹا مقامی طور پر محفوظ ہے')}" },
+    { line: 1010, find: 'Retry Now', replace: "{L('Retry Now', 'ابھی کوشش کریں')}" },
+    { line: 1032, find: 'Install Portal</h3>', replace: "{L('Install Portal', 'پورٹل انسٹال کریں')}</h3>" },
+    { line: 1034, find: 'Add to your home screen for quick access and a better mobile experience.', replace: "{L('Add to your home screen for quick access and a better mobile experience.', 'فوری رسائی اور بہتر موبائل تجربے کے لیے اسے اپنی ہوم اسکرین پر شامل کریں۔')}" },
+    { line: 1043, find: 'Install Now', replace: "{L('Install Now', 'ابھی انسٹال کریں')}" },
+    { line: 1049, find: 'Maybe Later', replace: "{L('Maybe Later', 'شاید بعد میں')}" },
+    { line: 1054, find: '{getSchoolName(appSettings)} Management System', replace: "{getSchoolName(appSettings)} {L('Management System', 'مینجمنٹ سسٹم')}" },
+    { line: 1088, find: 'App Maintenance Mein Hai</h1>', replace: "{L('App Under Maintenance', 'ایپ کی دیکھ بھال جاری ہے')}</h1>" },
+    { line: 1089, find: 'Thodi der mein wapas aa jayega. Developer se rabta karein.', replace: "{L('It will be back shortly. Contact the developer.', 'کچھ دیر میں واپس آئے گی۔ ڈویلپر سے رابطہ کریں۔')}" },
+    { line: 1091, find: 'Logout', replace: "{L('Logout', 'لاگ آؤٹ')}" },
+    { line: 1099, find: 'Principal Portal Suspended</h1>', replace: "{L('Principal Portal Suspended', 'پرنسپل پورٹل معطل ہے')}</h1>" },
+    { line: 1101, find: "'Principal portal access is temporarily disabled by developer admin.'", replace: "L('Principal portal access is temporarily disabled by developer admin.', 'پرنسپل پورٹل کی رسائی عارضی طور پر ڈویلپر ایڈمن نے بند کر رکھی ہے۔')" },
+    { line: 1104, find: 'Back to Login', replace: "{L('Back to Login', 'لاگ اِن پر واپس')}" },
+    { line: 1142, find: 'Teacher Portal Suspended</h1>', replace: "{L('Teacher Portal Suspended', 'استاد پورٹل معطل ہے')}</h1>" },
+    { line: 1144, find: "'Teacher portal is temporarily suspended by administration.'", replace: "L('Teacher portal is temporarily suspended by administration.', 'استاد پورٹل عارضی طور پر انتظامیہ نے معطل کر رکھا ہے۔')" },
+    { line: 1147, find: 'Back to Login', replace: "{L('Back to Login', 'لاگ اِن پر واپس')}" },
+    { line: 1180, find: 'Student Portal Suspended</h1>', replace: "{L('Student Portal Suspended', 'طلبہ پورٹل معطل ہے')}</h1>" },
+    { line: 1182, find: "'Student portal is temporarily closed for maintenance.'", replace: "L('Student portal is temporarily closed for maintenance.', 'طلبہ پورٹل دیکھ بھال کے لیے عارضی طور پر بند ہے۔')" },
+    { line: 1185, find: 'Back to Login', replace: "{L('Back to Login', 'لاگ اِن پر واپس')}" },
+  ],
+};

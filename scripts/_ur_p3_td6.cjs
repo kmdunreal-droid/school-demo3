@@ -1,0 +1,27 @@
+/* Phase 3 — TeacherDashboard batch 6: exam marks entry + saved exams */
+module.exports = {
+  'src/components/TeacherDashboard.tsx': [
+    { line: 3023, find: ">Exam Marks Entry</h1>", replace: ">{L('Exam Marks Entry', 'امتحان کے نمبر درج کریں')}</h1>" },
+    { line: 3025, find: "Enter marks for ALL students of the selected class for any exam — 1st / 2nd / 3rd Term, Annual, Monthly Test, or any custom name.", replace: "{L('Enter marks for ALL students of the selected class for any exam — 1st / 2nd / 3rd Term, Annual, Monthly Test, or any custom name.', 'منتخب کلاس کے تمام طلبہ کے نمبر کسی بھی امتحان — پہلی / دوسری / تیسری ششماہی، سالانہ، ماہانہ ٹیسٹ یا کوئی بھی نام — کے لیے درج کریں۔')}" },
+    { line: 3033, find: ">Class</label>", replace: ">{L('Class', 'کلاس')}</label>" },
+    { line: 3045, find: ">-- Choose Class --</option>", replace: ">{L('-- Choose Class --', '-- کلاس منتخب کریں --')}</option>" },
+    { line: 3053, find: ">Subject</label>", replace: ">{L('Subject', 'مضمون')}</label>" },
+    { line: 3071, find: ">-- Choose Subject --</option>", replace: ">{L('-- Choose Subject --', '-- مضمون منتخب کریں --')}</option>" },
+    { line: 3079, find: ">➕ Add Manual Subject</option>", replace: ">{L('➕ Add Manual Subject', '➕ نیا مضمون شامل کریں')}</option>" },
+    { line: 3098, find: "placeholder=\"Type subject name (e.g. Quran, Art)\"", replace: "placeholder={L('Type subject name (e.g. Quran, Art)', 'مضمون کا نام لکھیں (مثلاً قرآن، آرٹ)')}" },
+    { line: 3105, find: "title=\"Back to list\"", replace: "title={L('Back to list', 'فہرست پر واپس')}" },
+    { line: 3114, find: ">Exam Name</label>", replace: ">{L('Exam Name', 'امتحان کا نام')}</label>" },
+    { line: 3119, find: "placeholder=\"e.g. 1st Term / Annual\"", replace: "placeholder={L('e.g. 1st Term / Annual', 'مثلاً پہلی ششماہی / سالانہ')}" },
+    { line: 3128, find: ">Total / Max Marks</label>", replace: ">{L('Total / Max Marks', 'کل / زیادہ سے زیادہ نمبر')}</label>" },
+    { line: 3141, find: "toast.error('Please select a class first.'); return; }", replace: "toast.error(L('Please select a class first.', 'پہلے کلاس منتخب کریں۔')); return; }" },
+    { line: 3142, find: "toast.error('Please select a subject.'); return; }", replace: "toast.error(L('Please select a subject.', 'مضمون منتخب کریں۔')); return; }" },
+    { line: 3147, find: "toast.success(`Roster loaded for ${exam} — enter marks below`);", replace: "toast.success(L(`Roster loaded for ${exam} — enter marks below`, `${exam} کی فہرست لوڈ ہو گئی — نیچے نمبر درج کریں`));" },
+    { line: 3151, find: "Load Roster", replace: "{L('Load Roster', 'فہرست لوڈ کریں')}" },
+    { line: 3175, find: "Saved Exams — long-press to Edit / Delete", replace: "{L('Saved Exams — long-press to Edit / Delete', 'محفوظ امتحانات — ترمیم / حذف کے لیے دیر تک دبائیں')}" },
+    { line: 3185, find: "toast.success(`Editing: ${se.exam} · ${se.subject} — roster loaded with existing marks`);", replace: "toast.success(L(`Editing: ${se.exam} · ${se.subject} — roster loaded with existing marks`, `ترمیم: ${se.exam} · ${se.subject} — موجودہ نمبروں کے ساتھ فہرست لوڈ ہو گئی`));" },
+    { line: 3188, find: "window.confirm(`Delete ALL marks for \\\"${se.exam} · ${se.subject}\\\"?`)", replace: "window.confirm(L(`Delete ALL marks for \"${se.exam} · ${se.subject}\"?`, `\"${se.exam} · ${se.subject}\" کے تمام نمبر حذف کریں؟`))" },
+    { line: 3190, find: "toast.error('No marks found to delete.'); return; }", replace: "toast.error(L('No marks found to delete.', 'حذف کرنے کے لیے کوئی نمبر نہیں ملا۔')); return; }" },
+    { line: 3193, find: "toast.success(`${removed.length} marks deleted.`);", replace: "toast.success(L(`${removed.length} marks deleted.`, `${removed.length} نمبر حذف ہو گئے۔`));" },
+    { line: 3200, find: ": 'Class'}", replace: ": L('Class', 'کلاس')}" },
+  ],
+};
